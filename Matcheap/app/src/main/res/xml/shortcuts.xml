@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="search"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_search"
+        android:shortcutShortLabel="@string/shortcut_label_search">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.sandy.seoul_matcheap"
+            android:targetClass="com.sandy.seoul_matcheap.ui.MainActivity"
+            android:data="matcheap://destination/search" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="map"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_map"
+        android:shortcutShortLabel="@string/shortcut_label_map">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.sandy.seoul_matcheap"
+            android:targetClass="com.sandy.seoul_matcheap.ui.MainActivity"
+            android:data="matcheap://destination/map" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="bookmark"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_bookmark"
+        android:shortcutShortLabel="@string/shortcut_label_bookmark">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.sandy.seoul_matcheap"
+            android:targetClass="com.sandy.seoul_matcheap.ui.MainActivity"
+            android:data="matcheap://destination/bookmark" />
+    </shortcut>
+</shortcuts>

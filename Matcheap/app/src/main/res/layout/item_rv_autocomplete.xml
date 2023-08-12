@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="auto"
+            type="com.sandy.seoul_matcheap.data.store.dao.AutoComplete" />
+        <variable
+            name="viewModel"
+            type="com.sandy.seoul_matcheap.ui.search.SearchViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackground">
+
+        <TextView
+            android:id="@+id/tv_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="16dp"
+            android:bufferType="spannable"
+            android:text="@{auto.name}"
+            auto="@{auto.name}"
+            input="@{viewModel.input.trim()}"
+            android:textSize="16sp"
+            tools:text="별미 바지락칼국수" />
+
+        <TextView
+            android:id="@+id/tv_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="@{auto.address}"
+            android:textColor="@color/matcheap_lightgray"
+            tools:text="광진구 자양로15길 96 (자양동)" />
+    </LinearLayout>
+</layout>

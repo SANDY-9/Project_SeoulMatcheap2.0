@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/bg_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="2dp"
+        android:paddingHorizontal="8dp"
+        android:backgroundTintMode="multiply"
+        android:background="@drawable/bg_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:id="@+id/ic_bookmark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="4dp"
+            app:tint="@color/matcheap_blue"
+            android:src="@drawable/ic_bookmark_checked"/>
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/matcheap_black"
+            tools:text="다비다식당"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/tri_stroke"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:src="@drawable/shape_triangle"
+        app:layout_constraintEnd_toEndOf="@+id/bg_info"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bg_info" />
+
+    <ImageView
+        android:id="@+id/tri_bg"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="-2dp"
+        android:src="@drawable/shape_triangle"
+        app:tint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bg_info" />
+
+    <ImageView
+        android:id="@+id/ic_shadow"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="2dp"
+        app:layout_constraintEnd_toEndOf="@+id/ic_store"
+        app:layout_constraintStart_toStartOf="@+id/ic_store"
+        app:layout_constraintTop_toBottomOf="@+id/tri_stroke"
+        android:tint="@color/matcheap_lightgray"
+        tools:ignore="UseAppTint"
+        tools:srcCompat="@drawable/menu_etc" />
+
+    <ImageView
+        android:id="@+id/ic_store"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tri_bg"
+        tools:srcCompat="@drawable/menu_etc" />
+</androidx.constraintlayout.widget.ConstraintLayout>

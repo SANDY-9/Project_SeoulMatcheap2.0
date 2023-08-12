@@ -31,3 +31,11 @@ google-services.json
 
 # Android Profiling
 *.hprof
+Matcheap/gradle/wrapper/gradle-wrapper.jar
+Matcheap/gradle/wrapper/gradle-wrapper.properties
+Matcheap/gradlew
+Matcheap/gradlew.bat
+Matcheap/settings.gradle
+*.txt
+Matcheap/app/src/main/java/com/sandy/seoul_matcheap/util/constants
+Matcheap/app/src/main/res/values/strings.xml

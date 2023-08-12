@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="store"
+            type="com.sandy.seoul_matcheap.data.store.dao.StoreMapItem" />
+        <variable
+            name="mapViewModel"
+            type="com.sandy.seoul_matcheap.ui.map.MapViewModel" />
+        <variable
+            name="locationViewModel"
+            type="com.sandy.seoul_matcheap.ui.LocationViewModel" />
+        <variable
+            name="zoom"
+            type="Double" />
+        <variable
+            name="fragment"
+            type="com.sandy.seoul_matcheap.ui.map.MapFragment" />
+        <import type="android.view.View"/>
+    </data>
+
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/mapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutDescription="@xml/fragment_map_bottom_sheet_scene">
+
+        <fragment
+            android:id="@+id/naverMap"
+            android:name="com.naver.maps.map.MapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navermap_rotateGesturesEnabled="false"
+            app:navermap_stopGesturesEnabled="false"
+            app:navermap_maxZoom="19"
+            app:navermap_minZoom="10" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/address_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="40dp"
+            android:visibility="@{14.0 > zoom ? View.GONE : View.VISIBLE}"
+            app:layout_constraintStart_toStartOf="parent"
+            bind:cardCornerRadius="8dp"
+            bind:cardMaxElevation="4dp"
+            bind:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="16dp"
+                android:text="@{locationViewModel.address}"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/ic_location" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView11"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="16dp"
+            app:cardCornerRadius="50dp"
+            app:cardMaxElevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:tint="@color/matcheap_gray"
+                bind:srcCompat="@drawable/ic_filter" />
+
+            <FrameLayout
+                android:id="@+id/btn_filter"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:onClick="@{()->fragment.openMapFilter()}" >
+
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView13"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="50dp"
+            app:cardMaxElevation="4dp"
+            app:layout_constraintEnd_toEndOf="@+id/cardView11"
+            app:layout_constraintTop_toBottomOf="@+id/cardView11">
+
+            <ImageView
+                android:id="@+id/imageView14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:tint="@color/matcheap_gray"
+                bind:srcCompat="@drawable/ic_gps" />
+
+            <View
+                android:id="@+id/btn_gps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:onClick="@{()->fragment.resetCurrentLocation()}"/>
+        </androidx.cardview.widget.CardView>
+
+        <include
+            android:id="@+id/bottomSheet"
+            layout="@layout/item_map_store"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:elevation="5dp"
+            android:layout_marginBottom="-120dp"
+            bind:store="@{store}"
+            bind:fragment="@{fragment}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <FrameLayout
+            android:id="@+id/progress_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:elevation="5dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animationView"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/paperplane" />
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.motion.widget.MotionLayout>
+</layout>

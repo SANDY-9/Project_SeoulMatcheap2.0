@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splashFragment">
+
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.sandy.seoul_matcheap.ui.splash.SplashFragment"
+        android:label="/splash"
+        tools:layout="@layout/fragment_splash" >
+        <action
+            android:id="@+id/action_splashFragment_to_homeFragment"
+            app:destination="@id/homeFragment"/>
+        <action
+            android:id="@+id/action_splashFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_splashFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+        <action
+            android:id="@+id/action_splashFragment_to_bookMarkFragment"
+            app:destination="@id/bookMarkFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.sandy.seoul_matcheap.ui.home.HomeFragment"
+        android:label="/home"
+        app:launchSingleTop="true"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_storeListFragment"
+            app:destination="@id/storeListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.sandy.seoul_matcheap.ui.search.SearchFragment"
+        android:label="/search"
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_searchResultFragment"
+            app:destination="@id/searchResultFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.sandy.seoul_matcheap.ui.map.MapFragment"
+        android:label="/map"
+        tools:layout="@layout/fragment_map">
+    </fragment>
+    <fragment
+        android:id="@+id/bookMarkFragment"
+        android:name="com.sandy.seoul_matcheap.ui.more.bookmark.BookmarkFragment"
+        android:label="/bookmark"
+        tools:layout="@layout/fragment_bookmark">
+    </fragment>
+    <fragment
+        android:id="@+id/storeListFragment"
+        android:name="com.sandy.seoul_matcheap.ui.store.StoreListFragment"
+        android:label="/store_list"
+        tools:layout="@layout/fragment_store_list" >
+        <argument
+            android:name="category"
+            app:argType="string" />
+        <argument
+            android:name="address"
+            app:argType="string" />
+        <argument
+            android:name="type"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchResultFragment"
+        android:name="com.sandy.seoul_matcheap.ui.search.SearchResultFragment"
+        android:label="/search_result"
+        tools:layout="@layout/fragment_search_result" >
+        <argument
+            android:name="searchWord"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+    <fragment
+        android:id="@+id/seeMoreFragment"
+        android:name="com.sandy.seoul_matcheap.ui.more.SeeMoreFragment"
+        android:label="/more"
+        tools:layout="@layout/fragment_seemore" >
+        <action
+            android:id="@+id/action_seeMoreFragment_to_bookMarkFragment"
+            app:destination="@id/bookMarkFragment" />
+        <action
+            android:id="@+id/action_seeMoreFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_seeMoreFragment_to_noticeFragment"
+            app:destination="@id/noticeFragment" />
+        <action
+            android:id="@+id/action_seeMoreFragment_to_infoFragment"
+            app:destination="@id/infoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.sandy.seoul_matcheap.ui.more.settings.SettingsFragment"
+        android:label="SettingsFragment" >
+    </fragment>
+    <fragment
+        android:id="@+id/noticeFragment"
+        android:name="com.sandy.seoul_matcheap.ui.more.notice.NoticeFragment"
+        android:label="fragment_notice"
+        tools:layout="@layout/fragment_notice" />
+    <fragment
+        android:id="@+id/infoFragment"
+        android:name="com.sandy.seoul_matcheap.ui.more.info.InfoFragment"
+        android:label="InfoFragment" >
+        <action
+            android:id="@+id/action_infoFragment_to_licenseFragment"
+            app:destination="@id/licenseFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/licenseFragment"
+        android:name="com.sandy.seoul_matcheap.ui.more.info.LicenseFragment"
+        android:label="fragment_license"
+        tools:layout="@layout/fragment_license" />
+</navigation>

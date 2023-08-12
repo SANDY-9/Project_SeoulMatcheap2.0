@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable name="checkedHansik" type="Boolean" />
+        <variable name="checkedChina" type="Boolean" />
+        <variable name="checkedJapan" type="Boolean" />
+        <variable name="checkedOther" type="Boolean" />
+        <variable name="checkedWash" type="Boolean" />
+        <variable name="checkedBeauty" type="Boolean" />
+        <variable name="checkedHotel" type="Boolean" />
+        <variable name="checkedStore" type="Boolean" />
+        
+        <variable
+            name="fragment"
+            type="com.sandy.seoul_matcheap.ui.map.MapFilterFragment" />
+    </data>
+
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:id="@+id/map_filter_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutDescription="@xml/fragment_map_filter_scene">
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#80000000"
+            android:clickable="true"
+            android:onClick="@{()->fragment.closeTransition()}"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/filterArea"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/filterArea"
+            android:layout_width="210dp"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:paddingVertical="20dp"
+            android:layout_marginEnd="-210dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView32"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="지역"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/btn_region_spinner"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:cardBackgroundColor="@color/matcheap_background"
+                    app:cardCornerRadius="6dp"
+                    app:cardElevation="0dp"
+                    app:cardMaxElevation="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/tv_region"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="?attr/selectableItemBackground"
+                        android:onClick="@{()->fragment.showRegionSpinnerView()}"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="32dp"
+                        android:text="전체보기"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/spinner_icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="25dp"
+                        android:paddingVertical="10dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="12dp"
+                        android:scaleType="fitEnd"
+                        android:scaleY="-1"
+                        android:src="@drawable/ic_tri" />
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="카테고리"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <ToggleButton
+                    android:id="@+id/btn_all_select"
+                    android:layout_width="70dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:background="@null"
+                    android:button="@drawable/ic_select"
+                    android:buttonTint="@color/check_selector_color"
+                    android:checked="false"
+                    android:onCheckedChanged="@{(v, checked)->fragment.onAllSelectChecked(checked)}"
+                    android:textColor="@color/check_selector_color"
+                    android:textOff="전체선택"
+                    android:textOn="전체선택"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="28dp"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/btn_hansik"
+                    isChecked="@{checkedHansik}"
+                    sort="@{`1`}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="4dp"
+                    android:onClick="@{()->fragment.updateCategoryFilter(checkedHansik, `1`)}"
+                    android:text="한식"
+                    android:textAlignment="center"
+                    android:textColor="@color/matcheap_gray"
+                    app:drawableTopCompat="@drawable/menu_hansik_off"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/btn_japan"
+                    isChecked="@{checkedJapan}"
+                    sort="@{`3`}"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="4dp"
+                    android:onClick="@{()->fragment.updateCategoryFilter(checkedJapan, `3`)}"
+                    android:text="일식·경양식"
+                    android:textAlignment="center"
+                    android:textColor="@color/matcheap_gray"
+                    app:drawableTopCompat="@drawable/menu_japan_off"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/btn_china"
+                    isChecked="@{checkedChina}"
+                    sort="@{`2`}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:drawablePadding="4dp"
+                    android:onClick="@{()->fragment.updateCategoryFilter(checkedChina, `2`)}"
+                    android:text="중식"
+                    android:textAlignment="center"
+                    android:textColor="@color/matcheap_gray"
+                    app:drawableTopCompat="@drawable/menu_china_off"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_hansik" />
+
+                <TextView
+                    android:id="@+id/btn_other"
+                    isChecked="@{checkedOther}"
+                    sort="@{`4`}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:drawablePadding="4dp"
+                    android:onClick="@{()->fragment.updateCategoryFilter(checkedOther, `4`)}"
+                    android:text="기타외식"
+                    android:textAlignment="center"
+                    android:textColor="@color/matcheap_gray"
+                    app:drawableTopCompat="@drawable/menu_other_off"
+                    app:layout_constraintEnd_toEndOf="@+id/btn_japan"
+                    app:layout_constraintStart_toStartOf="@+id/btn_japan"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_japan" />
+
+                <TextView
+                    android:id="@+id/btn_wash"
+                    isChecked="@{checkedWash}"
+                    sort="@{`5`}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:drawablePadding="4dp"
+                    android:onClick="@{()->fragment.updateCategoryFilter(checkedWash, `5`)}"
+                    android:text="세탁"
+                    android:textAlignment="center"
+                    android:textColor="@color/matcheap_gray"
+                    app:drawableTopCompat="@drawable/menu_wash_off"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_china" />
+
+                <TextView
+                    android:id="@+id/btn_beauty"
+                    isChecked="@{checkedBeauty}"
+                    sort="@{`6`}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:onClick="@{()->fragment.updateCategoryFilter(checkedBeauty, `6`)}"
+                    android:text="미용"
+                    android:textAlignment="center"
+                    android:textColor="@color/matcheap_gray"
+                    android:drawablePadding="4dp"
+                    app:drawableTopCompat="@drawable/menu_beauty_off"
+                    app:layout_constraintEnd_toEndOf="@+id/btn_japan"
+                    app:layout_constraintStart_toStartOf="@+id/btn_japan"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_other" />
+
+                <TextView
+                    android:id="@+id/btn_hotel"
+                    isChecked="@{checkedHotel}"
+                    sort="@{`7`}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:drawablePadding="4dp"
+                    android:onClick="@{()->fragment.updateCategoryFilter(checkedHotel, `7`)}"
+                    android:text="숙박"
+                    android:textAlignment="center"
+                    android:textColor="@color/matcheap_gray"
+                    app:drawableTopCompat="@drawable/menu_hotel_off"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_wash" />
+
+                <TextView
+                    android:id="@+id/btn_store"
+                    isChecked="@{checkedStore}"
+                    sort="@{`8`}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:onClick="@{()->fragment.updateCategoryFilter(checkedStore, `8`)}"
+                    android:text="기타"
+                    android:textAlignment="center"
+                    android:textColor="@color/matcheap_gray"
+                    android:drawablePadding="4dp"
+                    app:drawableTopCompat="@drawable/menu_etc_off"
+                    app:layout_constraintEnd_toEndOf="@+id/btn_japan"
+                    app:layout_constraintStart_toStartOf="@+id/btn_japan"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_beauty" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="24dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView17"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="거리"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btn_distance_reset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="초기화"
+                    android:textColor="@color/matcheap_gray"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <com.warkiz.widget.IndicatorSeekBar
+                android:id="@+id/distanceSeekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="13dp"
+                app:isb_show_indicator="none"
+                app:isb_show_tick_texts="true"
+                app:isb_thumb_color="@color/matcheap_blue"
+                app:isb_thumb_size="12dp"
+                app:isb_tick_marks_drawable="@drawable/tickmark"
+                app:isb_tick_marks_size="20dp"
+                app:isb_tick_texts_array="@array/tick_texts_array"
+                app:isb_tick_texts_color="@color/matcheap_gray"
+                app:isb_tick_texts_size="11sp"
+                app:isb_ticks_count="3"
+                app:isb_track_background_color="@color/matcheap_gray"
+                app:isb_track_background_size="1dp"
+                app:isb_track_progress_color="@color/matcheap_blue"
+                app:isb_track_progress_size="3dp" />
+
+            <LinearLayout
+                android:id="@+id/tbn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView19"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="즐겨찾기"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <ToggleButton
+                    android:id="@+id/btn_bookmark"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/ic_select"
+                    android:backgroundTint="@color/check_selector_color"
+                    android:checked="false"
+                    android:onCheckedChanged="@{(v, checked)->fragment.updateBookmarkFilter(checked)}"
+                    android:textOff="@null"
+                    android:textOn="@null" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btn_reset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="36dp"
+                android:drawablePadding="4dp"
+                app:drawableTint="@color/matcheap_gray"
+                android:text="설정 초기화"
+                android:textColor="@color/matcheap_gray"
+                android:textStyle="bold"
+                app:drawableStartCompat="@drawable/ic_reset" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/region_spinner_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:elevation="5dp"
+            android:visibility="gone"
+            android:onClick="@{()->fragment.closeRegionSpinnerView()}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_spinner"
+                android:layout_width="95dp"
+                android:layout_height="216dp"
+                android:layout_gravity="end"
+                android:layout_marginTop="66dp"
+                android:layout_marginEnd="22dp"
+                android:elevation="1dp"
+                android:scrollbarSize="2dp"
+                android:scrollbars="vertical"
+                android:background="@color/white"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </FrameLayout>
+
+    </androidx.constraintlayout.motion.widget.MotionLayout>
+</layout>
