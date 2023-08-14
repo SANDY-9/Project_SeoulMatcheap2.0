@@ -21,7 +21,7 @@ import javax.inject.Inject
  * @author SANDY
  * @email nnal0256@naver.com
  * @created 2021-10-17
- * @desc
+ * @desc location viewModel should be called from activityViewModels() (sharedViewModel)
  */
 
 @HiltViewModel
@@ -32,6 +32,7 @@ class LocationViewModel @Inject constructor(
 
     private val _location = MutableLiveData<Location?>()
     val location: LiveData<Location?> = _location
+    fun getCurLocation() = location.value
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {

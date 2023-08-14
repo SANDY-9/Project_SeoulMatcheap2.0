@@ -102,7 +102,6 @@
 
                 <TextView
                     android:id="@+id/distance"
-                    Distance="@{store.distance}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|top"
@@ -120,6 +119,10 @@
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="@+id/photo"
                     app:layout_constraintTop_toTopOf="@+id/photo"
+                    app:lat="@{store.lat}"
+                    app:lng="@{store.lng}"
+                    app:curLat="@{store.curLat}"
+                    app:curLng="@{store.curLng}"
                     tools:text="1.2 km" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 

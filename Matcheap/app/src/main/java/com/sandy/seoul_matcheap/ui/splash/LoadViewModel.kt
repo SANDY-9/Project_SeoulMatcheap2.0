@@ -61,12 +61,7 @@ class LoadViewModel @Inject constructor(
             val token = it.split("\t")
             val lat = token[13].trim().toDouble()
             val lng = token[14].trim().toDouble()
-            val distance = DataHelper.calculateDistance(
-                curLat = location.latitude,
-                curLng = location.longitude,
-                lat = lat,
-                lng = lng
-            )
+            val distance = 0.0
             StoreInfo(
                 id = "0000" + token[0].trim(),
                 code = token[1].trim(),

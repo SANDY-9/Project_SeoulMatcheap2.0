@@ -1,5 +1,6 @@
 package com.sandy.seoul_matcheap.ui.home
 
+import android.location.Location
 import androidx.lifecycle.*
 import com.sandy.seoul_matcheap.data.forecast.Forecast
 import com.sandy.seoul_matcheap.data.forecast.ForecastRepository
@@ -11,6 +12,7 @@ import com.sandy.seoul_matcheap.util.constants.DEFAULT_
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.math.ln
 
 /**
  * @author SANDY
@@ -25,14 +27,15 @@ class HomeViewModel @Inject constructor (
     private val forecastRepository: ForecastRepository
 ) : ViewModel() {
 
-    //!-- store
+    //!-- surrounding stores
     private val _surroundingStores = MutableLiveData<List<SurroundingStore>>()
     val surroundingStores: LiveData<List<SurroundingStore>> = _surroundingStores
-    fun updateSurroundingStoreList() = viewModelScope.launch(Dispatchers.IO) {
-        val stores = storeRepository.downloadSurroundingStores()
+    fun updateSurroundingStoreList(location: Location) = viewModelScope.launch(Dispatchers.IO) {
+        val stores = storeRepository.downloadSurroundingStores(location)
         _surroundingStores.postValue(stores)
     }
 
+    //!-- random stores
     private val _randomStore = MutableLiveData<List<RandomStore>>()
     val randomStore: LiveData<List<RandomStore>> = _randomStore
     fun updateRandomStoreList() = viewModelScope.launch(Dispatchers.IO) {
@@ -40,12 +43,12 @@ class HomeViewModel @Inject constructor (
         _randomStore.postValue(stores)
     }
 
+
     private val _loadingState = MutableLiveData(ConnectState.NONE)
     val loadingState : LiveData<ConnectState> = _loadingState
     fun setLoadingState(state: ConnectState) {
         _loadingState.postValue(state)
     }
-    fun getCurLoadingState() = _loadingState.value!!
 
 
     //!-- forecast
@@ -57,8 +60,8 @@ class HomeViewModel @Inject constructor (
     val sky : LiveData<String> = _sky
     private val _wind = MutableLiveData<String>()
     val wind : LiveData<String> = _wind
-    fun updateForecast(lat: Double, lng: Double) = viewModelScope.launch(Dispatchers.IO) {
-        val result = forecastRepository.downloadCurrentForecast(lat, lng)
+    fun updateForecast(location: Location) = viewModelScope.launch(Dispatchers.IO) {
+        val result = forecastRepository.downloadCurrentForecast(location.latitude, location.longitude)
         updateWeather(result)
     }
 

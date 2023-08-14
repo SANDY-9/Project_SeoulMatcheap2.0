@@ -13,7 +13,7 @@ import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
  * @created 2023-04-07
  * @desc
  */
-class SurroundingStoreAdapter : BaseListAdapter<ItemRvSurroundingBinding, SurroundingStore>(R.layout.item_rv_surrounding) {
+class SurroundingStoreAdapter() : BaseListAdapter<ItemRvSurroundingBinding, SurroundingStore>(R.layout.item_rv_surrounding) {
 
     override fun ItemRvSurroundingBinding.setBinding(item: SurroundingStore, position: Int) {
         store = item
