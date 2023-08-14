@@ -1,6 +1,7 @@
 package com.sandy.seoul_matcheap.ui.common
 
 import android.graphics.Typeface
+import android.location.Location
 import android.text.Spannable
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -55,6 +56,14 @@ object BindingAdapter {
         distance?.let {
             textView.text = String.format("%.1f km", distance)
             textView.background = null
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter(value = ["lat", "lng", "curLat", "curLng"])
+    fun inputDistance(textView: TextView, lat: Double?, lng: Double?, curLat: Double?, curLng: Double?) {
+        if(lat != null && lng != null && curLat != null && curLng != null) {
+            textView.text = DataHelper.convertDistance(lat, lng, curLat, curLng)
         }
     }
 

@@ -21,7 +21,7 @@ import javax.inject.Inject
  * @author SANDY
  * @email nnal0256@naver.com
  * @created 2021-10-17
- * @desc
+ * @desc location viewModel should be called from activityViewModels() (sharedViewModel)
  */
 
 @HiltViewModel
@@ -30,8 +30,11 @@ class LocationViewModel @Inject constructor(
     private val geocoder: Geocoder
     ) : ViewModel() {
 
-    private val _location = MutableLiveData<Location?>()
-    val location: LiveData<Location?> = _location
+    private val _location = MutableLiveData<Location>()
+    val location: LiveData<Location> = _location
+
+    // Because location information must have been updated on Splash Screen, location should be not null.
+    fun getCurLocation() = location.value!!
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
@@ -105,10 +108,6 @@ class LocationViewModel @Inject constructor(
     private fun getAddress(address: List<Address>) : String {
         val split = address.first().getAddressLine(0).split(" ")
         return "${split[1]} ${split[2]} ${split[3]}"
-    }
-
-    fun init() {
-        _location.value = null
     }
 
     companion object {

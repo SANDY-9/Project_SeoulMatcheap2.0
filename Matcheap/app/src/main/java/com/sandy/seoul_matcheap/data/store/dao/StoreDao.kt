@@ -13,43 +13,31 @@ import java.io.Serializable
  * @desc
  */
 
-private const val DEFAULT_DISTANCE = 5
-
 @Dao
 interface StoreDao {
 
+    // !-- insert data
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStores(stores: List<StoreInfo>)
 
 
-    //!-- select storeDetails
+    //!-- select store details
     @Transaction
     @Query("SELECT * FROM store_info WHERE id = :id")
     suspend fun getStoreDetails(id: String) : StoreDetails
 
 
-    //!-- select recommend store
+    //!-- select store list
     @Query(
-        "SELECT id, name " +
-                "FROM store_info " +
-                "WHERE code IN (1, 2, 3, 4) " +
-                "AND distance <= 5 "+
-                "ORDER BY RANDOM() "
-    )
-    suspend fun getRecommendStore() : RecommendStore
-
-
-    //!-- select storeLists
-    @Query(
-        "SELECT id, code, name, address, photo, distance " +
+        "SELECT id, code, name, address, photo, lat, lng, $DISTANCE_QUERY, $CURRENT_LOCATION_QUERY " +
                 "FROM store_info " +
                 "ORDER BY distance " +
                 "LIMIT 5"
     )
-    suspend fun getSurroundingStores() : List<SurroundingStore>
+    suspend fun getSurroundingStores(curLat: Double, curLng: Double): List<StoreItem>
 
     @Query(
-        "SELECT id, code, codeName, name, address, content, photo, distance " +
+        "SELECT id, code, codeName, name, address, content, photo, lat, lng " +
                 "FROM store_info " +
                 "WHERE photo != 'http://tearstop.seoul.go.kr/mulga/photo/' " +
                 "ORDER BY RANDOM() " +
@@ -58,20 +46,30 @@ interface StoreDao {
     suspend fun getRandomStores() : List<RandomStore>
 
     @Query(
-        "SELECT id, code, codeName, name, address, photo, distance " +
+        "SELECT id, code, codeName, name, address, photo, lat, lng, $DISTANCE_QUERY " +
                 "FROM store_info " +
-                "WHERE distance <= :distance " +
+                "WHERE distance <= 25 " +
                 "ORDER BY distance "
     )
-    fun getStoreList(distance: Int = DEFAULT_DISTANCE) : PagingSource<Int, StoreListItem>
+    fun getStoreListByCategory(curLat: Double, curLng: Double) : PagingSource<Int, StoreItem>
 
     @Query(
-        "SELECT id, code, codeName, name, address, photo, distance " +
+        "SELECT id, code, codeName, name, address, photo, $DISTANCE_QUERY " +
                 "FROM store_info " +
                 "WHERE gu = :gu " +
                 "ORDER BY distance "
     )
-    fun getStoreList(gu: String) : PagingSource<Int, StoreListItem>
+    fun getStoreListByRegion(gu: String) : PagingSource<Int, StoreItem>
+
+
+    //!-- select recommend store
+    @Query(
+        "SELECT id, name " +
+                "FROM store_info " +
+                "WHERE code IN (1, 2, 3, 4) " +
+                "ORDER BY RANDOM() "
+    )
+    suspend fun getRecommendStore() : RecommendStore
 
 
     // !-- select storeCount
@@ -134,14 +132,18 @@ data class RecommendStore(
     val name: String
 )
 
-data class SurroundingStore(
+data class StoreItem(
     val id: String,
     val code: String,
     val	name: String,
     val	address: String,
     val	photo: String,
-    val distance: Double
-)
+    val lat: Double,
+    val lng: Double,
+    val curLat: Double,
+    val curLng: Double,
+    val distance: Float
+) : Serializable
 
 data class RandomStore(
     val id: String,
@@ -151,18 +153,9 @@ data class RandomStore(
     val	address: String,
     val content: String,
     val	photo: String,
-    val distance: Double
+    val lat: Double,
+    val lng: Double
 )
-
-data class StoreListItem(
-    val id: String,
-    val code: String,
-    val codeName: String,
-    val	name: String,
-    val	address: String,
-    val	photo: String,
-    val distance: Double
-) : Serializable
 
 data class StoreTotalCount(
     @ColumnInfo(name = "codeName") val category: String,
