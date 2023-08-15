@@ -29,9 +29,9 @@ interface StoreDao {
 
     //!-- select store list
     @Query(
-        "SELECT id, code, name, address, photo, lat, lng, $DISTANCE_QUERY, $CURRENT_LOCATION_QUERY " +
+        "SELECT id, code, name, address, photo, lat, lng, $CURRENT_LOCATION_QUERY, $DISTANCE_QUERY " +
                 "FROM store_info " +
-                "ORDER BY distance " +
+                "ORDER BY d " +
                 "LIMIT 5"
     )
     suspend fun getSurroundingStores(curLat: Double, curLng: Double): List<StoreItem>
@@ -46,20 +46,24 @@ interface StoreDao {
     suspend fun getRandomStores() : List<RandomStore>
 
     @Query(
-        "SELECT id, code, codeName, name, address, photo, lat, lng, $DISTANCE_QUERY " +
+        "SELECT id, code, name, address, photo, lat, lng, $CURRENT_LOCATION_QUERY, $DISTANCE_QUERY " +
                 "FROM store_info " +
-                "WHERE distance <= 25 " +
-                "ORDER BY distance "
+                "WHERE d <= :r " +
+                "ORDER BY d "
     )
-    fun getStoreListByCategory(curLat: Double, curLng: Double) : PagingSource<Int, StoreItem>
+    fun getStoreListByCategory(
+        curLat: Double,
+        curLng: Double,
+        r: Double
+    ) : PagingSource<Int, StoreItem>
 
     @Query(
-        "SELECT id, code, codeName, name, address, photo, $DISTANCE_QUERY " +
+        "SELECT id, code, name, address, photo, lat, lng, $CURRENT_LOCATION_QUERY, $DISTANCE_QUERY " +
                 "FROM store_info " +
                 "WHERE gu = :gu " +
-                "ORDER BY distance "
+                "ORDER BY d "
     )
-    fun getStoreListByRegion(gu: String) : PagingSource<Int, StoreItem>
+    fun getStoreListByRegion(curLat: Double, curLng: Double, gu: String) : PagingSource<Int, StoreItem>
 
 
     //!-- select recommend store
@@ -74,19 +78,19 @@ interface StoreDao {
 
     // !-- select storeCount
     @Query(
-        "SELECT count(*) " +
+        "SELECT count(*), lat, lng, $DISTANCE_QUERY " +
                 "FROM store_info " +
-                "WHERE distance <= :distance "
+                "WHERE d <= :r "
     )
-    suspend fun getStoreCountByDistance(distance: Int = DEFAULT_DISTANCE) : Int
+    suspend fun getStoreCountByDistance(curLat: Double, curLng: Double, r: Double) : Count
 
     @Query(
-        "SELECT count(*) " +
+        "SELECT count(*), lat, lng, $DISTANCE_QUERY " +
                 "FROM store_info " +
-                "WHERE distance <= :distance " +
-                "AND code = :code "
+                "WHERE d <= :r " +
+                "AND code = :code"
     )
-    suspend fun getStoreCountByDistanceAndCode(code: String, distance: Int = DEFAULT_DISTANCE) : Int
+    suspend fun getStoreCountByDistanceAndCode(curLat: Double, curLng: Double, r: Double, code: String) : Count
 
     @Query(
         "SELECT count(*) " +
@@ -142,7 +146,7 @@ data class StoreItem(
     val lng: Double,
     val curLat: Double,
     val curLng: Double,
-    val distance: Float
+    val d: Float
 ) : Serializable
 
 data class RandomStore(
@@ -155,6 +159,13 @@ data class RandomStore(
     val	photo: String,
     val lat: Double,
     val lng: Double
+)
+
+data class Count(
+    @ColumnInfo(name = "count(*)") val count: Int,
+    val lat: Double,
+    val lng: Double,
+    val d: Float
 )
 
 data class StoreTotalCount(

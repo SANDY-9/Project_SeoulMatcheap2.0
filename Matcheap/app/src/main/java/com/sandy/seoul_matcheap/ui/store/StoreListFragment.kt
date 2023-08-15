@@ -1,5 +1,6 @@
 package com.sandy.seoul_matcheap.ui.store
 
+import android.location.Location
 import android.os.Bundle
 import android.view.*
 import android.widget.*
@@ -10,8 +11,9 @@ import androidx.paging.filter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.sandy.seoul_matcheap.R
-import com.sandy.seoul_matcheap.data.store.dao.StoreListItem
+import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentStoreListBinding
+import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import com.sandy.seoul_matcheap.ui.common.PagerAdapter
 import com.sandy.seoul_matcheap.util.constants.*
@@ -21,15 +23,14 @@ import dagger.hilt.android.AndroidEntryPoint
 class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragment_store_list) {
 
     private val storeViewModel: StoreViewModel by viewModels()
-    private val args : StoreListFragmentArgs by navArgs()
+    private val args: StoreListFragmentArgs by navArgs()
+
+    private val locationViewModel: LocationViewModel by activityViewModels()
+    private val location: Location by lazy { locationViewModel.getCurLocation() }
 
     override fun setupBinding(): FragmentStoreListBinding = binding.apply {
         lifecycleOwner = viewLifecycleOwner
         viewModel = storeViewModel
-    }
-
-    override fun downloadData() {
-        storeViewModel.downloadStoreList(args.type, args.category)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,7 +69,7 @@ class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragme
 
     private fun setPagerPosition(type: Int, category: String, position: Int) {
         pagerAdapter!!.adapter[position]?.addOnItemClickListener()
-        storeViewModel.updateStoreCount(type, category, position)
+        storeViewModel.updateStoreCount(type, category, position, location)
         binding.btnTop.setOnTopScrollButtonClickListener(position)
     }
 
@@ -108,21 +109,21 @@ class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragme
     }
 
     override fun subscribeToObservers() {
-        storeViewModel.storeList.observe(viewLifecycleOwner) {
+        storeViewModel.getStoreList(args.type, args.category, location).observe(viewLifecycleOwner) {
             handleStoreListData(it)
         }
     }
 
     //why submit data to all of pagerAdapter is because thinking of swipe handling of viewpager.
     //when swiping, both sides of current page have to already be generated.
-    private fun handleStoreListData(storePagingData: PagingData<StoreListItem>) {
+    private fun handleStoreListData(storePagingData: PagingData<StoreItem>) {
         repeat(CATEGORY_SIZE) { position ->
             pagerAdapter?.run {
                 adapter[position]!!.submitData(lifecycle, filteredStoreList(position, storePagingData))
             }
         }
     }
-    private fun filteredStoreList(position: Int, stores: PagingData<StoreListItem>) = when (position) {
+    private fun filteredStoreList(position: Int, stores: PagingData<StoreItem>) = when (position) {
         DEFAULT_POSITION -> stores
         else -> stores.filter { it.code == "$position" }
     }

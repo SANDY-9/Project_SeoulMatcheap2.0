@@ -1,8 +1,10 @@
 package com.sandy.seoul_matcheap.ui.store
 
+import android.location.Location
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.sandy.seoul_matcheap.data.store.SeoulOpenAPIDataSource
+import com.sandy.seoul_matcheap.data.store.dao.DistanceRadius
 import com.sandy.seoul_matcheap.data.store.dao.StoreDetails
 import com.sandy.seoul_matcheap.data.store.entity.Menu
 import com.sandy.seoul_matcheap.data.store.repository.StoreRepository
@@ -62,31 +64,33 @@ class StoreViewModel @Inject constructor(
 
 
     // !-- store list
-    private val gu = MutableLiveData<String?>()
-    val storeList = gu.switchMap {
-        Pager(
-            PagingConfig(
-                pageSize = PAGE_SIZE,
-                enablePlaceholders = false,
-                maxSize = PAGE_SIZE * PAGE_DISTANCE
-            )
-        ) {
-            storeRepository.downloadStoreList(it)
-        }.liveData.cachedIn(viewModelScope)
-    }
+    fun getStoreList(type: Int, gu: String, location: Location) = Pager(
+        PagingConfig(
+            pageSize = PAGE_SIZE,
+            enablePlaceholders = false,
+            maxSize = PAGE_SIZE * PAGE_DISTANCE
+        )
+    ) {
+        val curLat = location.latitude
+        val curLng = location.longitude
+        when(type) {
+            TYPE_REGION -> storeRepository.downloadStoreList(curLat, curLng, gu)
+            else -> storeRepository.downloadStoreList(curLat, curLng, DistanceRadius.M3000.value)
+        }
+    }.liveData.cachedIn(this)
 
-    fun downloadStoreList(type: Int, gu: String) {
-        this.gu.value = if(type == TYPE_REGION) gu else null
-    }
 
     private val _storeCount = MutableLiveData<Int>()
     val storeCount: LiveData<Int> = _storeCount
 
-    fun updateStoreCount(type: Int, gu: String, position: Int) = viewModelScope.launch(Dispatchers.IO) {
-        val count = storeRepository.downloadStoreCount(
-            code = position.toString(),
-            gu = if(type == TYPE_REGION) gu else null
-        )
+    fun updateStoreCount(type: Int, param: String, position: Int, location: Location) = viewModelScope.launch(Dispatchers.IO) {
+        val code = position.toString()
+        val curLat = location.latitude
+        val curLng = location.longitude
+        val count = when(type) {
+            TYPE_REGION -> storeRepository.downloadStoreCount(param, code)
+            else -> storeRepository.downloadStoreCount(code, curLat, curLng, DistanceRadius.M3000.value).count
+        }
         _storeCount.postValue(count)
     }
 

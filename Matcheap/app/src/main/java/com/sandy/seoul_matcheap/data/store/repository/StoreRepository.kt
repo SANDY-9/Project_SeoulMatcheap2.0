@@ -1,7 +1,6 @@
 package com.sandy.seoul_matcheap.data.store.repository
 
 import android.location.Location
-import android.util.Log
 import com.sandy.seoul_matcheap.data.store.dao.*
 import com.sandy.seoul_matcheap.data.store.entity.StoreInfo
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_
@@ -29,24 +28,19 @@ class StoreRepository @Inject constructor(private val dao: StoreDao) {
 
     suspend fun downloadRandomStores() = dao.getRandomStores()
 
-    fun downloadStoreList(location: Location, gu: String? = null) = dao.run {
-        if(gu == null) getStoreList(location.latitude, location.longitude)
-        else getStoreList(gu)
-    }
+    fun downloadStoreList(curLat: Double, curLng: Double, gu: String) = dao.getStoreListByRegion(curLat, curLng, gu)
+    fun downloadStoreList(curLat: Double, curLng: Double, r: Double) = dao.getStoreListByCategory(curLat, curLng, r)
 
 
     // !-- select storeCount
-    suspend fun downloadStoreCount(code: String, gu: String? = null) = dao.run {
-        when(code) {
-            DEFAULT_ -> {
-                if(gu == null) getStoreCountByDistance()
-                else getStoreCountByGu(gu)
-            }
-            else -> {
-                if(gu == null) getStoreCountByDistanceAndCode(code)
-                else getStoreCountByGuAndCode(gu, code)
-            }
-        }
+    suspend fun downloadStoreCount(code: String, curLat: Double, curLng: Double, r: Double) = when(code) {
+        DEFAULT_ -> dao.getStoreCountByDistance(curLat, curLng, r)
+        else -> dao.getStoreCountByDistanceAndCode(curLat, curLng, r, code)
+    }
+
+    suspend fun downloadStoreCount(gu: String, code: String) = when(code) {
+        DEFAULT_ -> dao.getStoreCountByGu(gu)
+        else -> dao.getStoreCountByGuAndCode(gu, code)
     }
 
     suspend fun downloadStoreTotalCountForCode() = dao.getStoreTotalCountForCode()

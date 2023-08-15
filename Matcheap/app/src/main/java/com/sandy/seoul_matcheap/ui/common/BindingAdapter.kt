@@ -1,7 +1,6 @@
 package com.sandy.seoul_matcheap.ui.common
 
 import android.graphics.Typeface
-import android.location.Location
 import android.text.Spannable
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -16,6 +15,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.ui.more.settings.Time
 import com.sandy.seoul_matcheap.util.*
+import com.sandy.seoul_matcheap.util.constants.Category
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_
 import com.sandy.seoul_matcheap.util.helper.DataHelper
 import java.util.*
@@ -72,6 +72,14 @@ object BindingAdapter {
     fun setDateTextview(textView: TextView, now: Boolean?) {
         now?.let {
             textView.text = DataHelper.getDate()
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("Code")
+    fun convertCodeName(textView: TextView, code: String?) {
+        code?.let {
+            textView.text = Category.from(it).codeName
         }
     }
 

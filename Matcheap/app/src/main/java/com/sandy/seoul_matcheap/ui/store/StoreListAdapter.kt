@@ -5,7 +5,7 @@ import android.view.*
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.sandy.seoul_matcheap.data.store.dao.StoreListItem
+import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.ItemRvStoreBinding
 import com.sandy.seoul_matcheap.util.constants.PAGE_DISTANCE
 import com.sandy.seoul_matcheap.util.module.GlideApp
@@ -16,7 +16,7 @@ import com.sandy.seoul_matcheap.util.module.GlideApp
  * @created 2023-03-06
  * @desc
  */
-class StoreListAdapter : PagingDataAdapter<StoreListItem, StoreListAdapter.ItemRvStoreViewHolder>(DIFF_UTIL) {
+class StoreListAdapter : PagingDataAdapter<StoreItem, StoreListAdapter.ItemRvStoreViewHolder>(DIFF_UTIL) {
 
     inner class ItemRvStoreViewHolder(val binding: ItemRvStoreBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -57,9 +57,9 @@ class StoreListAdapter : PagingDataAdapter<StoreListItem, StoreListAdapter.ItemR
     }
 
     companion object {
-        val DIFF_UTIL = object : DiffUtil.ItemCallback<StoreListItem>() {
-            override fun areItemsTheSame(oldItem: StoreListItem, newItem: StoreListItem)= oldItem.id == newItem.id
-            override fun areContentsTheSame(oldItem: StoreListItem, newItem: StoreListItem) = oldItem == newItem
+        val DIFF_UTIL = object : DiffUtil.ItemCallback<StoreItem>() {
+            override fun areItemsTheSame(oldItem: StoreItem, newItem: StoreItem)= oldItem.id == newItem.id
+            override fun areContentsTheSame(oldItem: StoreItem, newItem: StoreItem) = oldItem == newItem
         }
     }
 
