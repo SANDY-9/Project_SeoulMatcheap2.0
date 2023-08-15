@@ -1,6 +1,7 @@
 package com.sandy.seoul_matcheap.ui.more.bookmark
 
 import android.content.Context
+import android.location.Location
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore
 import com.sandy.seoul_matcheap.databinding.ItemRvBookmarkBinding
@@ -14,7 +15,7 @@ import com.sandy.seoul_matcheap.util.constants.PAGE_DISTANCE
  * @created 2023-04-09
  * @desc
  */
-class BookmarkListAdapter : BaseListAdapter<ItemRvBookmarkBinding, BookmarkedStore>(R.layout.item_rv_bookmark) {
+class BookmarkListAdapter(private val location: Location) : BaseListAdapter<ItemRvBookmarkBinding, BookmarkedStore>(R.layout.item_rv_bookmark) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
@@ -22,6 +23,7 @@ class BookmarkListAdapter : BaseListAdapter<ItemRvBookmarkBinding, BookmarkedSto
     }
 
     override fun ItemRvBookmarkBinding.setBinding(item: BookmarkedStore, position: Int) {
+        location = this@BookmarkListAdapter.location
         bookmarkedStore = item
         item.menu?.let { menus ->
             rvMenu.adapter = StoreMenuAdapter().also {

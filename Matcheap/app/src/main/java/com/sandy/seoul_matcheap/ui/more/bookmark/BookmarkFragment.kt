@@ -2,15 +2,15 @@ package com.sandy.seoul_matcheap.ui.more.bookmark
 
 import android.os.Bundle
 import android.view.*
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore
 import com.sandy.seoul_matcheap.databinding.FragmentBookmarkBinding
+import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import com.sandy.seoul_matcheap.ui.common.PagerAdapter
-import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.CATEGORY_SIZE
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
 import com.sandy.seoul_matcheap.util.constants.TYPE_NORMAL_SCROLL
@@ -19,7 +19,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment_bookmark) {
 
-    private val bookmarkViewModel : BookmarkViewModel by viewModels()
+    private val bookmarkViewModel: BookmarkViewModel by viewModels()
+    private val locationViewModel: LocationViewModel by activityViewModels()
 
     override fun setupBinding(): FragmentBookmarkBinding {
         return binding.apply {
@@ -35,7 +36,8 @@ class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment
 
     private var pagerAdapter: PagerAdapter<BookmarkListAdapter>? = null
     override fun initGlobalVariables() {
-        pagerAdapter = PagerAdapter(BookmarkListAdapter())
+        val location = locationViewModel.getCurLocation()
+        pagerAdapter = PagerAdapter(BookmarkListAdapter(location), location = location)
     }
 
     override fun initView() = binding.run {

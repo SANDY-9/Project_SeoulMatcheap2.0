@@ -7,6 +7,9 @@
         <variable
             name="bookmarkedStore"
             type="com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore" />
+        <variable
+            name="location"
+            type="android.location.Location" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,7 +46,6 @@
 
             <TextView
                 android:id="@+id/textView37"
-                Distance="@{bookmarkedStore.store.distance}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|start|top|end"
@@ -52,6 +54,10 @@
                 android:background="#4D000000"
                 android:textColor="@color/white"
                 android:textSize="10sp"
+                app:lat="@{bookmarkedStore.store.lat}"
+                app:lng="@{bookmarkedStore.store.lng}"
+                app:curLat="@{location.latitude}"
+                app:curLng="@{location.longitude}"
                 tools:text="1.5 km" />
         </androidx.cardview.widget.CardView>
 

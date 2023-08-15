@@ -1,5 +1,6 @@
 package com.sandy.seoul_matcheap.ui.common
 
+import android.location.Location
 import android.view.*
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
@@ -18,13 +19,17 @@ import com.sandy.seoul_matcheap.util.constants.TYPE_NORMAL_SCROLL
  */
 
 typealias Adapter = RecyclerView.Adapter<out RecyclerView.ViewHolder>
-class PagerAdapter<T: Adapter>(private val t: T, private val size: Int = CATEGORY_SIZE) : RecyclerView.Adapter<PagerAdapter<T>.ItemPagerViewHolder>(){
+class PagerAdapter<T: Adapter>(
+    private val t: T,
+    private val size: Int = CATEGORY_SIZE,
+    private val location: Location? = null
+) : RecyclerView.Adapter<PagerAdapter<T>.ItemPagerViewHolder>(){
 
     val adapter = hashMapOf<Int, T>().also {
         repeat(size) { position ->
             it[position] = when(t) {
                 is StoreListAdapter -> StoreListAdapter()
-                else -> BookmarkListAdapter()
+                else -> BookmarkListAdapter(location!!)
             } as T
         }
     }.toMap()
