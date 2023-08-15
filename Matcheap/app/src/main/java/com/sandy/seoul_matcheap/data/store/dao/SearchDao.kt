@@ -16,12 +16,13 @@ interface SearchDao {
 
     // !-- request search
     @Query(
-        "SELECT id, code, codeName, name, address, photo, distance " +
+        "SELECT id, code, name, address, photo, lat, lng, $CURRENT_LOCATION_QUERY, $DISTANCE_QUERY " +
                 "FROM store_info " +
                 "WHERE REPLACE(name, ' ', '') " +
-                "LIKE '%' || :word || '%'"
+                "LIKE '%' || :param || '%' " +
+                "ORDER BY d"
     )
-    fun requestSearchStore(word: String): PagingSource<Int, StoreListItem>
+    fun requestSearchStore(param: String, curLat:Double, curLng:Double) : PagingSource<Int, StoreItem>
 
 
     // !-- autoComplete

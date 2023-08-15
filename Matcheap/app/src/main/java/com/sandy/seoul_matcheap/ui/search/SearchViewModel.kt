@@ -1,9 +1,10 @@
 package com.sandy.seoul_matcheap.ui.search
 
+import android.location.Location
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.sandy.seoul_matcheap.data.store.dao.AutoComplete
-import com.sandy.seoul_matcheap.data.store.dao.StoreListItem
+import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.data.store.entity.SearchHistory
 import com.sandy.seoul_matcheap.data.store.repository.SearchRepository
 import com.sandy.seoul_matcheap.util.helper.DataHelper
@@ -73,16 +74,15 @@ class SearchViewModel @Inject constructor(private val searchRepository: SearchRe
     }
 
     //!-- search
-    private val _searchResultList = MutableLiveData<PagingSource<Int, StoreListItem>>()
+    private val _searchResultList = MutableLiveData<PagingSource<Int, StoreItem>>()
     val searchResultList = _searchResultList.switchMap {
         Pager(PagingConfig(pageSize = 10, prefetchDistance = 1, maxSize = 50)) {
             it
         }.liveData.cachedIn(viewModelScope)
     }
-    fun requestSearch(param: String) = viewModelScope.launch(Dispatchers.IO) {
-        _searchResultList.postValue(
-            searchRepository.requestSearchStore(param)
-        )
+    fun requestSearch(param: String, location: Location) = viewModelScope.launch(Dispatchers.IO) {
+        val searchResult = searchRepository.requestSearchStore(param, location.latitude, location.longitude)
+        _searchResultList.postValue(searchResult)
     }
 
 }

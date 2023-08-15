@@ -1,5 +1,6 @@
 package com.sandy.seoul_matcheap.data.store.repository
 
+import android.location.Location
 import androidx.room.Transaction
 import com.sandy.seoul_matcheap.data.store.dao.SearchDao
 import com.sandy.seoul_matcheap.data.store.entity.SearchHistory
@@ -17,9 +18,9 @@ class SearchRepository @Inject constructor(private val dao: SearchDao) {
 
     // !-- get search result
     @Transaction
-    suspend fun requestSearchStore(param: String) = dao.run {
+    suspend fun requestSearchStore(param: String, curLat:Double, curLng:Double) = dao.run {
         insertSearchHistory(SearchHistory(param.trim(), "${LocalDateTime.now()}"))
-        requestSearchStore(DataHelper.removeSpace(param))
+        requestSearchStore(DataHelper.removeSpace(param), curLat, curLng)
     }
 
 

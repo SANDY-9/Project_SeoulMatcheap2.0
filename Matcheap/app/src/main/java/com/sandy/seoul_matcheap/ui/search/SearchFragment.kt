@@ -3,7 +3,6 @@ package com.sandy.seoul_matcheap.ui.search
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.databinding.FragmentSearchBinding

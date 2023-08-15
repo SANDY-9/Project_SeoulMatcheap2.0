@@ -12,7 +12,7 @@ import androidx.paging.PagingData
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.*
 import com.sandy.seoul_matcheap.R
-import com.sandy.seoul_matcheap.data.store.dao.StoreListItem
+import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentSearchResultBinding
 import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import com.sandy.seoul_matcheap.ui.LocationViewModel
@@ -40,15 +40,14 @@ class SearchResultFragment : BaseFragment<FragmentSearchResultBinding>(R.layout.
     @Inject lateinit var locationManager: LocationManager
     override fun downloadData() {
         requestSearch(args.searchWord)
-        updateLocation(locationViewModel, locationManager)
     }
 
     private fun requestSearch(param: String) {
-        searchViewModel.apply {
-            input.value = param
-            requestSearch(param)
-        }
         showProgressView(binding.progressView)
+        searchViewModel.run {
+            input.value = param
+            requestSearch(param, locationViewModel.getCurLocation())
+        }
     }
 
     private var autoCompleteListAdapter : AutoCompleteListAdapter? = null
@@ -134,7 +133,7 @@ class SearchResultFragment : BaseFragment<FragmentSearchResultBinding>(R.layout.
         }
     }
 
-    private fun updateStoreList(result: PagingData<StoreListItem>) {
+    private fun updateStoreList(result: PagingData<StoreItem>) {
         storeListAdapter?.submitData(lifecycle, result)
         binding.rvResultList.scrollToPosition(DEFAULT_POSITION)
     }
