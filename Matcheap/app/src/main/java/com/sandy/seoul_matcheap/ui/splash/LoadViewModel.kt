@@ -1,20 +1,15 @@
 package com.sandy.seoul_matcheap.ui.splash
 
-import android.content.SharedPreferences
-import android.location.Location
+import android.util.Log
 import androidx.lifecycle.*
 import com.sandy.seoul_matcheap.data.store.entity.Polygon
 import com.sandy.seoul_matcheap.data.store.entity.StoreInfo
 import com.sandy.seoul_matcheap.data.store.repository.MapRepository
 import com.sandy.seoul_matcheap.data.store.repository.StoreRepository
-import com.sandy.seoul_matcheap.util.constants.APP_PREFS_SETTINGS
-import com.sandy.seoul_matcheap.util.helper.AppPrefsUtils
-import com.sandy.seoul_matcheap.util.helper.DataHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * @author SANDY
@@ -26,8 +21,7 @@ import javax.inject.Named
 @HiltViewModel
 class LoadViewModel @Inject constructor(
     private val storeRepository: StoreRepository,
-    private val mapRepository: MapRepository,
-    @Named(APP_PREFS_SETTINGS) private val prefs: SharedPreferences
+    private val mapRepository: MapRepository
     ) : ViewModel() {
 
     private val storeDataLoadState = MutableLiveData(false)
@@ -35,50 +29,46 @@ class LoadViewModel @Inject constructor(
 
     private val _dataLoadState = MediatorLiveData<Boolean>().apply {
         addSource(storeDataLoadState) {
-            value = getState()
+            value = getLoadState()
         }
         addSource(polygonDataLoadState) {
-            value = getState()
+            value = getLoadState()
         }
     }
     val dataLoadSate : LiveData<Boolean> = _dataLoadState
-    private fun getState() = storeDataLoadState.value!! && polygonDataLoadState.value!!
+    private fun getLoadState() = storeDataLoadState.value!! && polygonDataLoadState.value!!
+    fun setLoadState(state: Boolean) {
+        storeDataLoadState.value = state
+        polygonDataLoadState.value = state
+    }
 
-    fun updateDatabase(location: Location, storeList: List<String>, polygonList: List<String>?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            fetchStoresData(location, storeList)
-        }
-        polygonList?.let {
-            viewModelScope.launch(Dispatchers.IO) {
-                fetchPolygonsData(it)
-            }
-        } ?: polygonDataLoadState.postValue(true)
+    fun updateDatabase(storeList: List<String>, polygonList: List<String>) {
+        fetchStoresData(storeList)
+        fetchPolygonsData(polygonList)
     }
 
     // database fetch : insert store data
-    private suspend fun fetchStoresData(location: Location, stores: List<String>){
+    private fun fetchStoresData(stores: List<String>) = viewModelScope.launch(Dispatchers.IO) {
+        Log.e("확인", "fetchStoresData: 확인의 확인", )
         val downloadedStores = stores.map {
             val token = it.split("\t")
-            val lat = token[13].trim().toDouble()
-            val lng = token[14].trim().toDouble()
-            val distance = 0.0
+            val lat = token[12].trim().toDouble()
+            val lng = token[13].trim().toDouble()
             StoreInfo(
                 id = "0000" + token[0].trim(),
                 code = token[1].trim(),
-                codeName = token[2].trim(),
-                name = token[3].trim(),
-                gu = token[4].trim(),
-                address = token[5].trim(),
-                tel = token[6].trim(),
-                time = token[7].trim(),
-                closed = token[8].trim(),
-                reserve = token[9].trim(),
-                parking = token[10].trim(),
-                content = token[11].trim(),
-                photo = token[12].trim(),
+                name = token[2].trim(),
+                gu = token[3].trim(),
+                address = token[4].trim(),
+                tel = token[5].trim(),
+                time = token[6].trim(),
+                closed = token[7].trim(),
+                reserve = token[8].trim(),
+                parking = token[9].trim(),
+                content = token[10].trim(),
+                photo = token[11].trim(),
                 lat = lat,
-                lng = lng,
-                distance = distance
+                lng = lng
             )
         }
         storeRepository.insertStores(downloadedStores)
@@ -86,17 +76,17 @@ class LoadViewModel @Inject constructor(
     }
 
     // database fetch : insert polygon data
-    private suspend fun fetchPolygonsData(polygons: List<String>) {
-        val downloadedPolygons = polygons.map {
-            val token = it.split("\t")
+    private fun fetchPolygonsData(polygons: List<String>) = viewModelScope.launch(Dispatchers.IO) {
+        val downloadedPolygons = polygons.mapIndexed { index, s ->
+            val token = s.split("\t")
             Polygon(
+                num = index + 1,
                 gu = token[0].trim(),
                 lat = token[1].trim().toDouble(),
                 lng = token[2].trim().toDouble()
             )
         }
         mapRepository.insertPolygons(downloadedPolygons)
-        AppPrefsUtils.setDatabaseState(prefs)
         polygonDataLoadState.postValue(true)
     }
 

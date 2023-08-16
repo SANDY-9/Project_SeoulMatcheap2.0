@@ -11,13 +11,13 @@ import com.sandy.seoul_matcheap.util.constants.*
  */
 object AppPrefsUtils {
 
-    fun setDatabaseState(prefs: SharedPreferences)  = prefs.edit()
-        .putString(APP_DATABASE_STATE, APP_DATABASE_STATE)
+    fun saveLatestDatabaseVersion(prefs: SharedPreferences, version: String)  = prefs.edit()
+        .putString(APP_DATABASE_STATE, version)
         .apply()
-    fun getDatabaseState(prefs: SharedPreferences) = prefs.getString(APP_DATABASE_STATE, null)
+    fun getSavedDatabaseVersion(prefs: SharedPreferences) = prefs.getString(APP_DATABASE_STATE, null)
 
-    fun getSavedVersion(prefs: SharedPreferences) = prefs.getString(APP_VERSION, null)
-    fun saveCurrentVersion(prefs: SharedPreferences, version: String) = prefs.edit()
+    fun getSavedAppVersion(prefs: SharedPreferences) = prefs.getString(APP_VERSION, null)
+    fun saveLatestAppVersion(prefs: SharedPreferences, version: String) = prefs.edit()
         .putString(APP_VERSION, version)
         .apply()
 

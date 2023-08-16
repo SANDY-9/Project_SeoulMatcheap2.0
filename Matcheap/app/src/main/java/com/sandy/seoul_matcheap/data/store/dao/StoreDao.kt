@@ -37,7 +37,7 @@ interface StoreDao {
     suspend fun getSurroundingStores(curLat: Double, curLng: Double): List<StoreItem>
 
     @Query(
-        "SELECT id, code, codeName, name, address, content, photo, lat, lng " +
+        "SELECT id, code, name, address, content, photo, lat, lng " +
                 "FROM store_info " +
                 "WHERE photo != 'http://tearstop.seoul.go.kr/mulga/photo/' " +
                 "ORDER BY RANDOM() " +
@@ -108,9 +108,9 @@ interface StoreDao {
     suspend fun getStoreCountByGuAndCode(gu: String, code: String) : Int
 
     @Query(
-        "SELECT codeName, count(*) " +
+        "SELECT code, count(*) " +
                 "FROM store_info " +
-                "GROUP BY codeName " +
+                "GROUP BY code " +
                 "ORDER BY code "
     )
     suspend fun getStoreTotalCountForCode() : List<StoreTotalCount>
@@ -152,7 +152,6 @@ data class StoreItem(
 data class RandomStore(
     val id: String,
     val code: String,
-    val codeName: String,
     val	name: String,
     val	address: String,
     val content: String,
@@ -169,6 +168,6 @@ data class Count(
 )
 
 data class StoreTotalCount(
-    @ColumnInfo(name = "codeName") val category: String,
+    @ColumnInfo(name = "code") val category: String,
     @ColumnInfo(name = "count(*)") val count: Int
 )

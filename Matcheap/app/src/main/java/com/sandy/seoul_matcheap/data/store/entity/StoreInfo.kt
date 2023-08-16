@@ -14,7 +14,6 @@ data class StoreInfo(
     @PrimaryKey
     val id: String,
     val code: String,
-    val codeName: String,
     val	name: String,
     val gu: String,
     val	address: String,
@@ -26,6 +25,5 @@ data class StoreInfo(
     val content: String,
     val	photo: String,
     val	lat: Double,
-    val	lng: Double,
-    val distance: Double = 0.0
+    val	lng: Double
 )

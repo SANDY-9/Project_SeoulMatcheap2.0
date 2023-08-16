@@ -94,7 +94,7 @@
                     android:id="@+id/textView56"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{store1.codeName}"
+                    Code="@{store1.code}"
                     android:textColor="@color/matcheap_gray"
                     android:textSize="10sp"
                     android:textStyle="bold" />
@@ -228,7 +228,7 @@
                     android:id="@+id/textView66"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{store2.codeName}"
+                    Code="@{store2.code}"
                     android:textColor="@color/matcheap_gray"
                     android:textSize="10sp"
                     android:textStyle="bold" />

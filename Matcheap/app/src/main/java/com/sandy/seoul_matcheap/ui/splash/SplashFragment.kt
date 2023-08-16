@@ -1,15 +1,14 @@
 package com.sandy.seoul_matcheap.ui.splash
 
 import android.Manifest.permission.*
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
 import android.location.LocationManager
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -22,6 +21,7 @@ import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.sandy.seoul_matcheap.BuildConfig
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.data.store.StoreDatabase
 import com.sandy.seoul_matcheap.databinding.FragmentSplashBinding
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.common.BaseFragment
@@ -38,16 +38,22 @@ import javax.inject.Named
 
 @AndroidEntryPoint
 class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_splash) {
-
+    
     override fun setupBinding() = binding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fetchRemoteConfig()
     }
+
     @Inject @Named(APP_PREFS_SETTINGS)
     lateinit var prefs : SharedPreferences
-    private fun fetchRemoteConfig() = AppPrefsUtils.getSavedVersion(prefs)?.let { _ ->
+    private fun fetchRemoteConfig() = when {
+        AppPrefsUtils.getSavedAppVersion(prefs) != null -> receiveRemoteConfig()
+        else -> requestPermissions()
+    }
+
+    private fun receiveRemoteConfig() {
         val configSettings = remoteConfigSettings { }
         Firebase.remoteConfig.run {
             setConfigSettingsAsync(configSettings)
@@ -58,31 +64,34 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
             })
             addOnFetchCompleteListener(this)
         }
-    } ?: requestPermissions()
+    }
 
     private fun FirebaseRemoteConfig.addOnFetchCompleteListener(remoteConfig: FirebaseRemoteConfig) {
         fetchAndActivate().addOnCompleteListener(requireActivity()) {
-            checkVersion(it.isSuccessful, remoteConfig)
+            val newVersion = remoteConfig.getString(APP_VERSION)
+            checkAppVersion(checkable = it.isSuccessful, versionCheck = BuildConfig.VERSION_NAME == newVersion)
         }
     }
 
-    private fun checkVersion(isCheckable: Boolean, remoteConfig: FirebaseRemoteConfig) = when {
-        isCheckable -> showAppUpdateNoticeDialog(BuildConfig.VERSION_NAME != remoteConfig.getString(APP_VERSION))
-        else -> showToastMessage(MESSAGE_NETWORK_ERROR).also { requestPermissions() }
-    }
-    private fun showAppUpdateNoticeDialog(show: Boolean) = when {
-        show -> createAppUpdateNoticeDialogBuilder().show()
-        else -> requestPermissions()
-    }
-    private fun createAppUpdateNoticeDialogBuilder() = MaterialAlertDialogBuilder(requireContext())
-        .setTitle(APP_NAME)
-        .setMessage(MESSAGE_NEW_VERSION_UPDATE)
-        .setCancelable(false)
-        .setNegativeButton(BUTTON_TITLE_UPDATE) { _, _ ->
-            navigateToBrowser(MARKET_URI + requireContext().packageName)
-            setOnBackPressedListener()
+    private fun checkAppVersion(checkable: Boolean, versionCheck: Boolean) = when {
+        checkable && !versionCheck -> showAppUpdateNoticeDialog()
+        else -> requestPermissions().also {
+            if(!checkable) showToastMessage(MESSAGE_NETWORK_ERROR)
         }
-        .setPositiveButton(BUTTON_TITLE_CONFIRM) { _, _ -> requestPermissions() }
+    }
+
+    private fun showAppUpdateNoticeDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(APP_NAME)
+            .setMessage(MESSAGE_NEW_VERSION_UPDATE)
+            .setCancelable(false)
+            .setNegativeButton(BUTTON_TITLE_UPDATE) { _, _ ->
+                navigateToBrowser(MARKET_URI + requireContext().packageName)
+                setOnBackPressedListener()
+            }
+            .setPositiveButton(BUTTON_TITLE_CONFIRM) { _, _ -> requestPermissions() }
+            .show()
+    }
 
     private fun requestPermissions() {
         val permissions = arrayOf(
@@ -141,11 +150,11 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
     }
 
     @Inject lateinit var locationManager : LocationManager
-    private val locationViewModel: LocationViewModel by viewModels()
+    private val locationViewModel: LocationViewModel by activityViewModels()
     private fun requestLocationUpdate() {
-        binding.tvLoading.visibility = View.VISIBLE
         getGpsProviderState(locationManager)
         locationViewModel.updateLocation()
+        binding.tvLoading.visibility = View.VISIBLE
     }
 
     private fun hasNotLocationPermission() {
@@ -169,50 +178,65 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
 
     private fun subscribeToLocationObserver() {
         locationViewModel.location.observe(viewLifecycleOwner) {
-            it?.let {
-                locationViewModel.stopLocation()
-                fetchDatabase(it)
-            }
+            handleLocationAndCheckDB(it)
         }
     }
 
-    // upgrade database using location information
-    private val loadViewModel: LoadViewModel by viewModels()
-    private fun fetchDatabase(location: Location) {
-        val dataSaveState = AppPrefsUtils.getDatabaseState(prefs) == APP_DATABASE_STATE
+    private fun handleLocationAndCheckDB(location: Location?) = location?.let {
+        locationViewModel.stopLocation()
+        checkDatabaseVersion()
+    }
 
-        val storeData = DataHelper.downloadStoreData(requireContext())
-        val polygonData = if(dataSaveState) null else DataHelper.downloadPolygonData(requireContext())
-        loadViewModel.updateDatabase(location, storeData, polygonData)
+    // upgrade database using location information
+    @Inject lateinit var db: StoreDatabase
+    private val loadViewModel: LoadViewModel by viewModels()
+    private fun checkDatabaseVersion() {
+        val latestDatabaseVersion = db.openHelper.readableDatabase.version.toString()
+        val savedDatabaseVersion = AppPrefsUtils.getSavedDatabaseVersion(prefs)
+        when (latestDatabaseVersion) {
+            savedDatabaseVersion -> loadViewModel.setLoadState(true)
+            else -> fetchDatabase(requireContext())
+        }
+    }
+
+    private fun fetchDatabase(context: Context) {
+        val storeData = DataHelper.downloadStoreData(context)
+        val polygonData = DataHelper.downloadPolygonData(context)
+        loadViewModel.updateDatabase(storeData, polygonData)
     }
 
     private fun subscribeToLoadViewModelObserver() {
         loadViewModel.dataLoadSate.observe(viewLifecycleOwner) {
-            if(it) navigateToHome()
+            handleLoadState(it)
         }
     }
 
-    private fun navigateToHome() {
-        findNavController().navigate(getDestination(HOME_), null, getPopUpNavOptions())
+    private fun handleLoadState(isLoadEnd: Boolean) {
+        if(isLoadEnd) {
+            saveDatabaseVersion()
+            navigateToDestination()
+        }
     }
 
-    override fun setOnBackPressedListener() {
-        requireActivity().finishAffinity()
+    private fun saveDatabaseVersion() {
+        val latestDatabaseVersion = db.openHelper.readableDatabase.version.toString()
+        AppPrefsUtils.saveLatestDatabaseVersion(prefs, latestDatabaseVersion)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        val intent = (context as Activity).intent
-        handleDeepLink(intent.data)
+    private fun navigateToDestination() {
+        val uri = requireActivity().intent.data
+        findNavController().navigate(getDestination(uri?.path), null, getPopUpNavOptions())
     }
-    private fun handleDeepLink(data: Uri?) = data?.path?.let {
-        findNavController().navigate(getDestination(it), null, getPopUpNavOptions())
-    }
+
     private fun getDestination(path: String?) = when(path) {
         SEARCH_ -> R.id.action_splashFragment_to_searchFragment
         MAP_ -> R.id.action_splashFragment_to_mapFragment
         BOOKMARK_ -> R.id.action_splashFragment_to_bookMarkFragment
         else -> R.id.action_splashFragment_to_homeFragment
+    }
+
+    override fun setOnBackPressedListener() {
+        requireActivity().finishAndRemoveTask()
     }
 
     companion object {

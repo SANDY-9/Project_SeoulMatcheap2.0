@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="@{bookmarkedStore.store.codeName}"
+            Code="@{bookmarkedStore.store.code}"
             android:textColor="@color/matcheap_lightgray"
             android:textSize="12sp"
             app:layout_constraintStart_toEndOf="@+id/cardView"

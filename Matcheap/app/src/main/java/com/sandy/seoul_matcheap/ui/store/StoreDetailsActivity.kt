@@ -283,14 +283,12 @@ class StoreDetailsActivity : AppCompatActivity() {
             val item = StoreMapItem(
                 id = id,
                 code = code,
-                codeName = codeName,
                 gu = gu,
                 name = name,
                 address = address,
                 photo = photo,
                 lat = lat,
                 lng = lng,
-                distance = distance,
                 bookmarked = binding.btnBookmark.isSelected
             )
             val returnIntent = Intent().apply {
