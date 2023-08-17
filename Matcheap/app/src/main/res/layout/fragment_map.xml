@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:bind="http://schemas.android.com/apk/res-auto">
 
@@ -96,7 +97,6 @@
             </FrameLayout>
         </androidx.cardview.widget.CardView>
 
-
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView13"
             android:layout_width="52dp"
@@ -123,6 +123,46 @@
                 android:onClick="@{()->fragment.resetCurrentLocation()}"/>
         </androidx.cardview.widget.CardView>
 
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView15"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="50dp"
+            app:cardMaxElevation="4dp"
+            app:layout_constraintEnd_toEndOf="@+id/cardView11"
+            app:layout_constraintTop_toBottomOf="@+id/cardView13">
+
+            <ImageView
+                android:id="@+id/imageView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="3dp"
+                app:tint="@color/matcheap_blue"
+                bind:srcCompat="@drawable/ic_re_search" />
+
+            <TextView
+                android:id="@+id/tv_re_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|bottom"
+                android:layout_marginBottom="6dp"
+                android:textStyle="bold"
+                android:textSize="8dp"
+                android:textColor="@color/matcheap_blue"
+                android:text="재검색" />
+
+            <FrameLayout
+                android:id="@+id/btn_re_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:onClick="@{()->fragment.requestReSearch()}" >
+
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+
         <include
             android:id="@+id/bottomSheet"
             layout="@layout/item_map_store"
@@ -146,7 +186,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone">
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/animationView"

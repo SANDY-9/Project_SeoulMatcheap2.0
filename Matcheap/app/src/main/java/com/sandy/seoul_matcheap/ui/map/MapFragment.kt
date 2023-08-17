@@ -292,10 +292,11 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
             val isRegionMatched = region == store.gu || region == ALL_SELECT
             val isCategoryMatched = category.contains(store.code)
-            val isDistanceMatched = distance == NOT_DISTANCE || distance > store.distance
+            //val isDistanceMatched = distance == NOT_DISTANCE || distance > store.distance
             val isBookmarkMatched = !bookmarked || store.bookmarked
 
-            val isNotFiltered = isRegionMatched && isCategoryMatched && isDistanceMatched && isBookmarkMatched
+            //val isNotFiltered = isRegionMatched && isCategoryMatched && isDistanceMatched && isBookmarkMatched
+            val isNotFiltered = isRegionMatched && isCategoryMatched && isBookmarkMatched
             when {
                 isNotFiltered -> mapViewModel.applyToNotFilteredOverlay(markers[i], store.gu)
                 else -> mapViewModel.applyToFilteredOverlay(markers[i])
@@ -310,6 +311,12 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
     private fun MapViewModel.applyToFilteredOverlay(marker: InfoWindow) = getStoreMarkerPair(marker)?.forEach {
         it.isVisible = false
+    }
+
+
+    //!-- center camera radius re-search
+    fun requestReSearch() {
+        // re-setting map data
     }
 
 
