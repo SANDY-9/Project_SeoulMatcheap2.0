@@ -1,6 +1,5 @@
 package com.sandy.seoul_matcheap.ui.common
 
-import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import com.sandy.seoul_matcheap.R
@@ -13,27 +12,16 @@ import com.sandy.seoul_matcheap.util.constants.*
  * @desc
  */
 object Resource {
+
     val colorMatcheapBlue = Color.parseColor("#1042C7")
     val colorMatcheapLightYellow = Color.parseColor("#4DFAE913")
     val colorMatcheapGray = Color.parseColor("#707070")
-    val colorMatcheapLightGray = Color.parseColor("#C3C3C3")
+    val colorMatcheapLightGray = Color.parseColor("#4D8a8a8a")
     val colorMatcheapTransparentBlue = Color.parseColor("#261042C7")
     val matCheapBlack = Color.parseColor("#222222")
     val matCheapBlue = ColorStateList.valueOf(colorMatcheapBlue)
     val matCheapGray = ColorStateList.valueOf(colorMatcheapGray)
-    val matCheapLightGray = ColorStateList.valueOf(colorMatcheapLightGray)
     val matCheapWhite = ColorStateList.valueOf(Color.WHITE)
-
-/*    fun getPlaceHolderDrawableResource(code: String) = when (code) {
-        HANSIK_ -> R.drawable.menu_hansik_holder
-        CHINA_ -> R.drawable.placeholder_china
-        JAPAN_ -> R.drawable.placeholder_japan
-        OTHER_ -> R.drawable.placeholder_other
-        WASH_ -> R.drawable.placeholder_wash
-        BEAUTY_ -> R.drawable.menu_beauty_holder
-        HOTEL_ -> R.drawable.placeholder_hotel
-        else -> R.drawable.placeholder_etc
-    }*/
 
     fun getStoreIconDrawableResource(isChecked: Boolean, sort: String) = when(sort) {
         HANSIK_ -> if(isChecked) R.drawable.menu_hansik else R.drawable.menu_hansik_off

@@ -31,6 +31,7 @@ import com.sandy.seoul_matcheap.ui.common.TouchFrameLayout
 import com.sandy.seoul_matcheap.ui.more.bookmark.BookmarkViewModel
 import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.ui.map.MapUtils
+import com.sandy.seoul_matcheap.util.helper.DataHelper
 import com.sandy.seoul_matcheap.util.helper.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

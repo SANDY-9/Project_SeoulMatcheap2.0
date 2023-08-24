@@ -90,6 +90,6 @@ data class StoreMapItem(
     val	photo: String,
     val	lat: Double,
     val	lng: Double,
-    val d: Float,
+    val d: Float = 0.0f,
     var bookmarked: Boolean = false
 ) : Serializable

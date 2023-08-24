@@ -9,6 +9,9 @@
             name="store"
             type="com.sandy.seoul_matcheap.data.store.dao.StoreMapItem" />
         <variable
+            name="location"
+            type="android.location.Location" />
+        <variable
             name="fragment"
             type="com.sandy.seoul_matcheap.ui.map.MapFragment" />
 
@@ -122,11 +125,11 @@
             tools:text="광진구 동일로 444 (중곡동)" />
 
         <TextView
+            Code="@{store.code}"
             android:id="@+id/textView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:text="@{store.codeName}"
             android:textColor="@color/matcheap_lightgray"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -135,12 +138,15 @@
 
         <TextView
             android:id="@+id/textView7"
-            Distance="@{store.distance}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:textColor="@color/matcheap_gray"
             android:textSize="10sp"
+            app:lat="@{store.lat}"
+            app:lng="@{store.lng}"
+            app:curLat="@{location.latitude}"
+            app:curLng="@{location.longitude}"
             app:layout_constraintBottom_toBottomOf="@+id/textView6"
             app:layout_constraintStart_toEndOf="@+id/textView6" />
 
@@ -153,7 +159,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:onClick="@{()->fragment.navigateToStoreDetails(store.id)}"/>
 
         <ToggleButton
             android:id="@+id/btn_bookmark"

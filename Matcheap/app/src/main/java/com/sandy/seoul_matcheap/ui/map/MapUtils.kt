@@ -12,13 +12,13 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.*
 import com.naver.maps.map.util.MarkerIcons
 import com.sandy.seoul_matcheap.R
-import com.sandy.seoul_matcheap.data.store.dao.StoreCountForGu
 import com.sandy.seoul_matcheap.data.store.dao.StoreMapItem
 import com.sandy.seoul_matcheap.data.store.entity.Polygon
 import com.sandy.seoul_matcheap.data.store.entity.StoreInfo
 import com.sandy.seoul_matcheap.databinding.ItemMapMarkerBinding
 import com.sandy.seoul_matcheap.ui.common.Resource
 import javax.inject.Inject
+import kotlin.math.sqrt
 
 /**
  * @author SANDY
@@ -83,7 +83,6 @@ class MapUtils @Inject constructor(context: Context) {
     }
 
 
-
     // !-- polygon
     fun createPolygon(gu: String, polygon: List<Polygon>) = PolygonOverlay().apply {
         coords = polygon.map { LatLng(it.lat, it.lng) }
@@ -98,15 +97,15 @@ class MapUtils @Inject constructor(context: Context) {
 
     // !-- countMarker
     private val circleMarker = OverlayImage.fromResource(R.drawable.ic_count_marker)
-    fun createCountMarker(storeCount: StoreCountForGu) = Marker().apply {
-        position = getPolygonLatLng(storeCount.gu)
-        tag = storeCount.gu
+    fun createCountMarker(gu: String, count: Int) = Marker().apply {
+        position = getPolygonLatLng(gu)
+        tag = gu
         icon = circleMarker
         anchor = PointF(MAP_MARKER_ANCHOR, MAP_MARKER_ANCHOR)
         isMaxZoomInclusive = false
         maxZoom = MAP_INFO_MIN_ZOOM
 
-        captionText = "${storeCount.count}"
+        captionText = "$count"
         captionTextSize = MAP_MARKER_TEXT_SIZE
         captionColor = Resource.colorMatcheapBlue
         setCaptionAligns(Align.Center)
@@ -173,13 +172,13 @@ class MapUtils @Inject constructor(context: Context) {
 
 
     // !-- circle overlay
-    fun createCircleOverlay(latLng: LatLng, distance: Double, naverMap: NaverMap) = CircleOverlay().apply {
-        center = latLng
+    fun createCircleOverlay(centerX: Double, centerY: Double, r: Double) = CircleOverlay().apply {
+        center = LatLng(centerX, centerY)
         color = Resource.colorMatcheapTransparentBlue
-        radius = distance * MAP_CIRCLE_RADIUS
+        radius = sqrt(r) * 100000
         minZoom = MAP_INFO_MIN_ZOOM
-        map = naverMap
     }
+
 
     fun createStoreLocationMarker(store: StoreInfo, map: NaverMap) = Marker().apply {
         position = LatLng(store.lat, store.lng)
@@ -199,20 +198,18 @@ class MapUtils @Inject constructor(context: Context) {
     companion object {
 
         // !-- camera
-        const val MAP_DEFAULT_ZOOM = 17.0
+        const val MAP_DEFAULT_ZOOM = 14.0
         private const val CAMERA_ANIMATION_DURATION = 750L
 
         // !-- marker
         private const val MAP_MARKER_MAX_ZOOM = 21.0
         const val MAP_INFO_MAX_ZOOM = 14.0
-        private const val MAP_INFO_MIN_ZOOM = 13.0
+        const val MAP_INFO_MIN_ZOOM = 13.0
 
         // !-- countMarker
         private const val MAP_MARKER_ANCHOR = 0.5f
         private const val MAP_MARKER_TEXT_SIZE = 22f
 
-        private const val MAP_CIRCLE_RADIUS = 1000
-        const val MAP_POLYGON_CAMERA_ZOOM = 14.0
         private const val MAP_POLYGON_WIDTH = 3
 
         const val Z_INDEX_DEFAULT = 0
