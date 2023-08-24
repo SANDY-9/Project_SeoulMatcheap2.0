@@ -31,90 +31,137 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
+
+    @Inject lateinit var mapUtils: MapUtils
+    private val mapViewModel: MapViewModel by activityViewModels()
+
+    @Inject lateinit var locationManager: LocationManager
     private val locationViewModel: LocationViewModel by viewModels()
-    private val mapViewModel: MapViewModel by viewModels()
-    private val bookmarkViewModel: BookmarkViewModel by viewModels()
 
     override fun setupBinding(): FragmentMapBinding {
         return binding.apply {
             lifecycleOwner = viewLifecycleOwner
             fragment = this@MapFragment
-            mapViewModel = this@MapFragment.mapViewModel
-            locationViewModel = this@MapFragment.locationViewModel
+            location = locationViewModel
+            locationManager = this@MapFragment.locationManager
             zoom = MapUtils.MAP_DEFAULT_ZOOM
         }
     }
 
-    @Inject lateinit var locationManager: LocationManager
     override fun downloadData() {
-        updateLocation(locationViewModel, locationManager)
-        mapViewModel.downloadMapData()
+        val gps = updateLocation(locationViewModel, locationManager)
+        if(!gps) mapViewModel.updateData(MapUtils.SEOUL_CITY_HALL_LAT, MapUtils.SEOUL_CITY_HALL_LNG)
     }
+
 
     override fun initView() {
-        initMap()
+        initMapAsync()
     }
 
-    private fun initMap() {
+    private fun initMapAsync() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.naverMap) as MapFragment
         mapFragment.getMapAsync {
-            val map = getMap(it)
-            subscribeToLocationObserver(map)
-            subscribeToFilterObserver(map)
+            binding.map = it
+            it.onLoad()
+            subscribeToObservers(it)
         }
     }
-    private fun getMap(map: NaverMap) = map.apply {
-        createMapOverlays(map)
-        setOnMapLoadListener()
-        setOnMapDoubleTapListener()
-        setOnMapTouchListener()
+
+    private fun NaverMap.onLoad() = addOnLoadListener {
+        completeProgress()
+        addOnZoomChangedListener()
+        addOnMapTouchEventLister()
     }
 
-    private fun createMapOverlays(map: NaverMap) = mapViewModel.run {
-        subscribeToStoreMarkersObserver(map)
-        subscribeToPolygonOverlaysObserver(map)
-        subscribeToCountMarkersObserver(map)
+    private fun completeProgress() = binding.run {
+        progressView.visibility = View.GONE
+        animationView.cancelAnimation()
+    }
+
+    private fun NaverMap.addOnZoomChangedListener() = addOnCameraIdleListener {
+        val zoom = cameraPosition.zoom
+        binding.zoom = zoom
+        if(zoom >= MapUtils.MAP_INFO_MAX_ZOOM) {
+            val target = cameraPosition.target
+            locationViewModel.updateAddress(target.latitude, target.longitude)
+        }
+    }
+
+    private fun NaverMap.addOnMapTouchEventLister() {
+        setOnMapDoubleTapListener { _, _ -> updateLocation(locationViewModel, locationManager) }
+        setOnMapClickListener { _, _ -> closeStoreBottomSheet() }
+    }
+
+
+    private fun subscribeToObservers(map: NaverMap) {
+        subscribeToLocationObserver(map)
+        subscribeToMapOverlays(map)
+        subscribeToBookmarkObserver(map)
+    }
+
+    private fun subscribeToLocationObserver(map: NaverMap) {
+        locationViewModel.location.observe(viewLifecycleOwner) {
+            handleLocationUpdate(it, map)
+        }
+    }
+
+    private fun handleLocationUpdate(location: Location?, map: NaverMap) = location?.run {
+        val latLng = LatLng(latitude, longitude)
+        mapViewModel.updateData(centerX = latitude, centerY = longitude)
+        mapUtils.createLocationOverlay(latLng, map)
+        map.updateCamera(latLng, MapUtils.MAP_DEFAULT_ZOOM)
+    }
+
+    private fun subscribeToMapOverlays(map: NaverMap) = mapViewModel.run {
+        storeMarkers.observe(viewLifecycleOwner) {
+            map.createStoreMarkers(it)
+        }
+        polygonOverlays.observe(viewLifecycleOwner) {
+            map.createPolygonOverlays(it)
+        }
+        countMarkers.observe(viewLifecycleOwner) {
+            map.createCountMarkers(it)
+        }
+        rangeCircleOverlay.observe(viewLifecycleOwner) {
+            map.createRangeCircleOverlay(it)
+        }
     }
 
     //!-- create Store Markers
-    private fun MapViewModel.subscribeToStoreMarkersObserver(map: NaverMap) {
-        storeMarkers.observe(viewLifecycleOwner) {
-            it?.let {
-                createStoreMarkers(it.first, true, map)
-                createStoreMarkers(it.second, false, map)
-            }
+    private fun NaverMap.createStoreMarkers(markers: Map<InfoWindow, InfoWindow>) = lifecycleScope.launch {
+        val map = this@createStoreMarkers
+        markers.forEach { (has, not) ->
+            has.setStoreMarker(true, map)
+            not.setStoreMarker(false, map)
         }
     }
-    private fun createStoreMarkers(markers: List<InfoWindow>, hasInfoWindow: Boolean, map: NaverMap) = lifecycleScope.launch {
-        if(!hasInfoWindow) delay(100L)
-        for(i in markers.indices) { markers[i].setStoreMarker(hasInfoWindow, map) }
-    }
-    private suspend fun InfoWindow.setStoreMarker(hasInfoWindow: Boolean, map: NaverMap) {
-        setOnMarkerClickListener()
-        adapter = withContext(Dispatchers.IO) {
-            mapUtils.getAdapter(tag as StoreMapItem, false, hasInfoWindow)
-        }
+
+    private fun InfoWindow.setStoreMarker(hasInfoWindow: Boolean, map: NaverMap) {
+        addOnMarkerClickListener()
+        adapter = mapUtils.getAdapter(tag as StoreMapItem, false, hasInfoWindow)
         this.map = map
     }
 
-    private var hasInfoClickedMarker: InfoWindow? = null
-    private var hasNotInfoClickedMarker: InfoWindow? = null
-    private fun InfoWindow.setOnMarkerClickListener() = setOnClickListener {
+    private var clickedMarkerWithInfo: InfoWindow? = null
+    private var clickedMarkerNoInfo: InfoWindow? = null
+    private fun InfoWindow.addOnMarkerClickListener() = setOnClickListener {
         // NaverMap.setOnMapTouchListener is delivered click event by returning false from Overlay. not allow re-settings.
-        if(hasInfoClickedMarker == it || hasNotInfoClickedMarker == it) return@setOnClickListener false
-        updateClickedMarker(this)
+        if(clickedMarkerWithInfo == it || clickedMarkerNoInfo == it) return@setOnClickListener false
         openStoreBottomSheet(tag as StoreMapItem)
+        updateClickedMarker(this)
         true
     }
-    private fun updateClickedMarker(newClickedMarker: InfoWindow?) {
-        hasInfoClickedMarker = hasInfoClickedMarker?.setClickedState(clicked = false, hasInfoWindow = true)
-        hasNotInfoClickedMarker = hasNotInfoClickedMarker?.setClickedState(clicked = false, hasInfoWindow = false)
 
-        val markerPair = newClickedMarker?.let { mapViewModel.getStoreMarkerPair(it) }
-        hasInfoClickedMarker = markerPair?.get(0)?.setClickedState(clicked = true, hasInfoWindow = true)
-        hasNotInfoClickedMarker = markerPair?.get(1)?.setClickedState(clicked = true, hasInfoWindow = true)
+    private fun updateClickedMarker(newClickMarker: InfoWindow?) {
+        clickedMarkerWithInfo?.setClickState(clicked = false, hasInfoWindow = true)
+        clickedMarkerNoInfo?.setClickState(clicked = false, hasInfoWindow = false)
+
+        val markerPair = newClickMarker?.let { mapViewModel.getStoreMarkerPair(it) }
+        clickedMarkerWithInfo = markerPair?.first?.setClickState(clicked = true, hasInfoWindow = true)
+        clickedMarkerNoInfo = markerPair?.second?.setClickState(clicked = true, hasInfoWindow = true)
     }
-    private fun InfoWindow?.setClickedState(clicked: Boolean, hasInfoWindow: Boolean, store: StoreMapItem? = null) = this?.apply {
+
+    private fun InfoWindow.setClickState(clicked: Boolean, hasInfoWindow: Boolean, store: StoreMapItem? = null) = this.apply {
         val store = store ?: tag as StoreMapItem
         tag = store
         adapter = mapUtils.getAdapter(store, clicked, hasInfoWindow)
@@ -123,101 +170,61 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
 
     //!-- create Polygon Overlays
-    private fun MapViewModel.subscribeToPolygonOverlaysObserver(map: NaverMap) {
-        polygonOverlays.observe(viewLifecycleOwner) {
-            it?.let { createPolygonOverlays(it, map) }
-        }
+    private fun NaverMap.createPolygonOverlays(polygons: Map<String, PolygonOverlay>) = polygons.forEach { (_, polygon)->
+        polygon.map = this
+        polygon.setOnClickListener { polygon.onPolygonClick(this) }
     }
-    private fun createPolygonOverlays(polygons: List<PolygonOverlay>, map: NaverMap) = polygons.forEach { polygon ->
-        polygon.map = map
-        polygon.setOnClickListener { onPolygonClick(polygon, map) }
-    }
-    private fun onPolygonClick(polygon: PolygonOverlay?, map: NaverMap) = polygon?.run {
+
+    private fun PolygonOverlay.onPolygonClick(map: NaverMap) : Boolean {
         color = Resource.colorMatcheapLightGray
-        map.updateCamera(mapUtils.getCenterLatLng(tag as String), MapUtils.MAP_POLYGON_CAMERA_ZOOM)
+        updateMap(map)
         registerHandler(delay = 1000L) { color = Resource.colorMatcheapLightYellow }
-        true
-    } ?: false
+        return true
+    }
+
+    private fun PolygonOverlay.updateMap(map: NaverMap) {
+        val center = mapUtils.getCenterLatLng(tag as String)
+        mapViewModel.updateData(centerX = center.latitude, centerY = center.longitude)
+        map.updateCamera(center, MapUtils.MAP_DEFAULT_ZOOM)
+    }
 
     private fun NaverMap.updateCamera(latLng: LatLng, zoom: Double) {
+        closeStoreBottomSheet()
         val cameraUpdate = mapUtils.getCameraUpdate(latLng, zoom)
         moveCamera(cameraUpdate)
     }
 
 
     //!-- create Count Markers
-    private fun MapViewModel.subscribeToCountMarkersObserver(map: NaverMap) {
-        countMarkers.observe(viewLifecycleOwner) {
-            it?.let { createCountMarkers(it, map) }
+    private fun NaverMap.createCountMarkers(markers: Map<String, Marker>) = markers.forEach { (_,marker)->
+        marker.map = this
+        marker.setOnClickListener {
+            val pairPolygon = mapViewModel.getPairPolygon(it.tag as String)
+            pairPolygon.onPolygonClick(this)
         }
     }
-    private fun createCountMarkers(markers: List<Marker>, map: NaverMap) = markers.forEach { marker ->
-        marker.map = map
-        marker.setOnClickListener { onPolygonClick(mapViewModel.createdPolygon[marker.tag as String], map) }
-    }
 
 
-    private fun NaverMap.setOnMapLoadListener() = addOnLoadListener {
-        with(binding) {
-            progressView.visibility = View.GONE
-            animationView.cancelAnimation()
-        }
-        addOnZoomListeners()
-    }
-
-    private fun NaverMap.addOnZoomListeners() = addOnCameraIdleListener {
-        val zoom = cameraPosition.zoom
-        binding.zoom = zoom
-        if(zoom >= MapUtils.MAP_INFO_MAX_ZOOM) updateAddress(cameraPosition.target)
-    }
-
-    private fun updateAddress(latLng: LatLng) {
-        locationViewModel.updateAddress(latLng.latitude, latLng.longitude)
-    }
-
-    private fun NaverMap.setOnMapDoubleTapListener() = setOnMapDoubleTapListener { _, _ ->
-        resetCurrentLocation()
-        true
-    }
-    fun resetCurrentLocation() {
-        locationViewModel.getLastLocation()
-    }
-
-    private fun NaverMap.setOnMapTouchListener() = setOnMapClickListener { _, _ -> closeStoreBottomSheet() }
-
-
-    //!--location Overlay, camera
-    @Inject lateinit var mapUtils: MapUtils
-    private var curLatLng = LatLng(MapUtils.SEOUL_CITY_HALL_LAT, MapUtils.SEOUL_CITY_HALL_LNG)
-    private fun subscribeToLocationObserver(map: NaverMap) {
-        locationViewModel.location.observe(viewLifecycleOwner) {
-            handleLocationUpdate(it, map)
-        }
-    }
-    private fun handleLocationUpdate(location: Location?, map: NaverMap) = location?.run {
-        curLatLng = LatLng(latitude, longitude)
-        mapUtils.createLocationOverlay(curLatLng, map)
-        map.updateCamera(curLatLng, MapUtils.MAP_DEFAULT_ZOOM)
+    //!-- create Range Circle Overlay
+    private fun NaverMap.createRangeCircleOverlay(circleOverlay: CircleOverlay?) = circleOverlay?.let {
+        it.map = this
     }
 
 
     //!--infoBottomSheet
-    private fun openStoreBottomSheet(item: StoreMapItem) {
-        initStoreBottomSheet(item)
-        binding.mapFragment.startTransition(R.id.open_transition)
+    private fun openStoreBottomSheet(item: StoreMapItem) = binding.run {
+        bottomSheet.store = item
+        mapFragment.startTransition(R.id.open_transition)
     }
-    private fun closeStoreBottomSheet() = hasInfoClickedMarker?.let {
+
+    private fun closeStoreBottomSheet() = clickedMarkerWithInfo?.let {
         binding.mapFragment.startTransition(R.id.close_transition)
         updateClickedMarker(null)
     }
 
-    private fun initStoreBottomSheet(item: StoreMapItem) = binding.bottomSheet.apply {
-        store = item
-        view.setOnClickListener { navigateToStoreDetails(item.id) }
-    }
-
     //!-- bookmark
     @Inject lateinit var connectivityManager: ConnectivityManager
+    private val bookmarkViewModel: BookmarkViewModel by viewModels()
     fun updateBookmarkState(store: StoreMapItem, isChecked: Boolean) = lifecycleScope.launch {
         connectivityManager.activeNetwork?.let {
             store.bookmarked = isChecked
@@ -225,10 +232,12 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
             bookmarkViewModel.updateBookmark(store.id, store.code, isChecked)
         } ?: cancelBookmarkUpdate()
     }
+
     private fun updateClickedMarker(store: StoreMapItem) {
-        hasInfoClickedMarker.setClickedState(clicked = true, hasInfoWindow = true, store)
-        hasNotInfoClickedMarker.setClickedState(clicked = true, hasInfoWindow = true, store)
+        clickedMarkerWithInfo?.setClickState(clicked = true, hasInfoWindow = true, store)
+        clickedMarkerNoInfo?.setClickState(clicked = true, hasInfoWindow = true, store)
     }
+
     private fun cancelBookmarkUpdate() = binding.bottomSheet.apply {
         showToastMessage(MESSAGE_NETWORK_ERROR)
         btnBookmark.isChecked = false
@@ -239,81 +248,15 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     }
 
 
-    //!-- filter
-    fun openMapFilter() {
-        closeStoreBottomSheet()
-        setOnFilterOpen()
-        addOnFilterChangeListener()
-    }
-
-    private fun setOnFilterOpen() {
-        val address = locationViewModel.getCurrentAddress()
-        requireActivity().supportFragmentManager.setFragmentResult(FILTER_OPEN, bundleOf(ADDRESS to address))
-    }
-    @Suppress("DEPRECATION")
-    private fun addOnFilterChangeListener() = requireActivity().supportFragmentManager
-        .setFragmentResultListener(FILTER_, viewLifecycleOwner) { _, result ->
-            val filter = result.getSerializable(FILTER_) as Filter
-            mapViewModel.updateFilter(filter)
-        }
-
-    private fun subscribeToFilterObserver(map: NaverMap) = mapViewModel.run {
-        filter.observe(viewLifecycleOwner) {
-            it?.run {
-                initCountMarkerData()
-                updateRangeCircleOverlay(it.distance, map)
-                filterStoreMarkers()
-            }
-        }
-    }
-
-    // To update the number of filtered markers, pre-count need to initialize into zero.
-    private fun MapViewModel.initCountMarkerData() = createdCountMarkers.forEach { (_, marker) ->
-        marker.captionText = DEFAULT_
-    }
-
-    private var createdCircleOverlay : CircleOverlay? = null
-    private fun updateRangeCircleOverlay(distance: Double, map: NaverMap) {
-        createdCircleOverlay = createdCircleOverlay?.let {
-            it.map = null
-            null
-        }
-        createRangeCircleOverlay(distance, map)
-    }
-    private fun createRangeCircleOverlay(distance: Double, map: NaverMap) {
-        if(distance == NOT_DISTANCE) return
-        createdCircleOverlay = mapUtils.createCircleOverlay(curLatLng, distance, map)
-    }
-
-    private fun Filter.filterStoreMarkers() = lifecycleScope.launch {
-        val markers = mapViewModel.createdStoreMarkers.first
-        for(i in markers.indices) {
-            val store = markers[i].tag as? StoreMapItem ?: return@launch
-
-            val isRegionMatched = region == store.gu || region == ALL_SELECT
-            val isCategoryMatched = category.contains(store.code)
-            val isDistanceMatched = distance == NOT_DISTANCE || distance > store.distance
-            val isBookmarkMatched = !bookmarked || store.bookmarked
-
-            val isNotFiltered = isRegionMatched && isCategoryMatched && isDistanceMatched && isBookmarkMatched
-            when {
-                isNotFiltered -> mapViewModel.applyToNotFilteredOverlay(markers[i], store.gu)
-                else -> mapViewModel.applyToFilteredOverlay(markers[i])
-            }
-        }
-    }
-
-    private fun MapViewModel.applyToNotFilteredOverlay(marker: InfoWindow, gu: String) {
-        getStoreMarkerPair(marker)?.forEach { it.isVisible = true }
-        createdCountMarkers[gu]?.run { captionText = "${captionText.toInt() + 1}" }
-    }
-
-    private fun MapViewModel.applyToFilteredOverlay(marker: InfoWindow) = getStoreMarkerPair(marker)?.forEach {
-        it.isVisible = false
+    // !-- request re-search
+    fun onReSearch(map: NaverMap) {
+        val center = map.cameraPosition.target
+        mapViewModel.updateData(centerX = center.latitude, centerY = center.longitude)
+        showToastMessage(MESSAGE_MAP_DESC)
     }
 
 
-    override fun subscribeToObservers() {
+    private fun subscribeToBookmarkObserver(map: NaverMap) {
         bookmarkViewModel.loadingState.observe(viewLifecycleOwner) {
             if(it == ConnectState.FAIL) { cancelBookmarkUpdate() }
         }
@@ -327,15 +270,15 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     }
     private val storeDetailsActivityLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { handleStoreDetailsActivityForResult(it.data) }
+    ) { updateStore(it.data) }
 
     // when back from StoreDetailsActivity, update current clicked store because bookmark state could change.
     @Suppress("DEPRECATION")
-    private fun handleStoreDetailsActivityForResult(intent: Intent?) = intent?.run {
+    private fun updateStore(intent: Intent?) = intent?.run {
         lifecycleScope.launch {
             val store = getSerializableExtra(STORE_) as StoreMapItem
             updateClickedMarker(store)
-            initStoreBottomSheet(store)
+            binding.bottomSheet.store = store
         }
     }
 
@@ -343,12 +286,17 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
         handleExistDeepLinkNavigation()
     }
 
+    //!-- filter
+    fun openMapFilter() {
+        closeStoreBottomSheet()
+        requireActivity().supportFragmentManager.setFragmentResult(FILTER_OPEN, bundleOf(FILTER_OPEN to true))
+    }
+
     override fun destroyGlobalVariables() {
-        mapViewModel.init()
-        hasInfoClickedMarker = null
-        hasNotInfoClickedMarker = null
-        createdCircleOverlay = null
-        requireActivity().supportFragmentManager.setFragmentResult(FILTER_OPEN, bundleOf())
+        mapViewModel.onCleared()
+        clickedMarkerWithInfo = null
+        clickedMarkerNoInfo = null
+        requireActivity().supportFragmentManager.setFragmentResult(FILTER_OPEN, bundleOf(FILTER_OPEN to false))
     }
 
 }

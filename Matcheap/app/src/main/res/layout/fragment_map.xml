@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
-            name="store"
-            type="com.sandy.seoul_matcheap.data.store.dao.StoreMapItem" />
-        <variable
-            name="mapViewModel"
-            type="com.sandy.seoul_matcheap.ui.map.MapViewModel" />
-        <variable
-            name="locationViewModel"
+            name="location"
             type="com.sandy.seoul_matcheap.ui.LocationViewModel" />
+        <variable
+            name="locationManager"
+            type="android.location.LocationManager" />
         <variable
             name="zoom"
             type="Double" />
         <variable
             name="fragment"
             type="com.sandy.seoul_matcheap.ui.map.MapFragment" />
+        <variable
+            name="map"
+            type="com.naver.maps.map.NaverMap" />
         <import type="android.view.View"/>
     </data>
 
@@ -26,6 +27,7 @@
         android:id="@+id/mapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
         app:layoutDescription="@xml/fragment_map_bottom_sheet_scene">
 
         <fragment
@@ -61,7 +63,7 @@
                 android:layout_gravity="center"
                 android:paddingVertical="8dp"
                 android:paddingHorizontal="16dp"
-                android:text="@{locationViewModel.address}"
+                android:text="@{location.address}"
                 android:drawablePadding="8dp"
                 app:drawableStartCompat="@drawable/ic_location" />
 
@@ -96,7 +98,6 @@
             </FrameLayout>
         </androidx.cardview.widget.CardView>
 
-
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView13"
             android:layout_width="52dp"
@@ -120,7 +121,48 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                android:onClick="@{()->fragment.resetCurrentLocation()}"/>
+                android:onClick="@{()->fragment.updateLocation(location, locationManager)}"/>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btn_re_search_view"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginTop="16dp"
+            android:visibility="@{zoom >= 13.0 ? View.VISIBLE : View.GONE}"
+            app:cardCornerRadius="50dp"
+            app:cardMaxElevation="4dp"
+            app:layout_constraintEnd_toEndOf="@+id/cardView11"
+            app:layout_constraintTop_toBottomOf="@+id/cardView13">
+
+            <ImageView
+                android:id="@+id/imageView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="3dp"
+                app:tint="@color/matcheap_blue"
+                bind:srcCompat="@drawable/ic_re_search" />
+
+            <TextView
+                android:id="@+id/tv_re_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|bottom"
+                android:layout_marginBottom="6dp"
+                android:textStyle="bold"
+                android:textSize="8dp"
+                android:textColor="@color/matcheap_blue"
+                android:text="재검색" />
+
+            <FrameLayout
+                android:id="@+id/btn_re_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:onClick="@{()->fragment.onReSearch(map)}">
+
+            </FrameLayout>
         </androidx.cardview.widget.CardView>
 
         <include
@@ -130,8 +172,8 @@
             android:layout_height="wrap_content"
             android:elevation="5dp"
             android:layout_marginBottom="-120dp"
-            bind:store="@{store}"
             bind:fragment="@{fragment}"
+            bind:location="@{location.location}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -146,7 +188,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone">
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/animationView"

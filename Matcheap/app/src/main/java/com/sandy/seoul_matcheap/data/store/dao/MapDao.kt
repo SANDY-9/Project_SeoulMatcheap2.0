@@ -17,47 +17,79 @@ interface MapDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPolygons(polygons: List<Polygon>)
 
-    @Query("SELECT * FROM map_polygon ORDER BY gu")
-    suspend fun getPolygons() : List<Polygon>
+    @Query("SELECT gu, num, lat, lng " +
+                "FROM map_polygon " +
+                "GROUP BY gu, num")
+    @MapInfo(keyColumn = "gu", valueTable = "map_polygon")
+    suspend fun getPolygons() : Map<String, List<Polygon>>
 
 
     // !-- store
     @Transaction
     @Query(
-        "SELECT store_info.id, store_info.code, codeName, gu, name, address, " +
-                "photo, lat, lng, distance, COALESCE(bookmarked, false) AS bookmarked " +
-                "FROM store_info " +
-                "LEFT JOIN store_bookmark  " +
-                "ON store_info.id = store_bookmark.id " +
-                "ORDER BY distance"
+        "SELECT filtered_stores.id, filtered_stores.code, gu, name, address, " +
+                "photo, lat, lng, d, " +
+                "COALESCE(bookmarked, false) AS bookmarked " +
+                "FROM (" +
+                    "SELECT id, code, gu, name, address, photo, lat, lng, $MAP_CENTER_LOCATION_QUERY, $MAP_DISTANCE_QUERY " +
+                    "FROM store_info " +
+                    "WHERE d <= :r " +
+                    "AND code IN (:code) " +
+                    "AND (:gu IS NULL OR gu = :gu) " +
+                ") AS filtered_stores " +
+                "LEFT JOIN store_bookmark " +
+                "ON filtered_stores.id = store_bookmark.id " +
+                "WHERE (:bookmarked = false OR bookmarked = :bookmarked)"
     )
-    suspend fun getStores() : List<StoreMapItem>
+    suspend fun getStoresByFilter(
+        code: List<String>,
+        gu: String?,
+        bookmarked: Boolean,
+        centerX: Double,
+        centerY: Double,
+        r: Double
+    ) : List<StoreMapItem>
 
     @Query(
-        "SELECT gu, count(*) " +
-                "FROM store_info " +
-                "GROUP BY gu " +
-                "ORDER BY gu"
+        "SELECT gu, count(*) AS total " +
+                "FROM (" +
+                    "SELECT filtered_stores.id, filtered_stores.code, gu, name, address, " +
+                    "photo, lat, lng, d, " +
+                    "COALESCE(bookmarked, false) AS bookmarked " +
+                        "FROM (" +
+                            "SELECT id, code, gu, name, address, photo, lat, lng, $MAP_CENTER_LOCATION_QUERY, $MAP_DISTANCE_QUERY " +
+                            "FROM store_info " +
+                            "WHERE (:r IS NULL OR d <= :r) " +
+                            "AND code IN (:code) " +
+                            "AND (:gu IS NULL OR gu = :gu) " +
+                        ") AS filtered_stores " +
+                        "LEFT JOIN store_bookmark " +
+                        "ON filtered_stores.id = store_bookmark.id " +
+                        "WHERE (:bookmarked = false OR bookmarked = :bookmarked)" +
+                ")" +
+                "GROUP BY gu "
     )
-    suspend fun getStoreCountForGu() : List<StoreCountForGu>
+    @MapInfo(keyColumn = "gu", valueColumn = "total")
+    suspend fun getStoreCountByGu(
+        code: List<String>,
+        gu: String?,
+        bookmarked: Boolean,
+        centerX: Double,
+        centerY: Double,
+        r: Double?
+    ) : Map<String, Int>
 
 }
-
-data class StoreCountForGu(
-    @ColumnInfo(name = "gu") val gu: String,
-    @ColumnInfo(name = "count(*)") val count: Int
-)
 
 data class StoreMapItem(
     val id: String,
     val code: String,
-    val codeName: String,
     val gu: String,
     val	name: String,
     val	address: String,
     val	photo: String,
     val	lat: Double,
     val	lng: Double,
-    val distance: Double,
+    val d: Float = 0.0f,
     var bookmarked: Boolean = false
 ) : Serializable

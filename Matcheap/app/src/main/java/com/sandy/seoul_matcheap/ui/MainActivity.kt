@@ -77,21 +77,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //!-- 맵 필터동작관련
+    //!-- 맵 필터 동작 관련
     private fun FragmentManager.addOnFilterOpenListener() {
         var fragment: MapFilterFragment? = null
         setFragmentResultListener(FILTER_OPEN, this@MainActivity) { _, result ->
-            val address = result.getString(ADDRESS)
+            val open = result.getBoolean(FILTER_OPEN)
             fragment = when {
-                address != null -> addFilterFragment(fragment ?: MapFilterFragment(), fragment == null, address)
+                open -> addFilterFragment(fragment ?: MapFilterFragment(), fragment == null)
                 else -> removeFilter(fragment)
             }
         }
     }
-    private fun addFilterFragment(fragment: MapFilterFragment, add: Boolean, address: String) = fragment.also {
+
+    private fun addFilterFragment(fragment: MapFilterFragment, create: Boolean) = fragment.also {
         when {
-            add -> supportFragmentManager.commit {
-                it.arguments = bundleOf(ADDRESS to address)
+            create -> supportFragmentManager.commit {
                 add(R.id.fragmentContainerView, it, FILTER_)
                 setReorderingAllowed(true)
             }

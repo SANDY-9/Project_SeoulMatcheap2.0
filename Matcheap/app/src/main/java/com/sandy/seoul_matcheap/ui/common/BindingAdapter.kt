@@ -51,15 +51,6 @@ object BindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("Distance")
-    fun setDistance(textView: TextView, distance: Double?) {
-        distance?.let {
-            textView.text = String.format("%.1f km", distance)
-            textView.background = null
-        }
-    }
-
-    @JvmStatic
     @BindingAdapter(value = ["lat", "lng", "curLat", "curLng"])
     fun inputDistance(textView: TextView, lat: Double?, lng: Double?, curLat: Double?, curLng: Double?) {
         if(lat != null && lng != null && curLat != null && curLng != null) {

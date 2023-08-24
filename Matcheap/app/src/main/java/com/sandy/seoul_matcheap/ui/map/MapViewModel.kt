@@ -1,16 +1,17 @@
 package com.sandy.seoul_matcheap.ui.map
 
 import androidx.lifecycle.*
+import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.PolygonOverlay
+import com.sandy.seoul_matcheap.data.store.dao.DistanceRadius
 import com.sandy.seoul_matcheap.data.store.repository.MapRepository
 import com.sandy.seoul_matcheap.util.constants.ALL_SELECT
-import com.sandy.seoul_matcheap.util.constants.NOT_DISTANCE
+import com.sandy.seoul_matcheap.util.constants.Category
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.Serializable
 import javax.inject.Inject
 
 /**
@@ -26,70 +27,171 @@ class MapViewModel @Inject constructor(
     private val mapUtils: MapUtils
     ) : ViewModel() {
 
-    private val _storeMarkers = MutableLiveData<Pair<List<InfoWindow>, List<InfoWindow>>?>()
-    val storeMarkers: LiveData<Pair<List<InfoWindow>, List<InfoWindow>>?> = _storeMarkers
-    val createdStoreMarkers: Pair<List<InfoWindow>, List<InfoWindow>> get() = storeMarkers.value ?: Pair(listOf(), listOf())
-    fun getStoreMarkerPair(marker: InfoWindow) : List<InfoWindow>? {
-        val (hasInfoWindow, hasNotInfoWindow) = createdStoreMarkers
-        val index = if(hasInfoWindow.contains(marker)) hasInfoWindow.indexOf(marker) else hasNotInfoWindow.indexOf(marker)
-        return if(index > -1) listOf(hasInfoWindow[index], hasNotInfoWindow[index]) else null
+    private var code: List<String> = Category.all()
+    private var gu: String? = null
+    private var bookmarked = false
+    private var centerX: Double = 0.0
+    private var centerY: Double = 0.0
+    private var r: Double? = null
+
+    fun filterCode(filtered: Boolean, param: String? = null) {
+        this.code = when(param) {
+            null -> if(filtered) Category.all() else listOf()
+            else -> code.toMutableList().apply {
+                if(filtered) {
+                    if(code.size == 8) clear()
+                    add(param)
+                } else remove(param)
+            }
+        }
+        updateData(centerX = centerX, centerY = centerY)
     }
 
-    private val _polygonOverlays = MutableLiveData<List<PolygonOverlay>?>()
-    val polygonOverlays: LiveData<List<PolygonOverlay>?> = _polygonOverlays
-    val createdPolygon: Map<String, PolygonOverlay> get() = polygonOverlays.value!!.associateBy { it.tag as String }
-
-    private val _countMarkers = MutableLiveData<List<Marker>?>()
-    val countMarkers: LiveData<List<Marker>?> = _countMarkers
-    val createdCountMarkers: Map<String, Marker> get() = countMarkers.value!!.associateBy { it.tag as String }
-
-    fun downloadMapData() = viewModelScope.launch(Dispatchers.IO) {
-        createStoreMarkers()
-        createPolygonOverlays()
-        createCountMarkers()
+    fun filterGu(param: String) {
+        this.gu = if(param != ALL_SELECT) param else null
+        updateData(centerX = centerX, centerY = centerY)
     }
-    private suspend fun createStoreMarkers() {
-        val stores = mapRepository.downloadStores()
-        val markers = stores.map {
+
+    fun filterBookmark(param: Boolean) {
+        this.bookmarked = param
+        updateData(centerX = centerX, centerY = centerY)
+    }
+
+    fun filterDistance(
+        param: Double?,
+        centerX: Double,
+        centerY: Double
+    ) {
+        if(param == null && r == null) return
+        this.r = param
+        updateData(centerX = centerX, centerY = centerY)
+        updateRangeCircleOverlay()
+    }
+
+    private fun initData() {
+        this.code = Category.all()
+        this.gu = null
+        this.bookmarked = false
+        this.r = null
+        updateRangeCircleOverlay()
+    }
+
+    fun resetFilter() {
+        if(code.size == 8 && gu == null && !bookmarked && r == null) return
+        initData()
+        updateData(centerX = centerX, centerY = centerY)
+    }
+
+
+    private val _storeMarkers = MutableLiveData<MutableMap<InfoWindow, InfoWindow>>()
+    val storeMarkers: LiveData<MutableMap<InfoWindow, InfoWindow>> = _storeMarkers
+
+    fun getStoreMarkerPair(marker: InfoWindow) = storeMarkers.value!!.let {
+        when(val noInfo = it[marker]) {
+            null -> it.filterValues { value-> value == marker }.keys.single() to marker
+            else -> marker to noInfo
+        }
+    }
+
+    private fun createStoreMarkers() = viewModelScope.launch(Dispatchers.IO) {
+        val stores = mapRepository.downloadStoresByFilter(
+            code = code,
+            gu = gu,
+            bookmarked = bookmarked,
+            centerX = centerX,
+            centerY = centerY,
+            r = r ?: DistanceRadius.M2500.value
+        )
+        val markers = stores.associate{
             mapUtils.createStoreMarker(it, true) to mapUtils.createStoreMarker(it, false)
-        }.unzip()
+        }.toMutableMap()
         _storeMarkers.postValue(markers)
     }
-    private suspend fun createPolygonOverlays() {
-        val polygons = mapRepository.downloadPolygons()
-        val polygonOverlays = polygons.map {
-            mapUtils.createPolygon(it.key, it.value)
+
+    private fun updateStoreMarkers() = viewModelScope.launch {
+        storeMarkers.value?.onEach { (has, no) ->
+            has.map = null
+            no.map = null
+        }.also {
+            it?.clear()
+            createStoreMarkers()
         }
+    }
+
+
+    private val _polygonOverlays = MutableLiveData<MutableMap<String, PolygonOverlay>>()
+    val polygonOverlays: LiveData<MutableMap<String, PolygonOverlay>> = _polygonOverlays
+    fun getPairPolygon(gu: String) = polygonOverlays.value!![gu]!!
+    private fun createPolygonOverlays() = viewModelScope.launch(Dispatchers.IO) {
+        val polygonOverlays = mapRepository.downloadPolygons().mapValues { (gu, polygons) ->
+            mapUtils.createPolygon(gu, polygons)
+        }.toMutableMap()
         _polygonOverlays.postValue(polygonOverlays)
     }
-    private suspend fun createCountMarkers() {
-        val counts = mapRepository.downloadStoreCountForGu()
-        val countMarkers = counts.map {
-            mapUtils.createCountMarker(it)
+
+
+    private val _countMarkers = MutableLiveData<MutableMap<String, Marker>>()
+    val countMarkers: LiveData<MutableMap<String, Marker>> = _countMarkers
+
+    private fun createCountMarkers() = viewModelScope.launch(Dispatchers.IO) {
+        val countsMarkers = mapRepository.downloadStoreCountByGu(
+            code = code,
+            gu = gu,
+            bookmarked = bookmarked,
+            centerX = centerX,
+            centerY = centerY,
+            r = r
+        ).mapValues {(gu, count) ->
+            mapUtils.createCountMarker(gu, count)
+        }.toMutableMap()
+        _countMarkers.postValue(countsMarkers)
+    }
+
+    private fun updateCountMarkers() = viewModelScope.launch {
+        countMarkers.value?.onEach { (_, marker) ->
+            marker.map = null
+        }.also {
+            it?.clear()
+            createCountMarkers()
         }
-        _countMarkers.postValue(countMarkers)
     }
 
 
-    private val _filter = MutableLiveData<Filter?>()
-    val filter: LiveData<Filter?> = _filter
-    fun updateFilter(filter: Filter) {
-        _filter.postValue(filter)
+    private val _rangeCircleOverlay  = MutableLiveData<CircleOverlay?>(null)
+    val rangeCircleOverlay: LiveData<CircleOverlay?> = _rangeCircleOverlay
+
+    private fun createRangeCircleOverlay() = r?.let {
+        val circleOverlay = mapUtils.createCircleOverlay(centerX, centerY, it)
+        _rangeCircleOverlay.postValue(circleOverlay)
     }
 
-    fun init() {
-        _filter.value = null
-        _storeMarkers.value = null
-        _polygonOverlays.value = null
-        _countMarkers.value = null
+
+    private fun updateRangeCircleOverlay() = rangeCircleOverlay.value?.let {
+        it.map = null
+    }.also {
+        createRangeCircleOverlay()
+    }
+
+
+    fun updateData(
+        centerX: Double,
+        centerY: Double
+    ) {
+        if(this.r == null) {
+            this.centerX = centerX
+            this.centerY = centerY
+        }
+        updateStoreMarkers()
+        updateCountMarkers()
+    }
+
+    init {
+        createPolygonOverlays()
+    }
+
+    public override fun onCleared() {
+        initData()
         super.onCleared()
     }
 
 }
-
-data class Filter(
-    val region: String = ALL_SELECT,
-    val category: Set<String>,
-    val distance: Double = NOT_DISTANCE,
-    val bookmarked: Boolean = false
-) : Serializable

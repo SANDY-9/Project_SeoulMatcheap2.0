@@ -13,13 +13,28 @@ import javax.inject.Inject
 class MapRepository @Inject constructor(private val dao: MapDao) {
 
     suspend fun insertPolygons(polygons: List<Polygon>) = dao.insertPolygons(polygons)
+    suspend fun downloadPolygons() = dao.getPolygons()
 
-    suspend fun downloadPolygons() = dao.getPolygons().groupBy {
-        it.gu
-    }
+    suspend fun downloadStoresByFilter(
+        code: List<String>,
+        gu: String?,
+        bookmarked: Boolean,
+        centerX: Double,
+        centerY: Double,
+        r: Double
+    ) = dao.getStoresByFilter(
+        code, gu, bookmarked, centerX, centerY, r
+    )
 
-    suspend fun downloadStores() = dao.getStores()
-
-    suspend fun downloadStoreCountForGu() = dao.getStoreCountForGu()
+    suspend fun downloadStoreCountByGu(
+        code: List<String>,
+        gu: String?,
+        bookmarked: Boolean,
+        centerX: Double,
+        centerY: Double,
+        r: Double?
+    ) = dao.getStoreCountByGu(
+        code, gu, bookmarked, centerX, centerY, r
+    )
 
 }
