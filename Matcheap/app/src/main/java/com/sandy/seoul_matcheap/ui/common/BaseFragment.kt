@@ -64,10 +64,16 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
     /**
      *  locationViewModel으로부터 last location 정보를 업데이트하도록 요청하는 함수.
      * 위치 정보 업데이트 요청 이후의 동작을 정의해야 하면 hasLocationUpdate()를 override 합니다. */
-    protected fun updateLocation(locationViewModel: LocationViewModel, locationManager: LocationManager) {
+    fun updateLocation(locationViewModel: LocationViewModel, locationManager: LocationManager) : Boolean {
+        showToastMessage(MESSAGE_GPS_DESC)
         val enableGpsProvider = getGpsProviderState(locationManager)
-        if (enableGpsProvider) locationViewModel.getLastLocation()
-        hasLocationUpdate()
+        return enableGpsProvider.also {
+            if(it) {
+                locationViewModel.updateLastLocation()
+                hasLocationUpdate()
+                showToastMessage(MESSAGE_GPS_COMPLETE_DESC)
+            }
+        }
     }
     protected fun getGpsProviderState(locationManager: LocationManager) = run {
         locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER).also {
@@ -75,7 +81,7 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
         }
     }
     /** locationViewModel로부터 location 업데이트를 요청한 후 이후 호출되는 함수 */
-    protected open fun hasLocationUpdate() = Unit
+    open fun hasLocationUpdate() = Unit
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

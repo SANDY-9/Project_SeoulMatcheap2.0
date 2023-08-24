@@ -1,7 +1,6 @@
 package com.sandy.seoul_matcheap.util.helper
 
 import android.content.Context
-import android.location.Location
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDate
@@ -31,15 +30,10 @@ object DataHelper {
         .readLines()
 
     fun convertDistance(lat: Double, lng : Double, curLat: Double, curLng: Double) : String {
-        val a = 2 * asin(
-            sqrt(
-                sin(Math.toRadians(lat - curLat) / 2).pow(2.0)
-                        + sin(Math.toRadians(lng - curLng) / 2).pow(2.0)
-                        * cos(Math.toRadians(curLat))
-                        * cos(Math.toRadians(lat))
-            )
+        val d = sqrt(
+            (lat - curLat).pow(2.0) + (lng - curLng).pow(2.0)
         )
-        return String.format("%.1f km", 6372.8 * a)
+        return String.format("%.1f km", 100 * d)
     }
 
     private val timeFormat = SimpleDateFormat("yyyyMMdd-HHmm")
