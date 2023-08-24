@@ -68,7 +68,7 @@ class LocationViewModel @Inject constructor(
         override fun isCancellationRequested(): Boolean = false
     }
     @SuppressLint("MissingPermission")
-    fun getLastLocation() = fusedLocationProviderClient.getCurrentLocation(
+    fun updateLastLocation() = fusedLocationProviderClient.getCurrentLocation(
         currentLocationRequest,
         cancellationToken
     ).addOnSuccessListener {

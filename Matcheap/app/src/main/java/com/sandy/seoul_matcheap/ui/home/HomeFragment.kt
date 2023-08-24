@@ -47,12 +47,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     lateinit var prefs: SharedPreferences
     private fun checkVersionUpdate() {
         val currentVersion = BuildConfig.VERSION_NAME
-        when(AppPrefsUtils.getSavedVersion(prefs)) {
+        when(AppPrefsUtils.getSavedAppVersion(prefs)) {
             currentVersion -> return
-            null -> AppPrefsUtils.saveCurrentVersion(prefs, currentVersion)
+            null -> AppPrefsUtils.saveLatestAppVersion(prefs, currentVersion)
             else -> {
                 showToastMessage(MESSAGE_VERSION_UPDATE)
-                AppPrefsUtils.saveCurrentVersion(prefs, currentVersion)
+                AppPrefsUtils.saveLatestAppVersion(prefs, currentVersion)
             }
         }
     }
