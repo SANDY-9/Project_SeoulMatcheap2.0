@@ -258,9 +258,9 @@ object BindingAdapter {
 
     @JvmStatic
     @BindingAdapter("StoreCountTitle")
-    fun setOnStoreCountTextTitle(textView: TextView, category: String?) {
-        category?.let {
-            textView.text = "$it 업체"
+    fun setOnStoreCountTextTitle(textView: TextView, code: String?) {
+        code?.let {
+            textView.text = Category.from(it).codeName + " 업체"
         }
     }
 
