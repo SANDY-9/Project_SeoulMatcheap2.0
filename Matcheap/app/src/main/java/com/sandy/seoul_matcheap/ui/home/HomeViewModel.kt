@@ -12,7 +12,6 @@ import com.sandy.seoul_matcheap.util.constants.DEFAULT_
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
-import kotlin.math.ln
 
 /**
  * @author SANDY
@@ -46,7 +45,7 @@ class HomeViewModel @Inject constructor (
 
     private val _loadingState = MutableLiveData(ConnectState.NONE)
     val loadingState : LiveData<ConnectState> = _loadingState
-    fun setLoadingState(state: ConnectState) {
+    private fun setLoadingState(state: ConnectState) {
         _loadingState.postValue(state)
     }
 
@@ -61,6 +60,7 @@ class HomeViewModel @Inject constructor (
     private val _wind = MutableLiveData<String>()
     val wind : LiveData<String> = _wind
     fun updateForecast(location: Location) = viewModelScope.launch(Dispatchers.IO) {
+        setLoadingState(ConnectState.ING)
         val result = forecastRepository.downloadCurrentForecast(location.latitude, location.longitude)
         updateWeather(result)
     }

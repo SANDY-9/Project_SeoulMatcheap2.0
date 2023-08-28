@@ -17,7 +17,6 @@ import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentHomeBinding
 import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.LocationViewModel.Companion.MESSAGE_INIT_ADDRESS
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.util.helper.AppPrefsUtils
@@ -136,10 +135,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     @Inject lateinit var locationManager: LocationManager
-    private var gpsButtonClick = false
     private fun ImageView.setOnGpsUpdateButtonClickListener() = setOnClickListener {
-        gpsButtonClick = true
-        homeViewModel.setLoadingState(ConnectState.ING)
         updateLocation(locationViewModel, locationManager)
     }
 
@@ -148,8 +144,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     override fun TextView.setOnRetryButtonClickListener() = setOnClickListener {
-        homeViewModel.setLoadingState(ConnectState.ING)
-        updateLocation(locationViewModel, locationManager)
+        isLoaded = false
+        homeViewModel.updateForecast(locationViewModel.getCurLocation())
     }
 
     override fun subscribeToObservers() {
@@ -169,17 +165,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         ConnectState.FAIL -> handleLoadFail()
         else -> handleNotLoad()
     }
+
     private fun handleLoadSuccess() {
         binding.progressView.root.visibility = View.GONE
     }
-    private fun handleLoadFail() {
-        showNetworkErrorToastMessage()
-        binding.progressView.fail.visibility = View.VISIBLE
-    }
 
     private var isLoaded = false
-    private fun showNetworkErrorToastMessage() {
-        showToastMessage(MESSAGE_NETWORK_ERROR)
+    private fun handleLoadFail() {
+        if(!isLoaded) showToastMessage(MESSAGE_NETWORK_ERROR)
+        binding.progressView.fail.visibility = View.VISIBLE
+        isLoaded = true
     }
 
     private fun handleNotLoad() {
@@ -192,9 +187,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private fun subscribeToLocationObserver() = locationViewModel.run {
         location.observe(viewLifecycleOwner) {
             handleLocationInfo(it)
-        }
-        address.observe(viewLifecycleOwner) {
-            handleAddress(it)
         }
     }
 
@@ -214,13 +206,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     private fun handleSurroundStores(stores: List<StoreItem>) {
         surroundingStoreAdapter?.submitList(stores)
-    }
-
-    // 현재 주소를 알려주는 toast message는 반드시 gps update button가 호출 되었을 때만 생성 되어야 함
-    private fun handleAddress(address: String) {
-        if(address == MESSAGE_INIT_ADDRESS || !gpsButtonClick) return
-        showToastMessage(address)
-        gpsButtonClick = false
     }
 
     fun navigateToStoreListForCategory(v: View, code: String) {
@@ -245,7 +230,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     override fun destroyGlobalVariables() {
         regionSpinnerAdapter = null
         surroundingStoreAdapter = null
-        isLoaded = false
     }
 
 }

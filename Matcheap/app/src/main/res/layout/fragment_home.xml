@@ -159,7 +159,7 @@
                             app:layout_constraintTop_toTopOf="parent"
                             bind:pty="@{viewModel.pty}"
                             bind:sky="@{viewModel.sky}"
-                            bind:wind="@{viewModel.temperature}"
+                            bind:wind="@{viewModel.wind}"
                             bind:temperature="@{viewModel.temperature}" />
 
                         <include
