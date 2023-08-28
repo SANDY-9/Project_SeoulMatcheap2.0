@@ -1,9 +1,8 @@
 package com.sandy.seoul_matcheap.ui.more.settings
 
-import android.annotation.SuppressLint
-import android.app.Application
 import android.content.SharedPreferences
 import androidx.lifecycle.*
+import com.sandy.seoul_matcheap.ui.more.settings.notification.NotificationScheduler
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.APP_PREFS_SETTINGS
 import com.sandy.seoul_matcheap.util.helper.AppPrefsUtils
@@ -20,12 +19,11 @@ import javax.inject.Named
 
 typealias Time = Pair<Int, Int>
 
-@SuppressLint("NullSafeMutableLiveData")
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     @Named(APP_PREFS_SETTINGS) private val prefs: SharedPreferences,
-    application: Application
-) : AndroidViewModel(application) {
+    private val notificationScheduler: NotificationScheduler
+) : ViewModel() {
 
     val isGranted = MutableLiveData<Boolean>()
 
@@ -39,18 +37,17 @@ class SettingsViewModel @Inject constructor(
         isGranted.value = AppPrefsUtils.getNotificationState(prefs)
 
         val savedTime = AppPrefsUtils.getSavedTime(prefs)
-        hour.value = savedTime.first
-        minute.value = savedTime.second
+        hour.value = savedTime.first!!
+        minute.value = savedTime.second!!
         _savedTime.value = savedTime
     }
 
     fun initTime() {
-        val time = getCurSavedTime()
-        hour.value = time.first
-        minute.value = time.second
+        val time = savedTime.value!!
+        hour.value = time.first!!
+        minute.value = time.second!!
     }
 
-    private fun getCurSavedTime() = savedTime.value!!
     private fun setSavedTime(hour: Int, min: Int) {
         _savedTime.value = hour to min
     }
@@ -73,9 +70,8 @@ class SettingsViewModel @Inject constructor(
         updateWorkerSchedule(state)
     }
 
-    private fun updateWorkerSchedule(isActive: Boolean) {
-        val context = getApplication<Application>().applicationContext
-        NotificationWorker.setNotificationSchedule(context, isActive, getCurSavedTime())
+    private fun updateWorkerSchedule(register: Boolean) {
+        notificationScheduler.setNotificationSchedule(register, savedTime.value!!)
     }
 
 }

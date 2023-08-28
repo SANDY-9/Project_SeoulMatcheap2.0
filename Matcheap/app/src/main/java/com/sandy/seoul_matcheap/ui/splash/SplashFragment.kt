@@ -25,8 +25,7 @@ import com.sandy.seoul_matcheap.data.store.StoreDatabase
 import com.sandy.seoul_matcheap.databinding.FragmentSplashBinding
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.common.BaseFragment
-import com.sandy.seoul_matcheap.ui.more.settings.NotificationWorker
-import com.sandy.seoul_matcheap.ui.more.settings.Time
+import com.sandy.seoul_matcheap.ui.more.settings.notification.NotificationScheduler
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.util.helper.AppPrefsUtils
@@ -119,25 +118,21 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
         else -> hasNotNotificationPermission()
     }
 
+    private var register = false
     private fun hasNotificationPermission() {
         val savedNotificationState = AppPrefsUtils.getNotificationState(prefs)
         val notificationPermissionState = AppPrefsUtils.getNotificationPermissionState(prefs)
         if(notificationPermissionState && !savedNotificationState) {
-            setNotificationSchedule(false)
+            register = false
             return
         }
 
-        val time = AppPrefsUtils.getSavedTime(prefs)
         AppPrefsUtils.setNotificationPermissionState(prefs, true)
-        setNotificationSchedule(true, time)
+        register = true
     }
     private fun hasNotNotificationPermission() {
         AppPrefsUtils.setNotificationPermissionState(prefs, false)
-        setNotificationSchedule(false)
-    }
-    private fun setNotificationSchedule(isActive: Boolean, time: Time= DEFAULT_HOUR to DEFAULT_MINUTE) {
-        AppPrefsUtils.setNotificationState(prefs, isActive)
-        NotificationWorker.setNotificationSchedule(requireContext(), isActive, time)
+        register = false
     }
 
     private fun handleAllLocationPermission(vararg locationPermissions: Boolean) {
@@ -214,8 +209,16 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
     private fun handleLoadState(isLoadEnd: Boolean) {
         if(isLoadEnd) {
             saveDatabaseVersion()
+            setNotificationSchedule()
             navigateToDestination()
         }
+    }
+
+    @Inject lateinit var notificationScheduler: NotificationScheduler
+    private fun setNotificationSchedule() {
+        val time = AppPrefsUtils.getSavedTime(prefs)
+        AppPrefsUtils.setNotificationState(prefs, register)
+        notificationScheduler.setNotificationSchedule(register, time)
     }
 
     private fun saveDatabaseVersion() {

@@ -1,5 +1,6 @@
 package com.sandy.seoul_matcheap.util.module
 
+import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
@@ -25,6 +26,8 @@ import com.sandy.seoul_matcheap.data.store.repository.MapRepository
 import com.sandy.seoul_matcheap.data.store.repository.SearchRepository
 import com.sandy.seoul_matcheap.data.store.repository.StoreRepository
 import com.sandy.seoul_matcheap.ui.map.MapUtils
+import com.sandy.seoul_matcheap.ui.more.settings.notification.NotificationScheduler
+import com.sandy.seoul_matcheap.ui.more.settings.notification.NotificationSchedulerImpl
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*
 import dagger.Module
@@ -200,5 +203,16 @@ object AppModules {
     @Singleton
     @Provides
     fun provideConnectivityManager(@ApplicationContext app: Context) = app.getSystemService(ConnectivityManager::class.java)
+
+    @Singleton
+    @Provides
+    fun provideAlarmManager(@ApplicationContext app: Context) = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    @Singleton
+    @Provides
+    fun provideNotificationScheduler(
+        @ApplicationContext app: Context,
+        alarmManager: AlarmManager
+    ): NotificationScheduler = NotificationSchedulerImpl(app, alarmManager)
 
 }

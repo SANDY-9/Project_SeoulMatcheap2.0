@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.View.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
@@ -36,7 +35,6 @@ class MainActivity : AppCompatActivity() {
             setupWithNavController(getNavController())
             setOnItemReselectedListener { /* NO-OP */ }
         }
-
         keyboardDetectorView.addOnKeyboardDropDownListener()
     }
 
