@@ -52,7 +52,7 @@ class NotificationReceiver: BroadcastReceiver() {
                     Intent(context, StoreDetailsActivity::class.java).apply {
                         putExtra(STORE_ID, store.id)
                     },
-                    PendingIntent.FLAG_IMMUTABLE
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
 
                 createNotification(context, store.name, pendingIntent)

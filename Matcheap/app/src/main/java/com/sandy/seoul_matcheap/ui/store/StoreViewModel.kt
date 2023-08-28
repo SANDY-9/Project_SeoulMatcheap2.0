@@ -44,9 +44,8 @@ class StoreViewModel @Inject constructor(
 
     fun updateStoreDetails(id: String) = viewModelScope.launch(Dispatchers.IO) {
         setLoadingState(ConnectState.ING)
-        _store.postValue(
-            storeRepository.downloadStoreDetails(id)
-        )
+        val storeDetails = storeRepository.downloadStoreDetails(id)
+        _store.postValue(storeDetails)
         updateMenu(id)
     }
 
