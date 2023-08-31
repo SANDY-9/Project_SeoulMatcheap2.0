@@ -1,6 +1,5 @@
 package com.sandy.seoul_matcheap.ui.splash
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.sandy.seoul_matcheap.data.store.entity.Polygon
 import com.sandy.seoul_matcheap.data.store.entity.StoreInfo
@@ -49,7 +48,6 @@ class LoadViewModel @Inject constructor(
 
     // database fetch : insert store data
     private fun fetchStoresData(stores: List<String>) = viewModelScope.launch(Dispatchers.IO) {
-        Log.e("확인", "fetchStoresData: 확인의 확인", )
         val downloadedStores = stores.map {
             val token = it.split("\t")
             val lat = token[12].trim().toDouble()
