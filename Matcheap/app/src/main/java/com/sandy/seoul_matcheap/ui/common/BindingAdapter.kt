@@ -31,8 +31,8 @@ import kotlin.math.*
 object BindingAdapter {
 
     @JvmStatic
-    @BindingAdapter(value = ["url", "code"])
-    fun setImage(imageView: ImageView, url: String?, code: String?) {
+    @BindingAdapter("StoreImage")
+    fun setImage(imageView: ImageView, url: String?) {
         url?.let {
             val requestBuilder = Glide.with(imageView.context)
                 .load(url)

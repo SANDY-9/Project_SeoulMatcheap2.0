@@ -37,11 +37,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                app:code="@{storeDetails.store.code}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:url="@{storeDetails.store.photo}"
+                StoreImage="@{storeDetails.store.photo}"
                 tools:srcCompat="@drawable/img_banner" />
 
             <View

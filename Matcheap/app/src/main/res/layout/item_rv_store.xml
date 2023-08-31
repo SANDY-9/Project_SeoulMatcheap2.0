@@ -31,8 +31,7 @@
                 android:id="@+id/imageView8"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:code="@{store.code}"
-                app:url="@{store.photo}"
+                StoreImage="@{store.photo}"
                 tools:srcCompat="@tools:sample/avatars" />
 
             <View
@@ -49,12 +48,15 @@
                 android:layout_gravity="start"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:background="#19000000"
                 android:paddingStart="8dp"
                 android:paddingVertical="2dp"
                 android:paddingEnd="4dp"
                 android:textColor="@color/white"
                 android:textSize="12sp"
+                android:shadowColor="@color/matcheap_shadow"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="5"
                 tools:text="한식" />
 
         </androidx.cardview.widget.CardView>

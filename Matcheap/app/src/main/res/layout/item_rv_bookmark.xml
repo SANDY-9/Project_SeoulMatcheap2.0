@@ -34,8 +34,7 @@
                 android:id="@+id/imageView8"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:code="@{bookmarkedStore.store.code}"
-                app:url="@{bookmarkedStore.store.photo}"
+                StoreImage="@{bookmarkedStore.store.photo}"
                 tools:srcCompat="@tools:sample/avatars" />
 
             <View
@@ -51,9 +50,12 @@
                 android:layout_gravity="bottom|start|top|end"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
-                android:background="#4D000000"
                 android:textColor="@color/white"
                 android:textSize="10sp"
+                android:shadowColor="@color/matcheap_shadow"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="5"
                 app:lat="@{bookmarkedStore.store.lat}"
                 app:lng="@{bookmarkedStore.store.lng}"
                 app:curLat="@{location.latitude}"

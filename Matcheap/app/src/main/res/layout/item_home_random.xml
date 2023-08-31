@@ -37,8 +37,7 @@
                 android:id="@+id/imageView8"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:code="@{store1.code}"
-                app:url="@{store1.photo}" />
+                StoreImage="@{store1.photo}" />
 
             <View
                 android:id="@+id/view4"
@@ -170,8 +169,7 @@
                 android:id="@+id/imageView68"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:code="@{store2.code}"
-                app:url="@{store2.photo}" />
+                StoreImage="@{store2.photo}" />
 
             <View
                 android:id="@+id/view64"
