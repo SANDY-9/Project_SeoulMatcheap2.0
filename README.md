@@ -19,6 +19,7 @@
 ## Skills
 <img src="https://img.shields.io/badge/Android-34A853?style=flat-square&logo=android&logoColor=white"/> <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat-square&logo=Kotlin&logoColor=white"/> <img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=white"/> <img src="https://img.shields.io/badge/MVVM-000000?style=flat-square&logo=&logoColor=white"/> <img src="https://img.shields.io/badge/RESTful API-000000?style=flat-square&logo=&logoColor=000000"/> 
 + ACC(Android Architecture Component)
++ Dagger-Hilt
 + Restrofit2
 + Coroutine
 + Naver Map SDK
