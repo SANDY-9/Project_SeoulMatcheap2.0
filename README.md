@@ -1,7 +1,12 @@
 # 서울맛칩 2.0</br>
 서울시에서 선정한 착한가격업소에 대한 정보앱
-
-🏆 2023 서울 열린데이터광장 공공데이터 활용 모바일 앱/웹 경진대회 일반부 **최우수상** 수상</br>
+</br>
+🏆 「2023 서울 열린데이터광장 공공데이터 활용 모바일 앱/웹 경진대회」 일반부 **최우수상** 수상</br>
+</br>
+<img src="./img/그래픽.png">
+</br>
+<img src="./img/소개.png">
+</br>
 
 </br>
 
@@ -50,5 +55,6 @@
 </br>
 
 ## Links
-서울맛칩 다운로드 : [링크](https://play.google.com/store/apps/details?id=com.sandy.seoul_matcheap)
-
+서울맛칩 개발기록 : [링크](https://reflective-goose-443.notion.site/0b89bddfb6334d178d6f6c45f1d71182?pvs=4)</br>
+서울맛칩 다운로드 : [링크](https://play.google.com/store/apps/details?id=com.sandy.seoul_matcheap)</br></br>
+<img src="./img/링크.png">
