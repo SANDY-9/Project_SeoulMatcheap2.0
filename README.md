@@ -17,7 +17,7 @@
 검색|서울시 착한가격업소 검색|- 검색어 히스토리</br>- 추천 검색어</br>- 검색어 자동완성</br>- 띄어쓰기 상관없이 부분검색 지원
 지도|서울시 착한가격업소 지도|- Zoom 배율이 높을 때는 내 위치 중심 지도 제공</br>- Zoom 배율이 낮을 때는 서울시 모양의 숫자 지도 제공</br>- 이 지역 재검색</br>- 필터 : 지역, 카테고리, 거리, 즐겨찾기
 업소 상세화면|착한가격업소 정보|- 업소 정보(소개, 정보, 메뉴, 위치)</br>- 연락하기, 길 찾기</br>- 즐겨찾기 저장</br>- SNS 공유하기
-편의|서울맛칩 앱 편의기능|- 즐겨찾기 관리</br> - 푸시알림 설정</br> - 앱 바로가기(Shortcut) 메뉴
+더보기기|서울맛칩 앱 편의기능|- 즐겨찾기 관리</br> - 푸시알림 설정</br> - 앱 바로가기(Shortcut) 메뉴
 
 </br>
 
@@ -55,6 +55,7 @@
 </br>
 
 ## Links
+서울맛칩 이전(1.0) 개발 버전 : [서울맛칩1.0 코드 보러가기](https://github.com/SANDY-9/Project_matcheap-1.0)</br>
 서울맛칩 개발기록 : [링크](https://reflective-goose-443.notion.site/0b89bddfb6334d178d6f6c45f1d71182?pvs=4)</br>
 서울맛칩 다운로드 : [링크](https://play.google.com/store/apps/details?id=com.sandy.seoul_matcheap)</br></br>
 <img src="./img/링크.png">
