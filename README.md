@@ -23,7 +23,7 @@
 
 ## Skills
 <img src="https://img.shields.io/badge/Android-34A853?style=flat&logo=android&logoColor=white"/> <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat&logo=Kotlin&logoColor=white"/> <img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=white"/> <img src="https://img.shields.io/badge/MVVM-000000?style=flat&logo=&logoColor=white"/> <img src="https://img.shields.io/badge/RESTful API-000000?style=flat&logo=&logoColor=000000"/> 
-+ ACC(Android Architecture Component) : Lifecycles, LiveData, ViewModel, Room, Paging, DataBinding, Navigation, WorkManager
++ AAC(Android Architecture Component) : Lifecycles, LiveData, ViewModel, Room, Paging, DataBinding, Navigation, WorkManager
 + Dagger-Hilt
 + Restrofit2
 + Coroutine
