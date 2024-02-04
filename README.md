@@ -17,13 +17,38 @@
 </br>
 
 ## Skills
-<img src="https://img.shields.io/badge/Android-34A853?style=flat-square&logo=android&logoColor=white"/> <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat-square&logo=Kotlin&logoColor=white"/> <img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=white"/> <img src="https://img.shields.io/badge/MVVM-000000?style=flat-square&logo=&logoColor=white"/> <img src="https://img.shields.io/badge/RESTful API-000000?style=flat-square&logo=&logoColor=000000"/> 
-+ ACC(Android Architecture Component)
+<img src="https://img.shields.io/badge/Android-34A853?style=flat&logo=android&logoColor=white"/> <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat&logo=Kotlin&logoColor=white"/> <img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=white"/> <img src="https://img.shields.io/badge/MVVM-000000?style=flat&logo=&logoColor=white"/> <img src="https://img.shields.io/badge/RESTful API-000000?style=flat&logo=&logoColor=000000"/> 
++ ACC(Android Architecture Component) : Lifecycles, LiveData, ViewModel, Room, Paging, DataBinding, Navigation, WorkManager
 + Dagger-Hilt
 + Restrofit2
 + Coroutine
 + Naver Map SDK
-+ Motion Layout
++ FusedLocaionProvider
 + Firebase RemoteConfig
 + Firebase Dynamic Link
-+ Lottie
++ LeakCanary
++ Alram Manager
++ Glide
++ Jsoup
++ UI: ConstaintLayout, Motion Layout, ViewPager2, TabLayout, RecyclerView, Lottie
+
+</br>
+
+## Release Note
+<details><summary>2.1.0 (2023.9.7)</summary>
+1. 앱의 로딩속도 개선 : 기존 5초 -> 2초</br>
+2. 지도에서 "재검색"기능 추가</br>
+3. 착한가격업소 사진이 나오지 않는 현상 수정</br>
+</details>    
+<details><summary>2.0.1 (2023.6.2)</summary>
+출시 후 버그 수정 : 동네 정보 불러오지 못하는 문제, 메뉴 정보를 네트워크에서 불러오지 못하는 문제
+</details>   
+<details><summary>2.0.0 (2023.6.1)</summary>
+서울맛칩2.0을 출시합니다. 서울맛칩은 서울시에서 선정한 착한가격업소 정보앱입니다!
+</details>   
+
+</br>
+
+## Links
+서울맛칩 다운로드 : [링크](https://play.google.com/store/apps/details?id=com.sandy.seoul_matcheap)
+
