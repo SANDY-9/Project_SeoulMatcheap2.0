@@ -32,7 +32,7 @@
 + Firebase RemoteConfig
 + Firebase Dynamic Link
 + LeakCanary
-+ Alram Manager
++ Alarm Manager
 + Glide
 + Jsoup
 + UI: ConstaintLayout, Motion Layout, ViewPager2, TabLayout, RecyclerView, Lottie
