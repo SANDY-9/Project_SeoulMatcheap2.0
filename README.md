@@ -55,7 +55,7 @@
 </br>
 
 ## Links
-서울맛칩 이전(1.0) 개발 버전 : [서울맛칩1.0 코드 보러가기](https://github.com/SANDY-9/Project_matcheap-1.0)</br>
-서울맛칩 개발기록 : [링크](https://reflective-goose-443.notion.site/0b89bddfb6334d178d6f6c45f1d71182?pvs=4)</br>
-서울맛칩 다운로드 : [링크](https://play.google.com/store/apps/details?id=com.sandy.seoul_matcheap)</br></br>
++ 서울맛칩 이전(1.0) 개발 버전 : [서울맛칩1.0 코드 보러가기](https://github.com/SANDY-9/Project_matcheap-1.0)</br>
++ 서울맛칩 개발기록 : [링크](https://reflective-goose-443.notion.site/0b89bddfb6334d178d6f6c45f1d71182?pvs=4)</br>
++ 서울맛칩 다운로드 : [링크](https://play.google.com/store/apps/details?id=com.sandy.seoul_matcheap)</br></br>
 <img src="./img/링크.png">
