@@ -44,6 +44,7 @@ class SearchResultFragment : BaseFragment<FragmentSearchResultBinding>(R.layout.
 
     private fun requestSearch(param: String) {
         showProgressView(binding.progressView)
+        binding.rvResultList.scrollToPosition(DEFAULT_POSITION)
         searchViewModel.run {
             input.value = param
             requestSearch(param, locationViewModel.getCurLocation())
