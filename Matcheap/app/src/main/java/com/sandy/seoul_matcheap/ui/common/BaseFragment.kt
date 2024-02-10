@@ -1,7 +1,6 @@
 package com.sandy.seoul_matcheap.ui.common
 
 import android.content.Intent
-import android.location.LocationManager
 import android.net.Uri
 import android.os.*
 import android.view.*
@@ -20,8 +19,8 @@ import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.*
+import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
-import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.store.StoreDetailsActivity
 import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.util.helper.PermissionHelper
@@ -61,27 +60,6 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
      * onCreateView에서 root view를 리턴하기 전에 뷰에 업데이트할 데이터를 다운받아야 한다면 이 함수를 override합니다. */
     protected open fun downloadData() = Unit
 
-    /**
-     *  locationViewModel으로부터 last location 정보를 업데이트하도록 요청하는 함수.
-     * 위치 정보 업데이트 요청 이후의 동작을 정의해야 하면 hasLocationUpdate()를 override 합니다. */
-    fun updateLocation(locationViewModel: LocationViewModel, locationManager: LocationManager) : Boolean {
-        showToastMessage(MESSAGE_GPS_DESC)
-        val enableGpsProvider = getGpsProviderState(locationManager)
-        return enableGpsProvider.also {
-            if(it) {
-                locationViewModel.updateLastLocation()
-                hasLocationUpdate()
-                showToastMessage(MESSAGE_GPS_COMPLETE_DESC)
-            }
-        }
-    }
-    protected fun getGpsProviderState(locationManager: LocationManager) = run {
-        locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER).also {
-            if(!it) showToastMessage(MESSAGE_GPS_WARNING)
-        }
-    }
-    /** locationViewModel로부터 location 업데이트를 요청한 후 이후 호출되는 함수 */
-    open fun hasLocationUpdate() = Unit
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -139,7 +117,7 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
             dropDownSoftKeyboard(inputManager)
             when (val param = text.toString().trim()) {
                 param -> handleValidInput(param)
-                else -> showToastMessage(MESSAGE_SEARCH_WARNING)
+                else -> showToastMessage(context, MESSAGE_SEARCH_WARNING)
             }
             return@setOnEditorActionListener true
         }
@@ -205,8 +183,6 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
         val intent = PermissionHelper.getPermissionSettingsIntent(requireContext())
         permissionSettingsIntentLauncher.launch(intent)
     }
-
-    protected fun showToastMessage(message : String) = Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
 
     protected fun registerHandler(handler: Handler = Handler(Looper.getMainLooper()), delay: Long, func: () -> Unit) {
         handler.postDelayed(func, delay)

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentHomeBinding
+import com.sandy.seoul_matcheap.extension.updateLocation
 import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.util.*
@@ -136,7 +137,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     @Inject lateinit var locationManager: LocationManager
     private fun ImageView.setOnGpsUpdateButtonClickListener() = setOnClickListener {
-        updateLocation(locationViewModel, locationManager)
+        locationManager.updateLocation(locationViewModel, requireContext())
     }
 
     private fun ImageView.setOnRefreshButtonClickListener() = setOnClickListener {

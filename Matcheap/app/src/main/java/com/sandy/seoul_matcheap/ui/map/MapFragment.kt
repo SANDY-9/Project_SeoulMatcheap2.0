@@ -19,6 +19,7 @@ import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.*
 import com.sandy.seoul_matcheap.data.store.entity.*
 import com.sandy.seoul_matcheap.databinding.*
+import com.sandy.seoul_matcheap.extension.updateLocation
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.common.*
 import com.sandy.seoul_matcheap.ui.more.bookmark.BookmarkViewModel
@@ -43,16 +44,16 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
             lifecycleOwner = viewLifecycleOwner
             fragment = this@MapFragment
             location = locationViewModel
-            locationManager = this@MapFragment.locationManager
             zoom = MapUtils.MAP_DEFAULT_ZOOM
         }
     }
 
     override fun downloadData() {
-        val gps = updateLocation(locationViewModel, locationManager)
-        if(!gps) mapViewModel.updateData(MapUtils.SEOUL_CITY_HALL_LAT, MapUtils.SEOUL_CITY_HALL_LNG)
+        val isLocationUpdateEnabled = updateLocation()
+        if(!isLocationUpdateEnabled) mapViewModel.updateData(MapUtils.SEOUL_CITY_HALL_LAT, MapUtils.SEOUL_CITY_HALL_LNG)
     }
 
+    fun updateLocation() = locationManager.updateLocation(locationViewModel, requireContext())
 
     override fun initView() {
         initMapAsync()
@@ -88,7 +89,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     }
 
     private fun NaverMap.addOnMapTouchEventLister() {
-        setOnMapDoubleTapListener { _, _ -> updateLocation(locationViewModel, locationManager) }
+        setOnMapDoubleTapListener { _, _ -> updateLocation() }
         setOnMapClickListener { _, _ -> closeStoreBottomSheet() }
     }
 

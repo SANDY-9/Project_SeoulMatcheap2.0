@@ -23,6 +23,7 @@ import com.sandy.seoul_matcheap.BuildConfig
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.StoreDatabase
 import com.sandy.seoul_matcheap.databinding.FragmentSplashBinding
+import com.sandy.seoul_matcheap.extension.updateLocation
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import com.sandy.seoul_matcheap.ui.more.settings.notification.NotificationScheduler
@@ -147,7 +148,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
     @Inject lateinit var locationManager : LocationManager
     private val locationViewModel: LocationViewModel by activityViewModels()
     private fun requestLocationUpdate() {
-        getGpsProviderState(locationManager)
+        locationManager.updateLocation(locationViewModel, requireContext())
         locationViewModel.updateLocation()
         binding.tvLoading.visibility = View.VISIBLE
     }
