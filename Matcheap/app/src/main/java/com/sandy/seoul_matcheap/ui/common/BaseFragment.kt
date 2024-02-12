@@ -77,42 +77,12 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
     abstract fun initView()
 
 
-    //!-- 여기서부터 재사용이 빈번한 뷰 확장함수
-
-    protected fun RecyclerView.addAdapter(recyclerViewAdapter: Adapter<out ViewHolder>?) {
-        adapter = recyclerViewAdapter
-    }
-
-    protected open fun Adapter<out ViewHolder>.addOnItemClickListener() = Unit
-
-    protected fun TextView.setVisibleForScroll(y: Int) {
-        visibility = if(y > MIN_SCROLL) View.VISIBLE else View.GONE
-    }
-
-    protected fun ImageView.setOnBackButtonClickListener() = setOnClickListener { setOnBackPressedListener() }
-
-    protected fun View.changeScale(scale: Float = SCALE) {
-        scaleX = scale
-        scaleY = scale
-    }
-
-    protected fun TextView.setChangeTextColorOnTouch(action: Int) {
-        val color = when (action) {
-            MotionEvent.ACTION_UP -> Resource.matCheapGray
-            else -> Resource.matCheapBlue
-        }
-        setTextColor(color)
-    }
-
     protected fun MotionLayout.startTransition(id: Int) {
         setTransition(id)
         transitionToEnd()
     }
 
-
     protected open fun subscribeToObservers() = Unit
-
-    protected open fun TextView.setOnRetryButtonClickListener() = Unit
 
 
     //!-- 퍼미션 관련
