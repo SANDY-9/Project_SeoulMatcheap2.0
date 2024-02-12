@@ -13,11 +13,13 @@ import androidx.viewpager2.widget.ViewPager2
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentStoreListBinding
+import com.sandy.seoul_matcheap.extension.connectPagerWithTabLayout
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import com.sandy.seoul_matcheap.ui.common.PagerAdapter
 import com.sandy.seoul_matcheap.util.constants.*
 import dagger.hilt.android.AndroidEntryPoint
+import showProgressView
 
 @AndroidEntryPoint
 class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragment_store_list) {
@@ -34,7 +36,7 @@ class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragme
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        showProgressView(binding.progressView)
+        binding.progressView.showProgressView()
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -51,7 +53,7 @@ class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragme
         initPager(type, category)
 
         with(binding) {
-            connectPagerWithTabLayout(tabLayout, pager, progressView)
+            pager.connectPagerWithTabLayout(tabLayout, progressView, requireContext())
             btnBack.setOnBackButtonClickListener()
             tvTitle.setTitleText(type, category)
             tvGps.text = address

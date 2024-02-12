@@ -5,6 +5,7 @@ import android.view.*
 import androidx.recyclerview.widget.*
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.extension.anchorSmoothScrollToPosition
 import com.sandy.seoul_matcheap.ui.more.bookmark.BookmarkListAdapter
 import com.sandy.seoul_matcheap.ui.store.*
 import com.sandy.seoul_matcheap.util.constants.CATEGORY_SIZE
@@ -37,6 +38,7 @@ class PagerAdapter<T: Adapter>(
     inner class ItemPagerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val recyclerView: RecyclerView = itemView.findViewById(R.id.recyclerView)
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = run {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_pager_view, parent, false)
         ItemPagerViewHolder(view)
@@ -70,25 +72,6 @@ class PagerAdapter<T: Adapter>(
         when(scrollType) {
             TYPE_NORMAL_SCROLL -> scrollToPosition(DEFAULT_POSITION)
             else -> anchorSmoothScrollToPosition(DEFAULT_POSITION)
-        }
-    }
-
-    private fun RecyclerView.anchorSmoothScrollToPosition(position: Int, anchorPosition: Int = 3) {
-        layoutManager?.apply {
-            when (this) {
-                is LinearLayoutManager -> {
-                    val topItem = findFirstVisibleItemPosition()
-                    val distance = topItem - position
-                    val anchorItem = when {
-                        distance > anchorPosition -> position + anchorPosition
-                        distance < -anchorPosition -> position - anchorPosition
-                        else -> topItem
-                    }
-                    if (anchorItem != topItem) scrollToPosition(anchorItem)
-                    post { smoothScrollToPosition(position) }
-                }
-                else -> smoothScrollToPosition(position)
-            }
         }
     }
 

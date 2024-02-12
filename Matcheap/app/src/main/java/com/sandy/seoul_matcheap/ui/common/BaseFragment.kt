@@ -17,8 +17,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.*
 import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.ui.store.StoreDetailsActivity
@@ -93,24 +91,6 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
 
     protected fun ImageView.setOnBackButtonClickListener() = setOnClickListener { setOnBackPressedListener() }
 
-    protected fun connectPagerWithTabLayout(tabLayout: TabLayout, pager: ViewPager2, progressView: FrameLayout) {
-        val category = resources.getStringArray(R.array.category_name)
-        TabLayoutMediator(tabLayout, pager) { tab, position ->
-            tab.setupTab(category[position], progressView)
-        }.attach()
-    }
-    /**
-     * TabLayoutMediator에 의해 tab과 viewpager가 Mediator될 때 tab 설정.
-     * tab의 타이틀 text와 tab을 클릭 했을 때 이벤트를 설정함
-     * @param name tab title
-     * @param progressView tab을 클릭 했을 때 보여주는 progressView
-     */
-    private fun TabLayout.Tab.setupTab(name: String, progressView: FrameLayout) {
-        text = name
-        view.setOnClickListener {
-            if(!isSelected) showProgressView(progressView)
-        }
-    }
 
     protected fun EditText.addOnEnterKeyPressedListener(inputManager: InputMethodManager) =
         setOnEditorActionListener { _, _, _ ->
@@ -144,18 +124,6 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
 
 
     protected open fun subscribeToObservers() = Unit
-
-    /**
-     * 화면을 로딩할 때 보여주는 화면
-     * @param progressView 보여주는 로딩화면
-     * @param duration progressView를 보여주는 시간. default setting duration = 500L
-     */
-    protected fun showProgressView(progressView: ViewGroup, duration: Long = PROGRESS_DURATION) = progressView.apply {
-        visibility = View.VISIBLE
-        Handler(Looper.getMainLooper()).postDelayed({
-            visibility = View.GONE
-        }, duration)
-    }
 
     protected open fun TextView.setOnRetryButtonClickListener() = Unit
 
@@ -246,5 +214,3 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
     protected open fun destroyGlobalVariables() = Unit
 
 }
-
-private const val PROGRESS_DURATION = 1000L

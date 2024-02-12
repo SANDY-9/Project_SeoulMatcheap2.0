@@ -8,6 +8,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore
 import com.sandy.seoul_matcheap.databinding.FragmentBookmarkBinding
+import com.sandy.seoul_matcheap.extension.connectPagerWithTabLayout
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import com.sandy.seoul_matcheap.ui.common.PagerAdapter
@@ -30,7 +31,7 @@ class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        showProgressView(binding.progressView)
+        binding.progressView.showProgressView()
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -42,7 +43,7 @@ class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment
 
     override fun initView() = binding.run {
         initPager()
-        connectPagerWithTabLayout(tabLayout, pager, progressView)
+        pager.connectPagerWithTabLayout(tabLayout, progressView, requireContext())
 
         btnBack.setOnBackButtonClickListener()
     }
