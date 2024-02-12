@@ -91,19 +91,6 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
 
     protected fun ImageView.setOnBackButtonClickListener() = setOnClickListener { setOnBackPressedListener() }
 
-
-    protected fun EditText.addOnEnterKeyPressedListener(inputManager: InputMethodManager) =
-        setOnEditorActionListener { _, _, _ ->
-            dropDownSoftKeyboard(inputManager)
-            when (val param = text.toString().trim()) {
-                param -> handleValidInput(param)
-                else -> showToastMessage(context, MESSAGE_SEARCH_WARNING)
-            }
-            return@setOnEditorActionListener true
-        }
-
-    protected open fun handleValidInput(param: String) = Unit
-
     protected fun View.changeScale(scale: Float = SCALE) {
         scaleX = scale
         scaleY = scale
@@ -126,18 +113,6 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
     protected open fun subscribeToObservers() = Unit
 
     protected open fun TextView.setOnRetryButtonClickListener() = Unit
-
-    /**
-     * 화면의 focus를 clear하고 softKeyboard를 화면에서 내린다(drop down)
-     * @param inputManager
-     */
-    protected fun dropDownSoftKeyboard(inputManager: InputMethodManager) = requireActivity().currentFocus?.let{
-        inputManager.hideSoftInputFromWindow(
-            it.windowToken,
-            InputMethodManager.HIDE_NOT_ALWAYS
-        )
-        it.clearFocus()
-    }
 
 
     //!-- 퍼미션 관련
@@ -185,7 +160,7 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
         })
 
     /** onBackPressed의 callback으로 동작되는 함수 */
-    protected open fun setOnBackPressedListener() {
+    open fun setOnBackPressedListener() {
         findNavController().popBackStack()
     }
 
