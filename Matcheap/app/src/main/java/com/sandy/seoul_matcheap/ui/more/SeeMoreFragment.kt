@@ -1,22 +1,22 @@
 package com.sandy.seoul_matcheap.ui.more
 
-import android.animation.Animator
-import android.animation.ValueAnimator
 import android.os.Handler
 import android.os.Looper
 import android.view.*
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import changeScale
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.adapters.StoreCountPagerAdapter
 import com.sandy.seoul_matcheap.databinding.FragmentSeemoreBinding
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
+import com.sandy.seoul_matcheap.extension.setPageAnimationDuration
+import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
 import com.sandy.seoul_matcheap.util.constants.TEAR_STOP_SEOUL_HOME_URL
 import dagger.hilt.android.AndroidEntryPoint
+import setChangeTextColorOnTouch
 
 @AndroidEntryPoint
 class SeeMoreFragment : BaseFragment<FragmentSeemoreBinding>(R.layout.fragment_seemore) {
@@ -38,63 +38,40 @@ class SeeMoreFragment : BaseFragment<FragmentSeemoreBinding>(R.layout.fragment_s
     override fun initGlobalVariables() {
         autoPageScrollHandler = Handler(Looper.getMainLooper())
         countPagerAdapter = StoreCountPagerAdapter().apply {
-            addOnItemClickListener()
-        }
-    }
-    override fun RecyclerView.Adapter<out RecyclerView.ViewHolder>.addOnItemClickListener() {
-        when(this) {
-            is StoreCountPagerAdapter -> setOnItemClickListener {
+            setOnItemClickListener {
                 binding.pager.changePage()
             }
         }
     }
 
-    override fun initView() {
-        with(binding) {
-            pager.setup()
-            btnVisit.setOnTouchListener()
-        }
+    override fun initView() = binding.run {
+        pager.init()
+        btnVisit.setOnTouchListener()
     }
 
-    private fun ViewPager2.setup() {
+    private fun ViewPager2.init() {
         post {
             setCurrentItem(savePosition, false)
         }
         orientation = ViewPager2.ORIENTATION_VERTICAL
         adapter = countPagerAdapter
-        registerHandler(autoPageScrollHandler!!, HANDLER_DURATION, ::addAutoPageScrollHandler)
+        registerHandler(autoPageScrollHandler!!, HANDLER_DURATION / 2, ::addAutoPageScrollHandler)
+    }
+
+    private fun registerHandler(handler: Handler = Handler(Looper.getMainLooper()), delay: Long, func: () -> Unit) {
+        handler.postDelayed(func, delay)
     }
 
     private fun addAutoPageScrollHandler() {
         binding.pager.changePage()
         registerHandler(autoPageScrollHandler!!, HANDLER_DURATION, ::addAutoPageScrollHandler)
     }
+
     private fun ViewPager2.changePage() {
-        setCurrentItemWithDuration(
+        setPageAnimationDuration(
             item = if(currentItem == CODE_SIZE - 1) DEFAULT_POSITION else currentItem + 1,
             duration = 700L
         )
-    }
-    private fun ViewPager2.setCurrentItemWithDuration(item: Int, duration: Long) {
-        val pxToDrag: Int = height * (item - currentItem)
-        var previousValue = DEFAULT_POSITION
-        ValueAnimator.ofInt(DEFAULT_POSITION, pxToDrag).run {
-            addUpdateListener {
-                val currentValue = it.animatedValue as Int
-                val currentPxToDrag = -(currentValue - previousValue).toFloat()
-                fakeDragBy(currentPxToDrag)
-                previousValue = currentValue
-            }
-            addListener(object : Animator.AnimatorListener {
-                override fun onAnimationStart(animation: Animator) { beginFakeDrag() }
-                override fun onAnimationEnd(animation: Animator) { endFakeDrag() }
-                override fun onAnimationCancel(animation: Animator) { /* NO_OP */ }
-                override fun onAnimationRepeat(animation: Animator) { /* NO_OP */ }
-            })
-            interpolator = AccelerateDecelerateInterpolator()
-            this.duration = duration
-            start()
-        }
     }
 
     private fun TextView.setOnTouchListener() = setOnTouchListener { _, event ->
@@ -114,7 +91,7 @@ class SeeMoreFragment : BaseFragment<FragmentSeemoreBinding>(R.layout.fragment_s
         findNavController().navigate(getDestination(index))
         savePosition = binding.pager.currentItem
     }
-    private fun getDestination(index: Int) = arrayOf(
+    private fun getDestination(index: Int) = intArrayOf(
         R.id.action_seeMoreFragment_to_bookMarkFragment,
         R.id.action_seeMoreFragment_to_settingsFragment,
         R.id.action_seeMoreFragment_to_noticeFragment,

@@ -1,10 +1,10 @@
-package com.sandy.seoul_matcheap.ui.search
+package com.sandy.seoul_matcheap.adapters
 
 import androidx.lifecycle.LifecycleOwner
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.AutoComplete
 import com.sandy.seoul_matcheap.databinding.ItemRvAutocompleteBinding
-import com.sandy.seoul_matcheap.ui.common.BaseListAdapter
+import com.sandy.seoul_matcheap.ui.search.SearchViewModel
 
 /**
  * @author SANDY

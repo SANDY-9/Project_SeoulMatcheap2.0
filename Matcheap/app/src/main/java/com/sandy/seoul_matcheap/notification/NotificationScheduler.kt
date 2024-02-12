@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.ui.more.settings.notification
+package com.sandy.seoul_matcheap.notification
 
 import com.sandy.seoul_matcheap.ui.more.settings.Time
 

@@ -9,9 +9,6 @@
             name="location"
             type="com.sandy.seoul_matcheap.ui.LocationViewModel" />
         <variable
-            name="locationManager"
-            type="android.location.LocationManager" />
-        <variable
             name="zoom"
             type="Double" />
         <variable
@@ -121,7 +118,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
-                android:onClick="@{()->fragment.updateLocation(location, locationManager)}"/>
+                android:onClick="@{()->fragment.updateLocation()}"/>
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView

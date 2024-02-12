@@ -44,7 +44,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.sandy.seoul_matcheap.ui.common.SoftKeyboardDetectorView
+        <com.sandy.seoul_matcheap.util.custom.SoftKeyboardDetectorView
             android:id="@+id/keyboardDetectorView"
             android:layout_width="0dp"
             android:layout_height="0dp"

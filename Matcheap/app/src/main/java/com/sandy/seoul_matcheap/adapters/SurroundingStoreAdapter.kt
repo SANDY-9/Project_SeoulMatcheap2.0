@@ -1,10 +1,9 @@
-package com.sandy.seoul_matcheap.ui.home
+package com.sandy.seoul_matcheap.adapters
 
 import android.content.Context
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.ItemRvSurroundingBinding
-import com.sandy.seoul_matcheap.ui.common.BaseListAdapter
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
 
 /**

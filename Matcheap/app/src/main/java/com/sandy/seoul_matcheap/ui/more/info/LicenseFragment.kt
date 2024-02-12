@@ -2,7 +2,7 @@ package com.sandy.seoul_matcheap.ui.more.info
 
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.databinding.FragmentLicenseBinding
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
+import com.sandy.seoul_matcheap.ui.BaseFragment
 
 class LicenseFragment : BaseFragment<FragmentLicenseBinding>(R.layout.fragment_license) {
 
@@ -11,7 +11,7 @@ class LicenseFragment : BaseFragment<FragmentLicenseBinding>(R.layout.fragment_l
     }
 
     override fun initView() = binding.run {
-        btnBack.setOnBackButtonClickListener()
+        btnBack.setOnClickListener { setOnBackPressedListener() }
         webView.loadUrl(LICENSE_URI)
     }
 

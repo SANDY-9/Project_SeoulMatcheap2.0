@@ -10,6 +10,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.ktx.Firebase
@@ -20,12 +21,13 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigException
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.sandy.seoul_matcheap.BuildConfig
+import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.StoreDatabase
 import com.sandy.seoul_matcheap.databinding.FragmentSplashBinding
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
-import com.sandy.seoul_matcheap.ui.more.settings.notification.NotificationScheduler
+import com.sandy.seoul_matcheap.ui.BaseFragment
+import com.sandy.seoul_matcheap.notification.NotificationScheduler
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.util.helper.AppPrefsUtils
@@ -75,7 +77,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
     private fun checkAppVersion(checkable: Boolean, versionCheck: Boolean) = when {
         checkable && !versionCheck -> showAppUpdateNoticeDialog()
         else -> requestPermissions().also {
-            if(!checkable) showToastMessage(MESSAGE_NETWORK_ERROR)
+            if(!checkable) showToastMessage(requireContext(), MESSAGE_NETWORK_ERROR)
         }
     }
 
@@ -147,33 +149,39 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
     @Inject lateinit var locationManager : LocationManager
     private val locationViewModel: LocationViewModel by activityViewModels()
     private fun requestLocationUpdate() {
-        getGpsProviderState(locationManager)
+        val isLocationUpdateEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        if(!isLocationUpdateEnabled) showToastMessage(requireContext(), MESSAGE_GPS_WARNING)
         locationViewModel.updateLocation()
         binding.tvLoading.visibility = View.VISIBLE
     }
 
     private fun hasNotLocationPermission() {
-        showToastMessage(MESSAGE_PERMISSION_WARNING_LOCATION)
-        startPermissionSettingsIntent()
+        showToastMessage(requireContext(), MESSAGE_PERMISSION_WARNING_LOCATION)
+        PermissionHelper.startPermissionSettingsIntent(requireContext(), permissionSettingsIntentLauncher)
     }
-    override fun handlePermissionSettingsActivityResult() {
+
+    private val permissionSettingsIntentLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        handlePermissionSettingsActivityResult()
+    }
+
+    private fun handlePermissionSettingsActivityResult() {
         val isGrantedLocationPermission = PermissionHelper.isGrantedLocationPermission(requireContext())
         when {
             isGrantedLocationPermission -> requestLocationUpdate()
-            else -> showToastMessage(MESSAGE_PERMISSION_WARNING_LOCATION)
+            else -> showToastMessage(requireContext(), MESSAGE_PERMISSION_WARNING_LOCATION)
         }
     }
 
     override fun initView() { /* NO_OP */ }
 
     override fun subscribeToObservers() {
-        subscribeToLocationObserver()
-        subscribeToLoadViewModelObserver()
-    }
-
-    private fun subscribeToLocationObserver() {
         locationViewModel.location.observe(viewLifecycleOwner) {
             handleLocationAndCheckDB(it)
+        }
+        loadViewModel.dataLoadSate.observe(viewLifecycleOwner) {
+            handleLoadState(it)
         }
     }
 
@@ -188,7 +196,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
     private fun checkDatabaseVersion() {
         val latestDatabaseVersion = db.openHelper.readableDatabase.version.toString()
         val savedDatabaseVersion = AppPrefsUtils.getSavedDatabaseVersion(prefs)
-        when (latestDatabaseVersion) {
+        when(latestDatabaseVersion) {
             savedDatabaseVersion -> loadViewModel.setLoadState(true)
             else -> fetchDatabase(requireContext())
         }
@@ -200,11 +208,6 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
         loadViewModel.updateDatabase(storeData, polygonData)
     }
 
-    private fun subscribeToLoadViewModelObserver() {
-        loadViewModel.dataLoadSate.observe(viewLifecycleOwner) {
-            handleLoadState(it)
-        }
-    }
 
     private fun handleLoadState(isLoadEnd: Boolean) {
         if(isLoadEnd) {
@@ -228,7 +231,8 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
 
     private fun navigateToDestination() {
         val uri = requireActivity().intent.data
-        findNavController().navigate(getDestination(uri?.path), null, getPopUpNavOptions())
+        val option = NavOptions.Builder().setPopUpTo(R.id.nav_graph, false).build()
+        findNavController().navigate(getDestination(uri?.path), null, option)
     }
 
     private fun getDestination(path: String?) = when(path) {
