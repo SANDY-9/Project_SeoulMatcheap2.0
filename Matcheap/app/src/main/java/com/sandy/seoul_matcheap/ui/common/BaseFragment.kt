@@ -21,7 +21,6 @@ import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.ui.store.StoreDetailsActivity
 import com.sandy.seoul_matcheap.util.constants.*
-import com.sandy.seoul_matcheap.util.helper.PermissionHelper
 
 /**
  * @author SANDY
@@ -83,23 +82,6 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
     }
 
     protected open fun subscribeToObservers() = Unit
-
-
-    //!-- 퍼미션 관련
-    private val permissionSettingsIntentLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        handlePermissionSettingsActivityResult()
-    }
-    protected open fun handlePermissionSettingsActivityResult() = Unit
-    protected fun startPermissionSettingsIntent() {
-        val intent = PermissionHelper.getPermissionSettingsIntent(requireContext())
-        permissionSettingsIntentLauncher.launch(intent)
-    }
-
-    protected fun registerHandler(handler: Handler = Handler(Looper.getMainLooper()), delay: Long, func: () -> Unit) {
-        handler.postDelayed(func, delay)
-    }
 
 
     /**

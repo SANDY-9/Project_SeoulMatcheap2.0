@@ -58,3 +58,7 @@ fun TextView.setChangeIconTintColorOnTouch(action: Int) {
         else -> Resource.matCheapBlue
     }
 }
+
+fun View.setIsVisible(isVisible: Boolean) {
+    visibility = if(isVisible) View.GONE else View.VISIBLE
+}
