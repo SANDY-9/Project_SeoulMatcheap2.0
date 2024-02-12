@@ -22,7 +22,7 @@ class InfoFragment : BaseFragment<FragmentInfoBinding>(R.layout.fragment_info) {
 
     override fun initView() = binding.run {
         tvVersion.setVersionName()
-        btnBack.setOnBackButtonClickListener()
+        btnBack.setOnClickListener { setOnBackPressedListener() }
     }
 
     private fun TextView.setVersionName() {

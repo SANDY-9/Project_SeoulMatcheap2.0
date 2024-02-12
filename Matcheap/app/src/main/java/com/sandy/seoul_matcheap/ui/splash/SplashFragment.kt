@@ -10,6 +10,7 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.ktx.Firebase
@@ -230,7 +231,8 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
 
     private fun navigateToDestination() {
         val uri = requireActivity().intent.data
-        findNavController().navigate(getDestination(uri?.path), null, getPopUpNavOptions())
+        val option = NavOptions.Builder().setPopUpTo(R.id.nav_graph, false).build()
+        findNavController().navigate(getDestination(uri?.path), null, option)
     }
 
     private fun getDestination(path: String?) = when(path) {

@@ -11,7 +11,7 @@ class LicenseFragment : BaseFragment<FragmentLicenseBinding>(R.layout.fragment_l
     }
 
     override fun initView() = binding.run {
-        btnBack.setOnBackButtonClickListener()
+        btnBack.setOnClickListener { setOnBackPressedListener() }
         webView.loadUrl(LICENSE_URI)
     }
 

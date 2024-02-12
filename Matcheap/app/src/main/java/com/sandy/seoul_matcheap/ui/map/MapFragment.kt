@@ -25,6 +25,7 @@ import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.util.helper.MapUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import startTransition
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -177,7 +178,10 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     private fun PolygonOverlay.onPolygonClick(map: NaverMap) : Boolean {
         color = Resource.colorMatcheapLightGray
         updateMap(map)
-        registerHandler(delay = 1000L) { color = Resource.colorMatcheapLightYellow }
+        lifecycleScope.launch {
+            delay(1000L)
+            color = Resource.colorMatcheapLightYellow
+        }
         return true
     }
 

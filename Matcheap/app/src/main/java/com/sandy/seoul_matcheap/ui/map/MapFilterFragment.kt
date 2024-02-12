@@ -16,6 +16,7 @@ import com.sandy.seoul_matcheap.util.constants.*
 import com.warkiz.widget.*
 import setChangeIconTintColorOnTouch
 import setChangeTextColorOnTouch
+import startTransition
 
 class MapFilterFragment : BaseFragment<FragmentMapFilterBinding>(R.layout.fragment_map_filter) {
 

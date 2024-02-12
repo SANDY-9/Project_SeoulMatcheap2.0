@@ -4,11 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.*
 import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.LayoutRes
-import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.databinding.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.*
@@ -70,12 +67,6 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
     /** 뷰가 생성된 후(onViewCreated) view components 객체들을 초기화한다. */
     abstract fun initView()
 
-
-    protected fun MotionLayout.startTransition(id: Int) {
-        setTransition(id)
-        transitionToEnd()
-    }
-
     protected open fun subscribeToObservers() = Unit
 
 
@@ -97,8 +88,6 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
         findNavController().navigate(action)
     }
 
-    protected fun getPopUpNavOptions() = NavOptions.Builder().setPopUpTo(R.id.nav_graph, false).build()
-
     private fun registerOnBackPressedDispatcher() = requireActivity().onBackPressedDispatcher
         .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -111,14 +100,13 @@ abstract class BaseFragment<B: ViewDataBinding>(@LayoutRes private val layoutId:
         findNavController().popBackStack()
     }
 
-    protected fun handleExistDeepLinkNavigation() {
-        findNavController().run {
-            previousBackStackEntry?.let {
-                popBackStack()
-                return
-            }
-            navigate(R.id.homeFragment, null, getPopUpNavOptions())
+    protected fun handleExistDeepLinkNavigation() = findNavController().run {
+        previousBackStackEntry?.let {
+            popBackStack()
+            return
         }
+        val option = NavOptions.Builder().setPopUpTo(R.id.nav_graph, false).build()
+        navigate(R.id.homeFragment, null, option)
     }
 
 

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.sandy.seoul_matcheap.ui.common.Resource
 
@@ -61,4 +62,9 @@ fun TextView.setChangeIconTintColorOnTouch(action: Int) {
 
 fun View.setIsVisible(isVisible: Boolean) {
     visibility = if(isVisible) View.GONE else View.VISIBLE
+}
+
+fun MotionLayout.startTransition(id: Int) {
+    setTransition(id)
+    transitionToEnd()
 }
