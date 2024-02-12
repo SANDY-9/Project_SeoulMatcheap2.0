@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.adapters
+package com.sandy.seoul_matcheap.ui.common
 
 import android.graphics.Typeface
 import android.text.Spannable
@@ -17,7 +17,6 @@ import com.sandy.seoul_matcheap.ui.more.settings.Time
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.Category
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_
-import com.sandy.seoul_matcheap.util.constants.Resource
 import com.sandy.seoul_matcheap.util.helper.DataHelper
 import java.util.*
 import kotlin.math.*

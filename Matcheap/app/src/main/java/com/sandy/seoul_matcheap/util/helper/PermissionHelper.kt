@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.provider.Settings
-import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
 
 /**
@@ -27,11 +26,6 @@ object PermissionHelper {
 
     fun getPermissionSettingsIntent(context: Context) = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
         data = Uri.parse("package:" + context.packageName)
-    }
-
-    fun startPermissionSettingsIntent(context: Context, permissionLauncher: ActivityResultLauncher<Intent>) {
-        val intent = getPermissionSettingsIntent(context)
-        permissionLauncher.launch(intent)
     }
 
 }

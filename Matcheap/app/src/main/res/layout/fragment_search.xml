@@ -385,7 +385,6 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
             android:src="@drawable/ic_back"
-            android:onClick="@{()->fragment.setOnBackPressedListener()}"
             app:layout_constraintBottom_toTopOf="@+id/guideline3"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

@@ -54,7 +54,6 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="8dp"
                 android:src="@drawable/ic_back"
-                android:onClick="@{()->fragment.setOnBackPressedListener()}"
                 app:layout_constraintBottom_toTopOf="@+id/guideline"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -163,7 +162,6 @@
                         android:layout_gravity="center"
                         android:layout_marginEnd="8dp"
                         android:enabled="@{viewModel.isGranted}"
-                        android:onClick="@{()->fragment.openTimePickerView()}"
                         SavedTime="@{viewModel.savedTime}"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -215,7 +213,6 @@
                             android:text="설정 완료"
                             android:textColor="@color/matcheap_gray"
                             android:textSize="14sp"
-                            android:onClick="@{()->fragment.saveTimeSettings()}"
                             app:cornerRadius="20dp"
                             app:rippleColor="@color/matcheap_lightgray"
                             app:strokeColor="@color/matcheap_gray" />

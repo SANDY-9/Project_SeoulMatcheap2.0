@@ -1,9 +1,9 @@
-package com.sandy.seoul_matcheap.adapters
+package com.sandy.seoul_matcheap.ui.store
 
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.entity.Menu
 import com.sandy.seoul_matcheap.databinding.ItemRvMenuBinding
-import com.sandy.seoul_matcheap.adapters.BaseListAdapter
+import com.sandy.seoul_matcheap.ui.common.BaseListAdapter
 
 /**
  * @author SANDY

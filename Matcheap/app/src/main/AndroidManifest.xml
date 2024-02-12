@@ -56,7 +56,7 @@
                 android:resource="@xml/shortcuts" />
         </activity>
 
-        <receiver android:name=".notification.NotificationReceiver"/>
+        <receiver android:name=".ui.more.settings.notification.NotificationReceiver"/>
 
     </application>
 

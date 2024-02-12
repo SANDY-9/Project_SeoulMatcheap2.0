@@ -1,7 +1,8 @@
-package com.sandy.seoul_matcheap.adapters
+package com.sandy.seoul_matcheap.ui.home
 
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.databinding.ItemRvSpinnerBinding
+import com.sandy.seoul_matcheap.ui.common.BaseListAdapter
 import com.sandy.seoul_matcheap.util.constants.TYPE_CATEGORY
 import com.sandy.seoul_matcheap.util.constants.TYPE_REGION
 

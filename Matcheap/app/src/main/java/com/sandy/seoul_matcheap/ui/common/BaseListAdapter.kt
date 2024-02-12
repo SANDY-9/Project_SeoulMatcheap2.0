@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.adapters
+package com.sandy.seoul_matcheap.ui.common
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -17,9 +17,7 @@ import com.bumptech.glide.Glide
  * @created 2023-04-25
  * @desc
  */
-abstract class BaseListAdapter<B: ViewDataBinding, T>(@LayoutRes private val layoutId: Int) : ListAdapter<Any, BaseListAdapter<B, T>.ViewHolder>(
-    DIFF_UTIL
-) {
+abstract class BaseListAdapter<B: ViewDataBinding, T>(@LayoutRes private val layoutId: Int) : ListAdapter<Any, BaseListAdapter<B, T>.ViewHolder>(DIFF_UTIL) {
     inner class ViewHolder(val binding: B) : RecyclerView.ViewHolder(binding.root)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = DataBindingUtil.inflate<B>(LayoutInflater.from(parent.context), layoutId, parent, false)

@@ -1,29 +1,35 @@
 package com.sandy.seoul_matcheap.ui.search
 
+import android.location.LocationManager
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.paging.PagingData
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.*
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentSearchResultBinding
+import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.adapters.StoreListAdapter
+import com.sandy.seoul_matcheap.ui.store.StoreListAdapter
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
-import connectRecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import showProgressView
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class SearchResultFragment : SearchBaseFragment<FragmentSearchResultBinding>(R.layout.fragment_search_result) {
+class SearchResultFragment : BaseFragment<FragmentSearchResultBinding>(R.layout.fragment_search_result) {
 
+    private val searchViewModel: SearchViewModel by viewModels()
     private val locationViewModel: LocationViewModel by activityViewModels()
 
     override fun setupBinding(): FragmentSearchResultBinding {
         return binding.apply {
             lifecycleOwner = viewLifecycleOwner
-            fragment = this@SearchResultFragment
             viewModel = searchViewModel
             location = locationViewModel
             hasFocus = false
@@ -31,34 +37,44 @@ class SearchResultFragment : SearchBaseFragment<FragmentSearchResultBinding>(R.l
     }
 
     private val args: SearchResultFragmentArgs by navArgs()
+    @Inject lateinit var locationManager: LocationManager
     override fun downloadData() {
         requestSearch(args.searchWord)
     }
 
-    override fun requestSearch(param: String) {
-        with(binding) {
-            progressView.showProgressView()
-            rvResultList.scrollToPosition(DEFAULT_POSITION)
-        }
+    private fun requestSearch(param: String) {
+        showProgressView(binding.progressView)
         searchViewModel.run {
             input.value = param
             requestSearch(param, locationViewModel.getCurLocation())
         }
     }
 
+    private var autoCompleteListAdapter : AutoCompleteListAdapter? = null
     private var storeListAdapter: StoreListAdapter? = null
     override fun initGlobalVariables() {
-        super.initGlobalVariables()
-        setAutoCompleteRecyclerView(binding.rvAutoComplete)
+        autoCompleteListAdapter = AutoCompleteListAdapter(searchViewModel, viewLifecycleOwner).apply {
+            addOnItemClickListener()
+        }
         storeListAdapter = StoreListAdapter().apply {
-            setOnItemClickListener {
+            addOnItemClickListener()
+            addOnLoadStateListener()
+        }
+    }
+    override fun RecyclerView.Adapter<out RecyclerView.ViewHolder>.addOnItemClickListener() {
+        when(this) {
+            is AutoCompleteListAdapter -> setOnItemClickListener {
+                dropDownSoftKeyboard(inputManager)
+                requestSearch(it.name)
+            }
+            is StoreListAdapter -> setOnItemClickListener {
                 navigateToStoreDetails(it)
             }
-            addLoadStateListener {
-                if (it.prepend.endOfPaginationReached) {
-                    handleResultCount(itemCount)
-                }
-            }
+        }
+    }
+    private fun StoreListAdapter.addOnLoadStateListener() = addLoadStateListener {
+        if (it.prepend.endOfPaginationReached) {
+            handleResultCount(itemCount)
         }
     }
 
@@ -69,30 +85,51 @@ class SearchResultFragment : SearchBaseFragment<FragmentSearchResultBinding>(R.l
         }
     }
 
-    override fun initView() {
-        super.initView()
-        binding.run {
-            rvResultList.adapter = storeListAdapter
-            with(evSearch) {
-                addOnEnterKeyPressedListener()
-                setOnFocusChangeListener { _, hasFocus ->
-                    binding.hasFocus = hasFocus
-                }
-            }
-            textField.setOnEndIconClickListener()
-            btnTop.connectRecyclerView(rvResultList)
-        }
+    override fun initView() = binding.run {
+        btnBack.setOnBackButtonClickListener()
+        evSearch.setup()
+        rvResultList.addAdapter(storeListAdapter)
+        rvAutoComplete.addAdapter(autoCompleteListAdapter)
+        btnTop.addVisibleTopScrollButton(rvResultList)
     }
 
+    @Inject lateinit var inputManager: InputMethodManager
+    private fun EditText.setup() {
+        addOnEnterKeyPressedListener(inputManager)
+        addOnFocusChangeListener()
+        binding.textField.setOnEndIconClickListener()
+    }
+    private fun EditText.addOnFocusChangeListener() = setOnFocusChangeListener { _, hasFocus ->
+        binding.hasFocus = hasFocus
+    }
     private fun TextInputLayout.setOnEndIconClickListener() = setEndIconOnClickListener {
         editText?.text?.clear()
-        dropDownSoftKeyboard()
+        dropDownSoftKeyboard(inputManager)
     }
 
-    override fun subscribeToObservers() {
-        super.subscribeToObservers()
-        searchViewModel.searchResultList.observe(viewLifecycleOwner) {
+    override fun handleValidInput(param: String) {
+        requestSearch(param)
+    }
+
+    private fun TextView.addVisibleTopScrollButton(recyclerView: RecyclerView) {
+        val listener = object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                setVisibleForScroll(dy)
+            }
+        }
+        recyclerView.addOnScrollListener(listener)
+        setOnClickListener { recyclerView.smoothScrollToPosition(DEFAULT_POSITION) }
+    }
+
+
+    override fun subscribeToObservers() = searchViewModel.run {
+        searchResultList.observe(viewLifecycleOwner) {
             updateStoreList(it)
+        }
+        filteredAutoCompleteList.observe(viewLifecycleOwner) {
+            autoCompleteListAdapter?.run {
+                submitList(it)
+            }
         }
     }
 
@@ -103,7 +140,7 @@ class SearchResultFragment : SearchBaseFragment<FragmentSearchResultBinding>(R.l
 
     override fun setOnBackPressedListener() {
         when {
-            binding.evSearch.hasFocus() -> dropDownSoftKeyboard()
+            binding.evSearch.hasFocus() -> dropDownSoftKeyboard(inputManager)
             else -> super.setOnBackPressedListener()
         }
     }
@@ -117,6 +154,7 @@ class SearchResultFragment : SearchBaseFragment<FragmentSearchResultBinding>(R.l
 
     override fun destroyGlobalVariables() {
         super.destroyGlobalVariables()
+        autoCompleteListAdapter = null
         storeListAdapter = null
     }
 

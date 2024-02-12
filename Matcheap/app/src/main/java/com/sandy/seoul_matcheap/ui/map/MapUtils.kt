@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.util.helper
+package com.sandy.seoul_matcheap.ui.map
 
 import android.content.Context
 import android.graphics.Color
@@ -16,7 +16,7 @@ import com.sandy.seoul_matcheap.data.store.dao.StoreMapItem
 import com.sandy.seoul_matcheap.data.store.entity.Polygon
 import com.sandy.seoul_matcheap.data.store.entity.StoreInfo
 import com.sandy.seoul_matcheap.databinding.ItemMapMarkerBinding
-import com.sandy.seoul_matcheap.util.constants.Resource
+import com.sandy.seoul_matcheap.ui.common.Resource
 import javax.inject.Inject
 import kotlin.math.sqrt
 

@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.util.custom
+package com.sandy.seoul_matcheap.ui.common
 
 import android.content.Context
 import android.util.AttributeSet

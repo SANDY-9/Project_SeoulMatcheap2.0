@@ -1,8 +1,9 @@
-package com.sandy.seoul_matcheap.adapters
+package com.sandy.seoul_matcheap.ui.more
 
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.StoreTotalCount
 import com.sandy.seoul_matcheap.databinding.ItemPagerStoreCountBinding
+import com.sandy.seoul_matcheap.ui.common.BaseListAdapter
 
 /**
  * @author SANDY

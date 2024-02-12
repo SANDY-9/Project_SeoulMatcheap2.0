@@ -11,9 +11,6 @@
             name="location"
             type="com.sandy.seoul_matcheap.ui.LocationViewModel" />
         <variable
-            name="fragment"
-            type="com.sandy.seoul_matcheap.ui.search.SearchResultFragment" />
-        <variable
             name="hasFocus"
             type="Boolean" />
         <import type="android.view.View"/>
@@ -33,7 +30,6 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
             android:src="@drawable/ic_back"
-            android:onClick="@{()-> fragment.setOnBackPressedListener()}"
             app:layout_constraintBottom_toTopOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

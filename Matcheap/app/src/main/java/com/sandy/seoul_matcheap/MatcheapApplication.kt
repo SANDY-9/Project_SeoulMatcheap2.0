@@ -4,9 +4,9 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_DEFAULT
-import android.content.Context
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.naver.maps.map.NaverMapSdk
 import com.sandy.seoul_matcheap.util.constants.APP_NAME
@@ -60,10 +60,6 @@ class MatcheapApplication : Application() {
             }
             notificationManager.createNotificationChannel(notificationChannel) // channel 생성
         } catch (e: Exception) { /* NO_OP */ }
-    }
-
-    companion object {
-        fun showToastMessage(context: Context, message : String) = Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
 }

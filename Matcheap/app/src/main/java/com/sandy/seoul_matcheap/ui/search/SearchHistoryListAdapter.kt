@@ -1,8 +1,9 @@
-package com.sandy.seoul_matcheap.adapters
+package com.sandy.seoul_matcheap.ui.search
 
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.entity.SearchHistory
 import com.sandy.seoul_matcheap.databinding.ItemRvHistoryBinding
+import com.sandy.seoul_matcheap.ui.common.BaseListAdapter
 
 /**
  * @author SANDY

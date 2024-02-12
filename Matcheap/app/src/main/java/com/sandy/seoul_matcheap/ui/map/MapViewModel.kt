@@ -9,7 +9,6 @@ import com.sandy.seoul_matcheap.data.store.dao.DistanceRadius
 import com.sandy.seoul_matcheap.data.store.repository.MapRepository
 import com.sandy.seoul_matcheap.util.constants.ALL_SELECT
 import com.sandy.seoul_matcheap.util.constants.Category
-import com.sandy.seoul_matcheap.util.helper.MapUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

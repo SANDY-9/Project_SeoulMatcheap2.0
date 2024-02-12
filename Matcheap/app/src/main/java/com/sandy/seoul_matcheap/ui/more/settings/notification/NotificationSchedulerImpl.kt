@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.notification
+package com.sandy.seoul_matcheap.ui.more.settings.notification
 
 import android.app.AlarmManager
 import android.app.PendingIntent

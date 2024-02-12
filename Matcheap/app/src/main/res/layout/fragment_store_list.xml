@@ -9,10 +9,6 @@
             name="viewModel"
             type="com.sandy.seoul_matcheap.ui.store.StoreViewModel" />
 
-        <variable
-            name="fragment"
-            type="com.sandy.seoul_matcheap.ui.store.StoreListFragment" />
-
         <import type="android.view.View"/>
 
     </data>
@@ -75,7 +71,6 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="8dp"
                     android:src="@drawable/ic_back"
-                    android:onClick="@{()->fragment.setOnBackPressedListener()}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

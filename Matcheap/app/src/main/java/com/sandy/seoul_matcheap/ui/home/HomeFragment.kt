@@ -5,18 +5,17 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import com.sandy.seoul_matcheap.BuildConfig
 import androidx.fragment.app.viewModels
-import changeScale
-import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
+import androidx.recyclerview.widget.RecyclerView
 import com.sandy.seoul_matcheap.R
-import com.sandy.seoul_matcheap.adapters.RegionSpinnerAdapter
-import com.sandy.seoul_matcheap.adapters.SurroundingStoreAdapter
 import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentHomeBinding
-import com.sandy.seoul_matcheap.extension.updateLocation
-import com.sandy.seoul_matcheap.ui.BaseFragment
+import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*
@@ -30,8 +29,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
 
     private val locationViewModel: LocationViewModel by activityViewModels()
     private val homeViewModel : HomeViewModel by viewModels()
-
-    @Inject lateinit var locationManager: LocationManager
 
     override fun setupBinding(): FragmentHomeBinding = binding.apply {
         lifecycleOwner = viewLifecycleOwner
@@ -49,10 +46,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     lateinit var prefs: SharedPreferences
     private fun checkVersionUpdate() {
         val currentVersion = BuildConfig.VERSION_NAME
-        when(val savedVersion = AppPrefsUtils.getSavedAppVersion(prefs)) {
+        when(AppPrefsUtils.getSavedAppVersion(prefs)) {
             currentVersion -> return
-            else -> AppPrefsUtils.saveLatestAppVersion(prefs, currentVersion).also {
-                if(savedVersion != null) showToastMessage(requireContext(), MESSAGE_VERSION_UPDATE)
+            null -> AppPrefsUtils.saveLatestAppVersion(prefs, currentVersion)
+            else -> {
+                showToastMessage(MESSAGE_VERSION_UPDATE)
+                AppPrefsUtils.saveLatestAppVersion(prefs, currentVersion)
             }
         }
     }
@@ -61,12 +60,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     private var surroundingStoreAdapter: SurroundingStoreAdapter? = null
     override fun initGlobalVariables() {
         regionSpinnerAdapter = RegionSpinnerAdapter().apply {
-            setOnItemClickListener{
-                navigateToStoreList(it, TYPE_REGION)
-            }
+            addOnItemClickListener()
         }
         surroundingStoreAdapter = SurroundingStoreAdapter().apply {
-            setOnItemClickListener {
+            addOnItemClickListener()
+        }
+    }
+
+    override fun RecyclerView.Adapter<out RecyclerView.ViewHolder>.addOnItemClickListener() {
+        when(this) {
+            is RegionSpinnerAdapter -> setOnItemClickListener{
+                navigateToStoreList(it, TYPE_REGION)
+            }
+            is SurroundingStoreAdapter -> setOnItemClickListener {
                 navigateToStoreDetails(it.id)
             }
         }
@@ -75,33 +81,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     override fun initView() = binding.run {
         checkSavedBackstackState()
 
-        rvRegionSpinner.adapter = regionSpinnerAdapter
-        rvSurroundingStores.adapter = surroundingStoreAdapter
+        rvRegionSpinner.addAdapter(regionSpinnerAdapter)
+        regionSpinnerView.setOnRegionSpinnerViewClickListener()
+        btnRegionSelect.setOnRegionButtonClickListener()
 
-        btnRegionSelect.setOnClickListener {
-            //RegionButton을 클릭 했을 때, region spinner가 나타나야하며 이 때 region spinner는 반드시 위치가 설정된 후 화면에 보여져야함
-            showRegionSpinnerView()
-        }
+        rvSurroundingStores.addAdapter(surroundingStoreAdapter)
 
-        regionSpinnerView.setOnClickListener {
-            // spinner의 바깥 뷰를 클릭했을 때 region spinner는 화면에서 사라짐
-            closeRegionSpinnerView()
-        }
-
-        btnGps.setOnClickListener {
-            isLoaded = false
-            locationManager.updateLocation(locationViewModel, requireContext())
-        }
-
-        btnRefresh.setOnClickListener {
-            homeViewModel.updateRandomStoreList()
-        }
-
-        progressView.retry.setOnClickListener {
-            isLoaded = false
-            homeViewModel.updateForecast(locationViewModel.getCurLocation())
-        }
-
+        btnGps.setOnGpsUpdateButtonClickListener()
+        btnRefresh.setOnRefreshButtonClickListener()
+        progressView.retry.setOnRetryButtonClickListener()
     }
 
     private var onBackstackCallback = false
@@ -112,53 +100,63 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             }
             rvSurroundingStores.scrollToPosition(DEFAULT_POSITION)
         }
-       onBackstackCallback = false
+        onBackstackCallback = false
     }
 
+    // spinner의 바깥 뷰를 클릭했을 때 region spinner는 화면에서 사라짐
+    private fun FrameLayout.setOnRegionSpinnerViewClickListener() = setOnClickListener {
+        closeRegionSpinnerView()
+    }
+    // region spinner가 화면에서 사라질 때, spinner아이콘과 spinner position은 defalut값으로 돌아가야함
+    private fun closeRegionSpinnerView() = binding.apply {
+        regionSpinnerView.visibility = View.GONE
+        spinnerIcon.rotation = DEFAULT_ROTATION
+        rvRegionSpinner.y = SPINNER_DEFAULT_POSION_Y
+    }
 
-    private var spinnerY: Float = 0.0f
-    private fun setRegionSpinnerPositionY() = binding.apply {
+    // RegionButton을 클릭 했을 때, region spinner가 나타나야하며 이 때 region spinner는 반드시 위치가 설정된 후 화면에 보여져야함
+    private fun View.setOnRegionButtonClickListener() = setOnClickListener {
+        setRegionSpinnerPositionY()
+        showRegionSpinnerView()
+    }
+
+    private var SPINNER_DEFAULT_POSION_Y: Float = 0.0f
+    private fun setRegionSpinnerPositionY() = binding.rvRegionSpinner.apply {
         // spinner의 default positionY를 측정하여 저장
-        spinnerY = rvRegionSpinner.y
-        rvRegionSpinner.y = spinnerY - nestedScrollView.scrollY
+        SPINNER_DEFAULT_POSION_Y = y
+        y = SPINNER_DEFAULT_POSION_Y - binding.nestedScrollView.scrollY
     }
 
     // region spinner가 visible되면 spinner icon이 180도 회전하고 spinner는 defalut postion으로 스크롤 되게 동작하는 설정
     private fun showRegionSpinnerView() = binding.apply {
-        setRegionSpinnerPositionY()
         regionSpinnerView.visibility = View.VISIBLE
         spinnerIcon.rotation = CHANGED_ROTATION
         rvRegionSpinner.scrollToPosition(DEFAULT_POSITION)
     }
 
-    // region spinner가 화면에서 사라질 때, spinner아이콘과 spinner position은 defalut값으로 돌아가야함
-    private fun closeRegionSpinnerView() = binding.apply {
-        regionSpinnerView.visibility = View.GONE
-        spinnerIcon.rotation = DEFAULT_ROTATION
-        rvRegionSpinner.y = spinnerY
+    @Inject lateinit var locationManager: LocationManager
+    private fun ImageView.setOnGpsUpdateButtonClickListener() = setOnClickListener {
+        updateLocation(locationViewModel, locationManager)
+    }
+
+    private fun ImageView.setOnRefreshButtonClickListener() = setOnClickListener {
+        homeViewModel.updateRandomStoreList()
+    }
+
+    override fun TextView.setOnRetryButtonClickListener() = setOnClickListener {
+        isLoaded = false
+        homeViewModel.updateForecast(locationViewModel.getCurLocation())
     }
 
     override fun subscribeToObservers() {
-        locationViewModel.location.observe(viewLifecycleOwner) {
-            handleLocationInfo(it)
-        }
-        homeViewModel.loadingState.observe(viewLifecycleOwner) {
-            handleLoadingState(it)
-        }
-        homeViewModel.surroundingStores.observe(viewLifecycleOwner) {
-            handleSurroundStores(it)
-        }
+        subscribeToLoadStateObserver()
+        subscribeToLocationObserver()
+        subscribeToSurroundingStoresObserver()
     }
 
-    private var isLoaded = false
-    private fun handleLocationInfo(location: Location?) = location?.let {
-        with(homeViewModel) {
-            if(!isLoaded) {
-                updateRandomStoreList()
-                updateForecast(it)
-                updateSurroundingStoreList(it)
-                isLoaded = true
-            }
+    private fun subscribeToLoadStateObserver() {
+        homeViewModel.loadingState.observe(viewLifecycleOwner) {
+            handleLoadingState(it)
         }
     }
 
@@ -172,8 +170,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding.progressView.root.visibility = View.GONE
     }
 
+    private var isLoaded = false
     private fun handleLoadFail() {
-        if(!isLoaded) showToastMessage(requireContext(), MESSAGE_NETWORK_ERROR)
+        if(!isLoaded) showToastMessage(MESSAGE_NETWORK_ERROR)
         binding.progressView.fail.visibility = View.VISIBLE
         isLoaded = true
     }
@@ -182,6 +181,26 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         with(binding.progressView) {
             root.visibility = View.VISIBLE
             fail.visibility = View.GONE
+        }
+    }
+
+    private fun subscribeToLocationObserver() = locationViewModel.run {
+        location.observe(viewLifecycleOwner) {
+            handleLocationInfo(it)
+        }
+    }
+
+    private fun handleLocationInfo(location: Location?) = location?.let {
+        with(homeViewModel) {
+            updateRandomStoreList()
+            updateForecast(it)
+            updateSurroundingStoreList(it)
+        }
+    }
+
+    private fun subscribeToSurroundingStoresObserver() {
+        homeViewModel.surroundingStores.observe(viewLifecycleOwner) {
+            handleSurroundStores(it)
         }
     }
 

@@ -324,7 +324,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <com.sandy.seoul_matcheap.util.custom.TouchFrameLayout
+                        <com.sandy.seoul_matcheap.ui.common.TouchFrameLayout
                             android:id="@+id/map_container"
                             android:layout_width="0dp"
                             android:layout_height="150dp"
@@ -367,7 +367,7 @@
 
                             </FrameLayout>
 
-                        </com.sandy.seoul_matcheap.util.custom.TouchFrameLayout>
+                        </com.sandy.seoul_matcheap.ui.common.TouchFrameLayout>
 
                         <TextView
                             android:id="@+id/tv_address"

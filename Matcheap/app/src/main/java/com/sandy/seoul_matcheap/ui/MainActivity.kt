@@ -12,8 +12,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.databinding.ActivityMainBinding
-import com.sandy.seoul_matcheap.util.custom.SoftKeyboardDetectorView
+import com.sandy.seoul_matcheap.ui.common.SoftKeyboardDetectorView
 import com.sandy.seoul_matcheap.ui.map.MapFilterFragment
+import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*
 import dagger.hilt.android.AndroidEntryPoint
 
