@@ -16,6 +16,7 @@ import com.sandy.seoul_matcheap.util.constants.CATEGORY_SIZE
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
 import com.sandy.seoul_matcheap.util.constants.TYPE_NORMAL_SCROLL
 import dagger.hilt.android.AndroidEntryPoint
+import showProgressView
 
 @AndroidEntryPoint
 class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment_bookmark) {
@@ -44,8 +45,6 @@ class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment
     override fun initView() = binding.run {
         initPager()
         pager.connectPagerWithTabLayout(tabLayout, progressView, requireContext())
-
-        btnBack.setOnBackButtonClickListener()
     }
 
     private fun initPager() = binding.pager.apply {
