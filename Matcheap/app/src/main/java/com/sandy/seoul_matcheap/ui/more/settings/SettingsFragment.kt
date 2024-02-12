@@ -9,7 +9,7 @@ import androidx.fragment.app.*
 import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.databinding.FragmentSettingsBinding
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
+import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.util.helper.AppPrefsUtils

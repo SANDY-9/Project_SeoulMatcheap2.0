@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.ui.more.notice
+package com.sandy.seoul_matcheap.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -20,12 +20,12 @@ class NoticeTitleAdapter : PagingDataAdapter<Notice, NoticeTitleAdapter.MyViewHo
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): NoticeTitleAdapter.MyViewHolder {
+    ): MyViewHolder {
         val binding = ItemRvNoticeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: NoticeTitleAdapter.MyViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         getItem(position)?.let { item ->
             holder.binding.run {
                 notice = item

@@ -8,7 +8,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.sandy.seoul_matcheap.ui.common.Resource
+import com.sandy.seoul_matcheap.util.constants.Resource
 
 /**
  * 화면을 로딩할 때 보여주는 화면

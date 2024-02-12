@@ -9,9 +9,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import changeScale
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.adapters.StoreCountPagerAdapter
 import com.sandy.seoul_matcheap.databinding.FragmentSeemoreBinding
 import com.sandy.seoul_matcheap.extension.setPageAnimationDuration
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
+import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
 import com.sandy.seoul_matcheap.util.constants.TEAR_STOP_SEOUL_HOME_URL
 import dagger.hilt.android.AndroidEntryPoint

@@ -1,25 +1,18 @@
-package com.sandy.seoul_matcheap.ui.common
+package com.sandy.seoul_matcheap.adapters
 
 import android.location.Location
-import android.view.*
-import androidx.recyclerview.widget.*
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.extension.anchorSmoothScrollToPosition
-import com.sandy.seoul_matcheap.ui.more.bookmark.BookmarkListAdapter
-import com.sandy.seoul_matcheap.ui.store.*
 import com.sandy.seoul_matcheap.util.constants.CATEGORY_SIZE
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
 import com.sandy.seoul_matcheap.util.constants.TYPE_NORMAL_SCROLL
 
-/**
- * @author SANDY
- * @email nnal0256@naver.com
- * @created 2023-03-04
- * @desc
- */
-
 typealias Adapter = RecyclerView.Adapter<out RecyclerView.ViewHolder>
+
 class PagerAdapter<T: Adapter>(
     private val t: T,
     private val size: Int = CATEGORY_SIZE,
@@ -40,7 +33,8 @@ class PagerAdapter<T: Adapter>(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = run {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_pager_view, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_pager_view, parent, false)
         ItemPagerViewHolder(view)
     }
 
@@ -54,7 +48,7 @@ class PagerAdapter<T: Adapter>(
     }
 
     private fun RecyclerView.addOnScrollChangeListener() {
-        val onScrollListener = object : OnScrollListener() {
+        val onScrollListener = object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 onScroll?.let { it(dy) }
@@ -67,7 +61,7 @@ class PagerAdapter<T: Adapter>(
     fun setOnScrollChangeListener(listener: (Int) -> Unit) {
         onScroll = listener
     }
-    
+
     fun initScroll(position: Int, scrollType: Int) = recyclerViews[position]?.apply {
         when(scrollType) {
             TYPE_NORMAL_SCROLL -> scrollToPosition(DEFAULT_POSITION)

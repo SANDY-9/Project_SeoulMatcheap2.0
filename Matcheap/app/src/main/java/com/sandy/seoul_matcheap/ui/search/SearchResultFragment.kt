@@ -9,7 +9,7 @@ import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentSearchResultBinding
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.store.StoreListAdapter
+import com.sandy.seoul_matcheap.adapters.StoreListAdapter
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
 import connectRecyclerView
 import dagger.hilt.android.AndroidEntryPoint

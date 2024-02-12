@@ -8,7 +8,8 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.sandy.seoul_matcheap.MatcheapApplication
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
+import com.sandy.seoul_matcheap.adapters.AutoCompleteListAdapter
+import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.util.constants.MESSAGE_SEARCH_WARNING
 import dropDownSoftKeyboard
 

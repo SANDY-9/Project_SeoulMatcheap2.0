@@ -25,10 +25,9 @@ import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.StoreDatabase
 import com.sandy.seoul_matcheap.databinding.FragmentSplashBinding
-import com.sandy.seoul_matcheap.extension.updateLocation
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
-import com.sandy.seoul_matcheap.ui.more.settings.notification.NotificationScheduler
+import com.sandy.seoul_matcheap.ui.BaseFragment
+import com.sandy.seoul_matcheap.notification.NotificationScheduler
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.util.helper.AppPrefsUtils

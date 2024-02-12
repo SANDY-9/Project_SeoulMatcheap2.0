@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.ui.common;
+package com.sandy.seoul_matcheap.util.custom;
 
 import android.app.Activity;
 import android.content.Context;

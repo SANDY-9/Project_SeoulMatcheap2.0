@@ -11,10 +11,12 @@ import androidx.fragment.app.viewModels
 import changeScale
 import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.adapters.RegionSpinnerAdapter
+import com.sandy.seoul_matcheap.adapters.SurroundingStoreAdapter
 import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentHomeBinding
 import com.sandy.seoul_matcheap.extension.updateLocation
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
+import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*

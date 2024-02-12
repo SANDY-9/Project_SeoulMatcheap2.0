@@ -1,6 +1,7 @@
 package com.sandy.seoul_matcheap.ui.search
 
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.adapters.SearchHistoryAdapter
 import com.sandy.seoul_matcheap.databinding.FragmentSearchBinding
 import dagger.hilt.android.AndroidEntryPoint
 

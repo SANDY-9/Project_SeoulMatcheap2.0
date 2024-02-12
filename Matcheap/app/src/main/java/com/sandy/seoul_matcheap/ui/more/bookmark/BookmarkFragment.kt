@@ -6,12 +6,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.adapters.BookmarkListAdapter
 import com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore
 import com.sandy.seoul_matcheap.databinding.FragmentBookmarkBinding
 import com.sandy.seoul_matcheap.extension.connectPagerWithTabLayout
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
-import com.sandy.seoul_matcheap.ui.common.PagerAdapter
+import com.sandy.seoul_matcheap.ui.BaseFragment
+import com.sandy.seoul_matcheap.adapters.PagerAdapter
 import com.sandy.seoul_matcheap.util.constants.CATEGORY_SIZE
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
 import com.sandy.seoul_matcheap.util.constants.TYPE_NORMAL_SCROLL

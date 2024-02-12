@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.ui.common
+package com.sandy.seoul_matcheap.ui
 
 import android.content.Intent
 import android.net.Uri

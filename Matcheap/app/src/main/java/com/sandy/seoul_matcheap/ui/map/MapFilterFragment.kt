@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.DistanceRadius
 import com.sandy.seoul_matcheap.databinding.FragmentMapFilterBinding
+import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.common.*
-import com.sandy.seoul_matcheap.ui.home.RegionSpinnerAdapter
+import com.sandy.seoul_matcheap.adapters.RegionSpinnerAdapter
 import com.sandy.seoul_matcheap.util.constants.*
 import com.warkiz.widget.*
 import setChangeIconTintColorOnTouch

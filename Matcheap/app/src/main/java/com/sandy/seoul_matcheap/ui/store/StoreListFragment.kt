@@ -15,8 +15,9 @@ import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentStoreListBinding
 import com.sandy.seoul_matcheap.extension.connectPagerWithTabLayout
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
-import com.sandy.seoul_matcheap.ui.common.PagerAdapter
+import com.sandy.seoul_matcheap.ui.BaseFragment
+import com.sandy.seoul_matcheap.adapters.PagerAdapter
+import com.sandy.seoul_matcheap.adapters.StoreListAdapter
 import com.sandy.seoul_matcheap.util.constants.*
 import dagger.hilt.android.AndroidEntryPoint
 import showProgressView

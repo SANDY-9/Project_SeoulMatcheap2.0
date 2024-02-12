@@ -7,7 +7,7 @@ import androidx.navigation.fragment.findNavController
 import com.sandy.seoul_matcheap.BuildConfig
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.databinding.FragmentInfoBinding
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
+import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.util.constants.ACTION_SEND_TYPE
 import com.sandy.seoul_matcheap.util.constants.MAIL_TO_DEVELOPER_ADDRESS
 

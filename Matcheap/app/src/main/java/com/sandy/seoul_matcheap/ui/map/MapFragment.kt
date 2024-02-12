@@ -17,8 +17,8 @@ import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.*
 import com.sandy.seoul_matcheap.databinding.*
 import com.sandy.seoul_matcheap.extension.updateLocation
+import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.common.*
 import com.sandy.seoul_matcheap.ui.more.bookmark.BookmarkViewModel
 import com.sandy.seoul_matcheap.ui.store.StoreDetailsActivity
 import com.sandy.seoul_matcheap.util.constants.*

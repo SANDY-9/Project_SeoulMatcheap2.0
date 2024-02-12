@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.ui.store
+package com.sandy.seoul_matcheap.adapters
 
 import android.content.Context
 import android.view.*
@@ -16,7 +16,9 @@ import com.sandy.seoul_matcheap.util.module.GlideApp
  * @created 2023-03-06
  * @desc
  */
-class StoreListAdapter : PagingDataAdapter<StoreItem, StoreListAdapter.ItemRvStoreViewHolder>(DIFF_UTIL) {
+class StoreListAdapter : PagingDataAdapter<StoreItem, StoreListAdapter.ItemRvStoreViewHolder>(
+    DIFF_UTIL
+) {
 
     inner class ItemRvStoreViewHolder(val binding: ItemRvStoreBinding) : RecyclerView.ViewHolder(binding.root)
 
