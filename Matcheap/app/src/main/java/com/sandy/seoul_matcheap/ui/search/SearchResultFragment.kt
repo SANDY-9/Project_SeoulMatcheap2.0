@@ -69,19 +69,19 @@ class SearchResultFragment : SearchBaseFragment<FragmentSearchResultBinding>(R.l
         }
     }
 
-    override fun initView() = binding.run {
-        rvResultList.adapter = storeListAdapter
-
-        with(evSearch) {
-            addOnEnterKeyPressedListener()
-            setOnFocusChangeListener { _, hasFocus ->
-                binding.hasFocus = hasFocus
+    override fun initView() {
+        super.initView()
+        binding.run {
+            rvResultList.adapter = storeListAdapter
+            with(evSearch) {
+                addOnEnterKeyPressedListener()
+                setOnFocusChangeListener { _, hasFocus ->
+                    binding.hasFocus = hasFocus
+                }
             }
+            textField.setOnEndIconClickListener()
+            btnTop.connectRecyclerView(rvResultList)
         }
-
-        textField.setOnEndIconClickListener()
-
-        btnTop.connectRecyclerView(rvResultList)
     }
 
     private fun TextInputLayout.setOnEndIconClickListener() = setEndIconOnClickListener {

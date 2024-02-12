@@ -54,7 +54,7 @@ class SeeMoreFragment : BaseFragment<FragmentSeemoreBinding>(R.layout.fragment_s
         }
         orientation = ViewPager2.ORIENTATION_VERTICAL
         adapter = countPagerAdapter
-        registerHandler(autoPageScrollHandler!!, HANDLER_DURATION, ::addAutoPageScrollHandler)
+        registerHandler(autoPageScrollHandler!!, HANDLER_DURATION / 2, ::addAutoPageScrollHandler)
     }
 
     private fun registerHandler(handler: Handler = Handler(Looper.getMainLooper()), delay: Long, func: () -> Unit) {
@@ -105,7 +105,6 @@ class SeeMoreFragment : BaseFragment<FragmentSeemoreBinding>(R.layout.fragment_s
 
     override fun destroyGlobalVariables() {
         countPagerAdapter = null
-        savePosition = DEFAULT_POSITION
     }
 
     companion object {

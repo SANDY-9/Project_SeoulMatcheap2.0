@@ -27,13 +27,15 @@ class SearchFragment : SearchBaseFragment<FragmentSearchBinding>(R.layout.fragme
         }
     }
 
-    override fun initView() = binding.run {
-        rvHistory.adapter = searchHistoryAdapter
-
-        with(evSearch) {
-            addOnEnterKeyPressedListener()
-            setOnFocusChangeListener { _, hasFocus ->
-                binding.hasFocus = hasFocus
+    override fun initView() {
+        super.initView()
+        binding.run {
+            rvHistory.adapter = searchHistoryAdapter
+            with(evSearch) {
+                addOnEnterKeyPressedListener()
+                setOnFocusChangeListener { _, hasFocus ->
+                    binding.hasFocus = hasFocus
+                }
             }
         }
     }

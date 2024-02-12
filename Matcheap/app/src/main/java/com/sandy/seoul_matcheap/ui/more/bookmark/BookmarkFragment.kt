@@ -26,6 +26,7 @@ class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment
 
     override fun setupBinding(): FragmentBookmarkBinding {
         return binding.apply {
+            fragment = this@BookmarkFragment
             lifecycleOwner = viewLifecycleOwner
             viewModel = bookmarkViewModel
         }

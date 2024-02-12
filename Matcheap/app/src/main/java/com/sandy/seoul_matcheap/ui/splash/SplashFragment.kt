@@ -150,7 +150,8 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
     @Inject lateinit var locationManager : LocationManager
     private val locationViewModel: LocationViewModel by activityViewModels()
     private fun requestLocationUpdate() {
-        locationManager.updateLocation(locationViewModel, requireContext())
+        val isLocationUpdateEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        if(!isLocationUpdateEnabled) showToastMessage(requireContext(), MESSAGE_GPS_WARNING)
         locationViewModel.updateLocation()
         binding.tvLoading.visibility = View.VISIBLE
     }

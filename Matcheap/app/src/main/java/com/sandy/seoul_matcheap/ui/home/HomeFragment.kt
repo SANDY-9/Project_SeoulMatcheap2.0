@@ -87,6 +87,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         }
 
         btnGps.setOnClickListener {
+            isLoaded = false
             locationManager.updateLocation(locationViewModel, requireContext())
         }
 
@@ -109,7 +110,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
             }
             rvSurroundingStores.scrollToPosition(DEFAULT_POSITION)
         }
-        onBackstackCallback = false
+       onBackstackCallback = false
     }
 
 
@@ -147,11 +148,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         }
     }
 
+    private var isLoaded = false
     private fun handleLocationInfo(location: Location?) = location?.let {
         with(homeViewModel) {
-            updateRandomStoreList()
-            updateForecast(it)
-            updateSurroundingStoreList(it)
+            if(!isLoaded) {
+                updateRandomStoreList()
+                updateForecast(it)
+                updateSurroundingStoreList(it)
+                isLoaded = true
+            }
         }
     }
 
@@ -165,7 +170,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         binding.progressView.root.visibility = View.GONE
     }
 
-    private var isLoaded = false
     private fun handleLoadFail() {
         if(!isLoaded) showToastMessage(requireContext(), MESSAGE_NETWORK_ERROR)
         binding.progressView.fail.visibility = View.VISIBLE
