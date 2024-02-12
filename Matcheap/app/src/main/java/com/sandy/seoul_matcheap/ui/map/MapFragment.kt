@@ -1,12 +1,9 @@
 package com.sandy.seoul_matcheap.ui.map
 
 import android.content.*
-import android.graphics.*
 import android.location.*
 import android.net.ConnectivityManager
-import android.os.*
 import android.view.*
-import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.fragment.app.*
@@ -15,9 +12,9 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.overlay.*
+import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.*
-import com.sandy.seoul_matcheap.data.store.entity.*
 import com.sandy.seoul_matcheap.databinding.*
 import com.sandy.seoul_matcheap.extension.updateLocation
 import com.sandy.seoul_matcheap.ui.LocationViewModel
@@ -25,6 +22,7 @@ import com.sandy.seoul_matcheap.ui.common.*
 import com.sandy.seoul_matcheap.ui.more.bookmark.BookmarkViewModel
 import com.sandy.seoul_matcheap.ui.store.StoreDetailsActivity
 import com.sandy.seoul_matcheap.util.constants.*
+import com.sandy.seoul_matcheap.util.helper.MapUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -240,7 +238,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     }
 
     private fun cancelBookmarkUpdate() = binding.bottomSheet.apply {
-        showToastMessage(MESSAGE_NETWORK_ERROR)
+        showToastMessage(requireContext(), MESSAGE_NETWORK_ERROR)
         btnBookmark.isChecked = false
         store?.run {
             bookmarked = false
@@ -253,7 +251,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     fun onReSearch(map: NaverMap) {
         val center = map.cameraPosition.target
         mapViewModel.updateData(centerX = center.latitude, centerY = center.longitude)
-        showToastMessage(MESSAGE_MAP_DESC)
+        showToastMessage(requireContext(), MESSAGE_MAP_DESC)
     }
 
 

@@ -8,8 +8,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.sandy.seoul_matcheap.ui.common.Resource
-import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
-import com.sandy.seoul_matcheap.util.constants.SCALE
 
 /**
  * 화면을 로딩할 때 보여주는 화면
@@ -41,8 +39,6 @@ fun TextView.connectRecyclerView(recyclerView: RecyclerView, MIN_SCROLL: Int = 0
     setOnClickListener { recyclerView.smoothScrollToPosition(DEFAULT_POSITION) }
 }
 
-fun RecyclerView.Adapter<out RecyclerView.ViewHolder>.addOnItemClickListener() = Unit
-
 fun View.changeScale(scale: Float = 0.95f) {
     scaleX = scale
     scaleY = scale
@@ -54,4 +50,11 @@ fun TextView.setChangeTextColorOnTouch(action: Int) {
         else -> Resource.matCheapBlue
     }
     setTextColor(color)
+}
+
+fun TextView.setChangeIconTintColorOnTouch(action: Int) {
+    compoundDrawableTintList = when(action) {
+        MotionEvent.ACTION_UP -> Resource.matCheapGray
+        else -> Resource.matCheapBlue
+    }
 }

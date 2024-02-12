@@ -25,7 +25,7 @@ import com.sandy.seoul_matcheap.data.store.repository.BookmarkRepository
 import com.sandy.seoul_matcheap.data.store.repository.MapRepository
 import com.sandy.seoul_matcheap.data.store.repository.SearchRepository
 import com.sandy.seoul_matcheap.data.store.repository.StoreRepository
-import com.sandy.seoul_matcheap.ui.map.MapUtils
+import com.sandy.seoul_matcheap.util.helper.MapUtils
 import com.sandy.seoul_matcheap.ui.more.settings.notification.NotificationScheduler
 import com.sandy.seoul_matcheap.ui.more.settings.notification.NotificationSchedulerImpl
 import com.sandy.seoul_matcheap.util.*

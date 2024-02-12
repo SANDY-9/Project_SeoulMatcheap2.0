@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.ui.map
+package com.sandy.seoul_matcheap.util.helper
 
 import android.content.Context
 import android.graphics.Color
