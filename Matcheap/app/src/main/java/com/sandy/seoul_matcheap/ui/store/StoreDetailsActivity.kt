@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.*
 import android.net.Uri
 import android.os.Bundle
-import android.util.*
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
@@ -23,14 +22,14 @@ import com.google.firebase.ktx.Firebase
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.adapters.StoreMenuAdapter
 import com.sandy.seoul_matcheap.data.store.dao.StoreMapItem
 import com.sandy.seoul_matcheap.data.store.entity.StoreInfo
 import com.sandy.seoul_matcheap.databinding.ActivityStoreDetailsBinding
-import com.sandy.seoul_matcheap.util.*
-import com.sandy.seoul_matcheap.ui.common.TouchFrameLayout
+import com.sandy.seoul_matcheap.util.custom.TouchFrameLayout
 import com.sandy.seoul_matcheap.ui.more.bookmark.BookmarkViewModel
 import com.sandy.seoul_matcheap.util.constants.*
-import com.sandy.seoul_matcheap.ui.map.MapUtils
+import com.sandy.seoul_matcheap.util.helper.MapUtils
 import com.sandy.seoul_matcheap.util.helper.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

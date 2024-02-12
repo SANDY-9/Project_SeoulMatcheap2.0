@@ -1,16 +1,15 @@
 package com.sandy.seoul_matcheap.ui.more.notice
 
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.paging.LoadState
 import androidx.paging.PagingData
-import androidx.recyclerview.widget.RecyclerView
+import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.adapters.NoticeTitleAdapter
 import com.sandy.seoul_matcheap.data.matcheap.Notice
 import com.sandy.seoul_matcheap.databinding.FragmentNoticeBinding
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
+import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.util.constants.MESSAGE_NETWORK_ERROR
 
 class NoticeFragment : BaseFragment<FragmentNoticeBinding>(R.layout.fragment_notice) {
@@ -26,27 +25,16 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(R.layout.fragment_not
 
     private var noticeAdapter: NoticeTitleAdapter? = null
     override fun initGlobalVariables() {
-        noticeAdapter = NoticeTitleAdapter().apply { 
-            addOnItemClickListener()
-            addOnLoadStateListener()
-        }
-    }
-
-    override fun RecyclerView.Adapter<out RecyclerView.ViewHolder>.addOnItemClickListener() {
-        when(this) {
-            is NoticeTitleAdapter -> {
-                setOnItemClickListener {
-                    it.url?.let { url -> navigateToBrowser(url) }
-                }
+        noticeAdapter = NoticeTitleAdapter().apply {
+            setOnItemClickListener {
+                it.url?.let { url -> navigateToBrowser(url) }
             }
-        }
-    }
-    private fun NoticeTitleAdapter.addOnLoadStateListener() {
-        addLoadStateListener { loadState ->
-            when {
-                loadState.append.endOfPaginationReached -> handleLoadSuccess()
-                loadState.refresh is LoadState.Error -> handleLoadFail()
-                else -> handleLoading()
+            addLoadStateListener { loadState ->
+                when {
+                    loadState.append.endOfPaginationReached -> handleLoadSuccess()
+                    loadState.refresh is LoadState.Error -> handleLoadFail()
+                    else -> handleLoading()
+                }
             }
         }
     }
@@ -58,7 +46,7 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(R.layout.fragment_not
     // loadFail
     private fun handleLoadFail() {
         binding.progressView.fail.visibility = View.VISIBLE
-        showToastMessage(MESSAGE_NETWORK_ERROR)
+        showToastMessage(requireContext(), MESSAGE_NETWORK_ERROR)
     }
     private fun handleLoading() {
         binding.progressView.root.visibility = View.VISIBLE
@@ -66,13 +54,11 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(R.layout.fragment_not
     }
 
     override fun initView() = binding.run {
-        btnBack.setOnBackButtonClickListener()
         recyclerView.adapter = noticeAdapter
-        progressView.retry.setOnRetryButtonClickListener()
-    }
-
-    override fun TextView.setOnRetryButtonClickListener() {
-        setOnClickListener {
+        btnBack.setOnClickListener {
+            setOnBackPressedListener()
+        }
+        progressView.retry.setOnClickListener {
             noticeAdapter!!.refresh()
         }
     }

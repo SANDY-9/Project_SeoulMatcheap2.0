@@ -2,7 +2,7 @@ package com.sandy.seoul_matcheap.ui.more.settings
 
 import android.content.SharedPreferences
 import androidx.lifecycle.*
-import com.sandy.seoul_matcheap.ui.more.settings.notification.NotificationScheduler
+import com.sandy.seoul_matcheap.notification.NotificationScheduler
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.APP_PREFS_SETTINGS
 import com.sandy.seoul_matcheap.util.helper.AppPrefsUtils

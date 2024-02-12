@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.ui.more.settings.notification
+package com.sandy.seoul_matcheap.notification
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent

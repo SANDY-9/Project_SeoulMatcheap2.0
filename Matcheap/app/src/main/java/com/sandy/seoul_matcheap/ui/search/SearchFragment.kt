@@ -1,20 +1,13 @@
 package com.sandy.seoul_matcheap.ui.search
 
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.RecyclerView
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.adapters.SearchHistoryAdapter
 import com.sandy.seoul_matcheap.databinding.FragmentSearchBinding
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_search) {
-
-    private val searchViewModel : SearchViewModel by viewModels()
+class SearchFragment : SearchBaseFragment<FragmentSearchBinding>(R.layout.fragment_search) {
 
     override fun setupBinding(): FragmentSearchBinding {
         return binding.apply {
@@ -26,62 +19,41 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
     }
 
     private var searchHistoryAdapter : SearchHistoryAdapter? = null
-    private var autoCompleteListAdapter : AutoCompleteListAdapter? = null
     override fun initGlobalVariables() {
+        super.initGlobalVariables()
+        setAutoCompleteRecyclerView(binding.rvAutoComplete)
         searchHistoryAdapter = SearchHistoryAdapter().apply {
-            addOnItemClickListener()
-        }
-        autoCompleteListAdapter = AutoCompleteListAdapter(searchViewModel, viewLifecycleOwner).apply {
-            addOnItemClickListener()
+            setOnItemClickListener { requestSearch(it.name) }
+            setOnRemoveListener { searchViewModel.removeHistory(it) }
         }
     }
 
-    override fun RecyclerView.Adapter<out RecyclerView.ViewHolder>.addOnItemClickListener() {
-        when(this) {
-            is SearchHistoryAdapter -> {
-                setOnItemClickListener { navigateToSearchResult(it.name) }
-                setOnRemoveListener { searchViewModel.removeHistory(it) }
+    override fun initView() {
+        super.initView()
+        binding.run {
+            rvHistory.adapter = searchHistoryAdapter
+            with(evSearch) {
+                addOnEnterKeyPressedListener()
+                setOnFocusChangeListener { _, hasFocus ->
+                    binding.hasFocus = hasFocus
+                }
             }
-            is AutoCompleteListAdapter -> setOnItemClickListener {
-                navigateToSearchResult(it.name)
-            }
         }
     }
 
-    override fun initView() = binding.run {
-        btnBack.setOnBackButtonClickListener()
-        evSearch.setup()
-        rvHistory.addAdapter(searchHistoryAdapter)
-        rvAutoComplete.addAdapter(autoCompleteListAdapter)
-    }
-
-    @Inject lateinit var inputManager: InputMethodManager
-    private fun EditText.setup() {
-        addOnEnterKeyPressedListener(inputManager)
-        addOnFocusChangeListener()
-    }
-    private fun EditText.addOnFocusChangeListener() = setOnFocusChangeListener { _, hasFocus ->
-        binding.hasFocus = hasFocus
-    }
-
-    override fun handleValidInput(param: String) {
+    override fun requestSearch(param: String) {
         navigateToSearchResult(param)
     }
 
 
-    override fun subscribeToObservers() = searchViewModel.run {
-        historyList.observe(viewLifecycleOwner) {
+    override fun subscribeToObservers(){
+        super.subscribeToObservers()
+        searchViewModel.historyList.observe(viewLifecycleOwner) {
             searchHistoryAdapter?.run {
                 submitList(it)
             }
         }
-        filteredAutoCompleteList.observe(viewLifecycleOwner) {
-            autoCompleteListAdapter?.run {
-                submitList(it)
-            }
-        }
     }
-
 
     fun navigateToSearchResult(param: String) {
         val action = SearchFragmentDirections.actionSearchFragmentToSearchResultFragment(
@@ -93,7 +65,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
 
     override fun setOnBackPressedListener() {
         when {
-            binding.evSearch.hasFocus() -> dropDownSoftKeyboard(inputManager)
+            binding.evSearch.hasFocus() -> dropDownSoftKeyboard()
             else -> handleExistDeepLinkNavigation()
         }
     }
@@ -106,7 +78,6 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(R.layout.fragment_sea
     override fun destroyGlobalVariables() {
         super.destroyGlobalVariables()
         searchHistoryAdapter = null
-        autoCompleteListAdapter = null
     }
 
 }

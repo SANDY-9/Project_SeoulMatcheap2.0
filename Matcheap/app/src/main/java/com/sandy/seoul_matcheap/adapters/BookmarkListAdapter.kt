@@ -1,12 +1,10 @@
-package com.sandy.seoul_matcheap.ui.more.bookmark
+package com.sandy.seoul_matcheap.adapters
 
 import android.content.Context
 import android.location.Location
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore
 import com.sandy.seoul_matcheap.databinding.ItemRvBookmarkBinding
-import com.sandy.seoul_matcheap.ui.common.BaseListAdapter
-import com.sandy.seoul_matcheap.ui.store.StoreMenuAdapter
 import com.sandy.seoul_matcheap.util.constants.PAGE_DISTANCE
 
 /**

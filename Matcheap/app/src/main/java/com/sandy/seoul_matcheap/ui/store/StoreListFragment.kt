@@ -8,16 +8,19 @@ import androidx.fragment.app.*
 import androidx.navigation.fragment.navArgs
 import androidx.paging.PagingData
 import androidx.paging.filter
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentStoreListBinding
+import com.sandy.seoul_matcheap.extension.connectPagerWithTabLayout
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
-import com.sandy.seoul_matcheap.ui.common.PagerAdapter
+import com.sandy.seoul_matcheap.ui.BaseFragment
+import com.sandy.seoul_matcheap.adapters.PagerAdapter
+import com.sandy.seoul_matcheap.adapters.StoreListAdapter
 import com.sandy.seoul_matcheap.util.constants.*
 import dagger.hilt.android.AndroidEntryPoint
+import showProgressView
 
 @AndroidEntryPoint
 class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragment_store_list) {
@@ -29,12 +32,13 @@ class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragme
     private val location: Location by lazy { locationViewModel.getCurLocation() }
 
     override fun setupBinding(): FragmentStoreListBinding = binding.apply {
+        fragment = this@StoreListFragment
         lifecycleOwner = viewLifecycleOwner
         viewModel = storeViewModel
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        showProgressView(binding.progressView)
+        binding.progressView.showProgressView()
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -42,47 +46,38 @@ class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragme
     override fun initGlobalVariables() {
         pagerAdapter = PagerAdapter(StoreListAdapter()).apply {
             setOnScrollChangeListener {
-                binding.btnTop.setVisibleForScroll(it)
+                binding.btnTop.visibility = if(it > DEFAULT_POSITION) View.VISIBLE else View.GONE
             }
         }
     }
 
-    override fun initView() = args.run {
-        initPager(type, category)
+    override fun initView() = binding.run {
+        val type = args.type
+        val category = args.category
 
-        with(binding) {
-            connectPagerWithTabLayout(tabLayout, pager, progressView)
-            btnBack.setOnBackButtonClickListener()
-            tvTitle.setTitleText(type, category)
-            tvGps.text = address
-        }
+        pager.init(type, category, tabLayout, progressView)
+        tvTitle.text = if(type == TYPE_CATEGORY) TYPE_CATEGORY_NAME else category
+        tvGps.text = args.address
     }
 
-    private fun initPager(type: Int, category: String) = binding.pager.apply {
+    private fun ViewPager2.init(type: Int, category: String, tabLayout: TabLayout, progressView: FrameLayout,) {
         adapter = pagerAdapter
+        connectPagerWithTabLayout(tabLayout, progressView, requireContext())
 
-        val defaultPosition = if(args.type == TYPE_CATEGORY) args.category.toInt() else DEFAULT_POSITION
+        val defaultPosition = if(type == TYPE_CATEGORY) category.toInt() else DEFAULT_POSITION
         setCurrentItem(defaultPosition, false)
         setPagerPosition(type, category, defaultPosition)
         setOnPageChangeListener(type, category, defaultPosition)
     }
 
     private fun setPagerPosition(type: Int, category: String, position: Int) {
-        pagerAdapter!!.adapter[position]?.addOnItemClickListener()
-        storeViewModel.updateStoreCount(type, category, position, location)
-        binding.btnTop.setOnTopScrollButtonClickListener(position)
-    }
-
-    override fun RecyclerView.Adapter<out RecyclerView.ViewHolder>.addOnItemClickListener() {
-        when(this) {
-            is StoreListAdapter -> setOnItemClickListener {
-                navigateToStoreDetails(it)
-            }
+        pagerAdapter!!.adapter[position]?.setOnItemClickListener {
+            navigateToStoreDetails(it)
         }
-    }
-
-    private fun TextView.setOnTopScrollButtonClickListener(position: Int) = setOnClickListener {
-        pagerAdapter!!.initScroll(position, TYPE_SMOOTH_SCROLL)
+        storeViewModel.updateStoreCount(type, category, position, location)
+        binding.btnTop.setOnClickListener {
+            pagerAdapter!!.initScroll(position, TYPE_SMOOTH_SCROLL)
+        }
     }
 
     private fun ViewPager2.setOnPageChangeListener(type: Int, category: String, defaultPosition: Int) {
@@ -91,21 +86,14 @@ class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragme
             override fun onPageSelected(newPosition: Int) {
                 super.onPageSelected(newPosition)
                 // because current state of old page is recycled, have to be restored old page to default scroll state.
-                setOldPageScroll(oldPosition)
+                // whenever page change, old page have to is scrolled to top.
+                pagerAdapter!!.initScroll(oldPosition, TYPE_NORMAL_SCROLL)
                 oldPosition = newPosition
 
                 setPagerPosition(type, category, newPosition)
             }
         }
         registerOnPageChangeCallback(onPageChangeCallback)
-    }
-    private fun setOldPageScroll(oldPosition:Int) {
-        // whenever page change, old page have to is scrolled to top.
-        pagerAdapter!!.initScroll(oldPosition, TYPE_NORMAL_SCROLL)
-    }
-
-    private fun TextView.setTitleText(type: Int, name: String) {
-        text = if(type == TYPE_CATEGORY) TYPE_CATEGORY_NAME else name
     }
 
     override fun subscribeToObservers() {
@@ -123,6 +111,7 @@ class StoreListFragment : BaseFragment<FragmentStoreListBinding>(R.layout.fragme
             }
         }
     }
+
     private fun filteredStoreList(position: Int, stores: PagingData<StoreItem>) = when (position) {
         DEFAULT_POSITION -> stores
         else -> stores.filter { it.code == "$position" }
