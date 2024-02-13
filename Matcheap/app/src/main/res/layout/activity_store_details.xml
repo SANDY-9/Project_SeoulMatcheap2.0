@@ -496,7 +496,7 @@
             android:layout_marginEnd="8dp"
             android:src="@drawable/bookmark_selector"
             Bookmark="@{storeDetails.bookmark.bookmarked}"
-            android:onClick="@{(v)->activity.updateBookmarkState(v, storeDetails.store)}"
+            android:onClick="@{(v)->activity.updateBookmarkState(v)}"
             app:layout_constraintBottom_toBottomOf="@+id/toolbar_area_before"
             app:layout_constraintEnd_toStartOf="@+id/btn_share"
             app:layout_constraintTop_toTopOf="@+id/guideline2" />

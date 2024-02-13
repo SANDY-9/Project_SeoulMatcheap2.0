@@ -128,17 +128,21 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     }
 
     //!-- create Store Markers
+    private var markerBinding: ItemMapMarkerBinding? = null
     private fun NaverMap.createStoreMarkers(markers: Map<InfoWindow, InfoWindow>) = lifecycleScope.launch {
+        markerBinding = ItemMapMarkerBinding.inflate(LayoutInflater.from(context))
         val map = this@createStoreMarkers
-        markers.forEach { (has, not) ->
-            has.setStoreMarker(true, map)
-            not.setStoreMarker(false, map)
+        markerBinding?.let {
+            markers.forEach { (has, not) ->
+                has.setStoreMarker(true, map, it)
+                not.setStoreMarker(false, map, it)
+            }
         }
     }
 
-    private fun InfoWindow.setStoreMarker(hasInfoWindow: Boolean, map: NaverMap) {
+    private fun InfoWindow.setStoreMarker(hasInfoWindow: Boolean, map: NaverMap, binding: ItemMapMarkerBinding) {
         addOnMarkerClickListener()
-        adapter = mapUtils.getAdapter(tag as StoreMapItem, false, hasInfoWindow)
+        adapter = mapUtils.getAdapter(tag as StoreMapItem, false, hasInfoWindow, binding)
         this.map = map
     }
 
@@ -164,7 +168,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     private fun InfoWindow.setClickState(clicked: Boolean, hasInfoWindow: Boolean, store: StoreMapItem? = null) = this.apply {
         val store = store ?: tag as StoreMapItem
         tag = store
-        adapter = mapUtils.getAdapter(store, clicked, hasInfoWindow)
+        adapter = mapUtils.getAdapter(store, clicked, hasInfoWindow, markerBinding!!)
         zIndex = if (clicked) MapUtils.Z_INDEX_CLICKED else MapUtils.Z_INDEX_DEFAULT
     }
 
@@ -217,6 +221,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
     //!--infoBottomSheet
     private fun openStoreBottomSheet(item: StoreMapItem) = binding.run {
         bottomSheet.store = item
+        bottomSheet.icBookmark.visibility = if(item.bookmarked) View.VISIBLE else View.GONE
         mapFragment.startTransition(R.id.open_transition)
     }
 
@@ -227,13 +232,24 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
     //!-- bookmark
     @Inject lateinit var connectivityManager: ConnectivityManager
+    fun checkNetworkConnect() {
+        if(connectivityManager.activeNetwork == null) cancelBookmarkUpdate()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        updateBookmarkChanged()
+    }
+
     private val bookmarkViewModel: BookmarkViewModel by viewModels()
-    fun updateBookmarkState(store: StoreMapItem, isChecked: Boolean) = lifecycleScope.launch {
-        connectivityManager.activeNetwork?.let {
-            store.bookmarked = isChecked
-            updateClickedMarker(store)
-            bookmarkViewModel.updateBookmark(store.id, store.code, isChecked)
-        } ?: cancelBookmarkUpdate()
+    private fun updateBookmarkChanged() {
+        val store = binding.bottomSheet.store
+        store?.let {
+            val bookmarkBtnChecked = binding.bottomSheet.btnBookmark.isChecked
+            if(bookmarkBtnChecked != it.bookmarked) {
+                bookmarkViewModel.updateBookmark(it.id, it.code, bookmarkBtnChecked)
+            }
+        }
     }
 
     private fun updateClickedMarker(store: StoreMapItem) {
@@ -243,11 +259,8 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
     private fun cancelBookmarkUpdate() = binding.bottomSheet.apply {
         showToastMessage(requireContext(), MESSAGE_NETWORK_ERROR)
-        btnBookmark.isChecked = false
-        store?.run {
-            bookmarked = false
-            updateClickedMarker(this)
-        }
+        btnBookmark.isChecked = !btnBookmark.isChecked
+        store?.let { updateClickedMarker(it) }
     }
 
 
@@ -297,6 +310,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(R.layout.fragment_map) {
 
     override fun destroyGlobalVariables() {
         mapViewModel.onCleared()
+        markerBinding = null
         clickedMarkerWithInfo = null
         clickedMarkerNoInfo = null
         requireActivity().supportFragmentManager.setFragmentResult(FILTER_OPEN, bundleOf(FILTER_OPEN to false))
