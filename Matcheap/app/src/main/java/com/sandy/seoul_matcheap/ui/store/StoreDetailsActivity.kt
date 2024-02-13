@@ -3,11 +3,11 @@ package com.sandy.seoul_matcheap.ui.store
 import android.Manifest
 import android.app.Activity
 import android.content.*
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -21,6 +21,7 @@ import com.google.firebase.dynamiclinks.ktx.*
 import com.google.firebase.ktx.Firebase
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
+import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.adapters.StoreMenuAdapter
 import com.sandy.seoul_matcheap.data.store.dao.StoreMapItem
@@ -81,14 +82,14 @@ class StoreDetailsActivity : AppCompatActivity() {
             }
         }
         .addOnFailureListener(this) {
-            showToastMessage(MESSAGE_NETWORK_ERROR)
+            showToastMessage(this, MESSAGE_NETWORK_ERROR)
             onFinish()
         }
 
 
     private fun subscribeToConnectStateObserver() {
         storeViewModel.loadingState.observe(this) {
-            if(it == ConnectState.FAIL) showToastMessage(MESSAGE_NETWORK_ERROR)
+            if(it == ConnectState.FAIL) showToastMessage(this, MESSAGE_NETWORK_ERROR)
         }
     }
 
@@ -141,7 +142,6 @@ class StoreDetailsActivity : AppCompatActivity() {
         }
     )
 
-
     private fun setupMap() {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as MapFragment
         mapFragment.getMapAsync {
@@ -170,10 +170,28 @@ class StoreDetailsActivity : AppCompatActivity() {
     }
 
 
-    fun updateBookmarkState(v: View, store: StoreInfo) {
-        val curBookmark = v.isSelected
-        bookmarkViewModel.updateBookmark(store.id, store.code, !curBookmark)
-        v.isSelected = !curBookmark
+    @Inject lateinit var connectivityManager: ConnectivityManager
+    fun updateBookmarkState(v: View) {
+        val isNetworkEnabled = connectivityManager.activeNetwork
+        isNetworkEnabled?.let {
+            val curBookmark = v.isSelected
+            v.isSelected = !curBookmark
+        } ?: showToastMessage(this, MESSAGE_NETWORK_ERROR)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        updateBookmarkChanged()
+    }
+
+    private fun updateBookmarkChanged() {
+        val storeDetails = binding.storeDetails
+        storeDetails?.run {
+            val bookmarkBtnChecked = binding.btnBookmark.isSelected
+            if (bookmarkBtnChecked != bookmark?.bookmarked) {
+                bookmarkViewModel.updateBookmark(store.id, store.code, bookmarkBtnChecked)
+            }
+        }
     }
 
 
@@ -184,13 +202,13 @@ class StoreDetailsActivity : AppCompatActivity() {
         data = Uri.parse(uriText)
     }.run(::startActivity)
     private fun getEmailContent(store: StoreInfo) = """
-        --------<착한가격업소 정보>----------
-        가게 ID : ${store.id}
-        가게 이름 : ${store.name}
-        -------------------------------------------------
+       --------<착한가격업소 정보>----------
+       가게 ID : ${store.id}
+       가게 이름 : ${store.name}
+       -------------------------------------------------
         
-        수정 제안할 내용을 이곳에 입력해주세요.
-        (사진 교체를 희망 하시는 경우, 메일에 사진도 같이 첨부해서 보내주셔야 합니다.)
+       수정 제안할 내용을 이곳에 입력해주세요.
+       (사진 교체를 희망 하시는 경우, 메일에 사진도 같이 첨부해서 보내주셔야 합니다.)
     """.trimIndent()
 
 
@@ -211,7 +229,7 @@ class StoreDetailsActivity : AppCompatActivity() {
             startChooserIntent(store, shortLink)
         }
     }.addOnFailureListener {
-        showToastMessage(MESSAGE_WARNING_SHARE)
+        showToastMessage(this, MESSAGE_WARNING_SHARE)
     }
 
     private fun startChooserIntent(store: StoreInfo, shortLink: Uri) = Intent.createChooser(
@@ -221,15 +239,16 @@ class StoreDetailsActivity : AppCompatActivity() {
         },
         APP_NAME
     ).run(::startActivity)
-    private fun getSharedContent(store: StoreInfo, link: Uri) = """
-        [${store.name}]
-        
-        ${binding.content.text}
-        
-        주소 : ${store.address}
-        
-        $link
-    """.trimIndent()
+    private fun getSharedContent(store: StoreInfo, link: Uri) =
+        """
+            [${store.name}]
+            
+            ${binding.content.text}
+            
+            주소 : ${store.address}
+            
+            $link
+            """.trimIndent()
 
 
     fun requestCall() = callPermissionRequest.launch(Manifest.permission.CALL_PHONE)
@@ -251,7 +270,7 @@ class StoreDetailsActivity : AppCompatActivity() {
     }
     private fun hasNotGrantedCallPermission() {
         PermissionHelper.getPermissionSettingsIntent(this)
-        showToastMessage(MESSAGE_PERMISSION_WARNING_CALL)
+        showToastMessage(this, MESSAGE_PERMISSION_WARNING_CALL)
     }
 
 
@@ -264,7 +283,7 @@ class StoreDetailsActivity : AppCompatActivity() {
             `package` = NAVER_MAP_PACKAGE_NAME
         }.run(::startActivity)
     } catch (e : Exception) {
-        showToastMessage(MESSAGE_APP_WARNING)
+        showToastMessage(this, MESSAGE_APP_WARNING)
     }
     private fun getNavigationUriString(store: StoreInfo) =
         NAVER_MAP_URI + "dlat=${store.lat}" + "&dlng=${store.lng}" + "&dname=${store.name}" + "&appname=${packageName}"
@@ -297,8 +316,6 @@ class StoreDetailsActivity : AppCompatActivity() {
         }
         finish()
     }
-
-    private fun showToastMessage(message : String) = Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
     companion object {
         private const val STANDARD_POSITION = 0.5

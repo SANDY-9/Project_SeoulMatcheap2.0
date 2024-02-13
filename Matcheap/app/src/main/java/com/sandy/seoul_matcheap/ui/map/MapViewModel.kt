@@ -190,8 +190,29 @@ class MapViewModel @Inject constructor(
         createPolygonOverlays()
     }
 
+    private fun clearMarkers() {
+        viewModelScope.launch {
+            storeMarkers.value?.forEach { (u, i) ->
+                u.map = null
+                i.map = null
+            }
+        }
+        viewModelScope.launch {
+            polygonOverlays.value?.forEach { (_, polygonOverlay) ->
+                polygonOverlay.map = null
+            }
+        }
+        viewModelScope.launch {
+            countMarkers.value?.forEach { (_, marker) ->
+                marker.map = null
+            }
+        }
+        rangeCircleOverlay.value?.map = null
+    }
+
     public override fun onCleared() {
         initData()
+        clearMarkers()
         super.onCleared()
     }
 

@@ -3,7 +3,6 @@ package com.sandy.seoul_matcheap.util.helper
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PointF
-import android.view.LayoutInflater
 import android.view.View
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraAnimation
@@ -52,11 +51,10 @@ class MapUtils @Inject constructor(context: Context) {
         minZoom = if(hasInfoWindow) MAP_INFO_MAX_ZOOM else MAP_INFO_MIN_ZOOM
     }
 
-    private val markerBinding by lazy { ItemMapMarkerBinding.inflate(LayoutInflater.from(context)) }
-    fun getAdapter(store: StoreMapItem, clicked: Boolean, hasInfoWindow: Boolean) = object : InfoWindow.ViewAdapter() {
-        override fun getView(p0: InfoWindow): View = getStoreMarkerView(store, clicked, hasInfoWindow)
+    fun getAdapter(store: StoreMapItem, clicked: Boolean, hasInfoWindow: Boolean, binding: ItemMapMarkerBinding) = object : InfoWindow.ViewAdapter() {
+        override fun getView(p0: InfoWindow): View = getStoreMarkerView(store, clicked, hasInfoWindow, binding)
     }
-    private fun getStoreMarkerView(store: StoreMapItem, clicked: Boolean, hasInfoWindow: Boolean) = markerBinding.run {
+    private fun getStoreMarkerView(store: StoreMapItem, clicked: Boolean, hasInfoWindow: Boolean, binding: ItemMapMarkerBinding) = binding.run {
         with(bgInfo) {
             visibility = if(hasInfoWindow) View.VISIBLE else View.GONE
             backgroundTintList = if(clicked) Resource.matCheapBlue else Resource.matCheapWhite
