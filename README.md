@@ -25,30 +25,36 @@
 <img src="https://img.shields.io/badge/Android-34A853?style=flat&logo=android&logoColor=white"/> <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat&logo=Kotlin&logoColor=white"/> <img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=white"/> <img src="https://img.shields.io/badge/MVVM-000000?style=flat&logo=&logoColor=white"/> <img src="https://img.shields.io/badge/RESTful API-000000?style=flat&logo=&logoColor=000000"/> 
 + AAC(Android Architecture Component) : Lifecycles, LiveData, ViewModel, Room, Paging, DataBinding, Navigation, WorkManager
 + Dagger-Hilt
-+ Retrofit2
-+ Coroutine
++ Retrofit2 : 빠른 네트워크 통신 속도
++ Coroutine : 비동기 처리시 메모리 성능 최적화
 + Naver Map SDK
-+ FusedLocaionProvider
-+ Firebase RemoteConfig
++ FusedLocaionProvider : 정확성이 높은 사용자 위치 정보를 얻기 위해 사용
++ Firebase RemoteConfig : 앱 버전 업데이트 관리
 + Firebase Dynamic Link
 + LeakCanary
-+ Alarm Manager
++ Alarm Manager : 푸시알림 시간 정확도 개선
 + Glide
 + Jsoup
 + UI: ConstaintLayout, Motion Layout, ViewPager2, TabLayout, RecyclerView, Lottie
 
 </br>
 
-## Release Note
-<details><summary>2.1.0 (2023.9.7)</summary>
+## Update Note
+<details><summary>2.1.1 (2024.02.15)</summary>
+1. 북마크 기능 안정화 : 반복된 북마크 추가시 오류가 발생하는 현상 수정</br>
+2. 지도 기능 안정화 : 더이상 중복된 마커가 생성되지 않습니다.</br>
+3. 이외의 버그 수정 : 검색 후 재검색시 스크롤이 리셋되지 않는 현상, 부자연스러운 UI 애니메이션 수정</br>
+4. 코드 리팩토링으로 코드 최적화(중복코드 개선 및 유지보수 성능 향상)</br>
+</details>    
+<details><summary>2.1.0 (2023.09.7)</summary>
 1. 앱의 로딩속도 개선 : 기존 5초 -> 2초</br>
 2. 지도에서 "재검색"기능 추가</br>
 3. 착한가격업소 사진이 나오지 않는 현상 수정</br>
 </details>    
-<details><summary>2.0.1 (2023.6.2)</summary>
+<details><summary>2.0.1 (2023.06.2)</summary>
 출시 후 버그 수정 : 동네 정보 불러오지 못하는 문제, 메뉴 정보를 네트워크에서 불러오지 못하는 문제
 </details>   
-<details><summary>2.0.0 (2023.6.1)</summary>
+<details><summary>2.0.0 (2023.06.1)</summary>
 서울맛칩2.0을 출시합니다. 서울맛칩은 서울시에서 선정한 착한가격업소 정보앱입니다!
 </details>   
 
