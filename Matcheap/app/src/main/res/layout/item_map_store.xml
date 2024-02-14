@@ -169,7 +169,7 @@
             android:background="@drawable/ic_category"
             android:backgroundTint="@color/check_selector_color"
             android:checked="@{store.bookmarked}"
-            android:onCheckedChanged="@{(v, checked)->fragment.updateBookmarkState(store, checked)}"
+            android:onClick="@{()->fragment.checkNetworkConnect()}"
             android:gravity="center|top"
             android:paddingTop="4dp"
             android:stateListAnimator="@null"

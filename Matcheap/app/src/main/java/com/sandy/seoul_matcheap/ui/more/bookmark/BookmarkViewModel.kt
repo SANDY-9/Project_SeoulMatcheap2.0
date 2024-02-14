@@ -5,6 +5,7 @@ import com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore
 import com.sandy.seoul_matcheap.data.store.repository.BookmarkRepository
 import com.sandy.seoul_matcheap.util.constants.ConnectState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,7 +37,7 @@ class BookmarkViewModel @Inject constructor(private val bookmarkRepository: Book
         this.code.value = code
     }
 
-    fun updateBookmark(id: String, code: String, bookmarked: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+    fun updateBookmark(id: String, code: String, bookmarked: Boolean) = CoroutineScope(Dispatchers.IO).launch {
         setLoadingState(ConnectState.ING)
         when {
             bookmarked -> addBookmark(id, code)

@@ -324,7 +324,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                        <com.sandy.seoul_matcheap.ui.common.TouchFrameLayout
+                        <com.sandy.seoul_matcheap.util.custom.TouchFrameLayout
                             android:id="@+id/map_container"
                             android:layout_width="0dp"
                             android:layout_height="150dp"
@@ -367,7 +367,7 @@
 
                             </FrameLayout>
 
-                        </com.sandy.seoul_matcheap.ui.common.TouchFrameLayout>
+                        </com.sandy.seoul_matcheap.util.custom.TouchFrameLayout>
 
                         <TextView
                             android:id="@+id/tv_address"
@@ -496,7 +496,7 @@
             android:layout_marginEnd="8dp"
             android:src="@drawable/bookmark_selector"
             Bookmark="@{storeDetails.bookmark.bookmarked}"
-            android:onClick="@{(v)->activity.updateBookmarkState(v, storeDetails.store)}"
+            android:onClick="@{(v)->activity.updateBookmarkState(v)}"
             app:layout_constraintBottom_toBottomOf="@+id/toolbar_area_before"
             app:layout_constraintEnd_toStartOf="@+id/btn_share"
             app:layout_constraintTop_toTopOf="@+id/guideline2" />

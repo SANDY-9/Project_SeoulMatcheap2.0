@@ -6,15 +6,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.sandy.seoul_matcheap.R
+import com.sandy.seoul_matcheap.adapters.BookmarkListAdapter
 import com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore
 import com.sandy.seoul_matcheap.databinding.FragmentBookmarkBinding
+import com.sandy.seoul_matcheap.extension.connectPagerWithTabLayout
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.common.BaseFragment
-import com.sandy.seoul_matcheap.ui.common.PagerAdapter
+import com.sandy.seoul_matcheap.ui.BaseFragment
+import com.sandy.seoul_matcheap.adapters.PagerAdapter
 import com.sandy.seoul_matcheap.util.constants.CATEGORY_SIZE
 import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
 import com.sandy.seoul_matcheap.util.constants.TYPE_NORMAL_SCROLL
 import dagger.hilt.android.AndroidEntryPoint
+import showProgressView
 
 @AndroidEntryPoint
 class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment_bookmark) {
@@ -24,13 +27,14 @@ class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment
 
     override fun setupBinding(): FragmentBookmarkBinding {
         return binding.apply {
+            fragment = this@BookmarkFragment
             lifecycleOwner = viewLifecycleOwner
             viewModel = bookmarkViewModel
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        showProgressView(binding.progressView)
+        binding.progressView.showProgressView()
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -42,9 +46,7 @@ class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment
 
     override fun initView() = binding.run {
         initPager()
-        connectPagerWithTabLayout(tabLayout, pager, progressView)
-
-        btnBack.setOnBackButtonClickListener()
+        pager.connectPagerWithTabLayout(tabLayout, progressView, requireContext())
     }
 
     private fun initPager() = binding.pager.apply {

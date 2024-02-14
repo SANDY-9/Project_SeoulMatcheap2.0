@@ -9,11 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.dao.DistanceRadius
 import com.sandy.seoul_matcheap.databinding.FragmentMapFilterBinding
+import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.ui.LocationViewModel
-import com.sandy.seoul_matcheap.ui.common.*
-import com.sandy.seoul_matcheap.ui.home.RegionSpinnerAdapter
+import com.sandy.seoul_matcheap.adapters.RegionSpinnerAdapter
 import com.sandy.seoul_matcheap.util.constants.*
 import com.warkiz.widget.*
+import setChangeIconTintColorOnTouch
+import setChangeTextColorOnTouch
+import startTransition
 
 class MapFilterFragment : BaseFragment<FragmentMapFilterBinding>(R.layout.fragment_map_filter) {
 
@@ -77,11 +80,10 @@ class MapFilterFragment : BaseFragment<FragmentMapFilterBinding>(R.layout.fragme
 
     private fun RecyclerView.addAdapter() {
         adapter = RegionSpinnerAdapter(TYPE_REGION).apply {
-            addOnItemClickListener()
+            setOnItemClickListener {
+                updateRegionFilter(it)
+            }
         }
-    }
-    private fun RegionSpinnerAdapter.addOnItemClickListener() = setOnItemClickListener {
-        updateRegionFilter(it)
     }
 
     private fun updateRegionFilter(param: String) {
@@ -182,21 +184,12 @@ class MapFilterFragment : BaseFragment<FragmentMapFilterBinding>(R.layout.fragme
 
     // !-- form here, functions about filter reset
     private fun TextView.setOnResetButtonTouchListener() = setOnTouchListener { _, event ->
-        changeResetButtonColorOnTouch(event.action)
+        val action = event.action
+        setChangeTextColorOnTouch(action)
+        setChangeIconTintColorOnTouch(action)
         initViewDefaultState()
         mapViewModel.resetFilter()
         true
-    }
-
-    private fun TextView.changeResetButtonColorOnTouch(action: Int) = binding.run {
-        setChangeTextColorOnTouch(action)
-        setChangeIconTintColorOnTouch(action)
-    }
-    private fun TextView.setChangeIconTintColorOnTouch(action: Int) {
-        compoundDrawableTintList = when(action) {
-            MotionEvent.ACTION_UP -> Resource.matCheapGray
-            else -> Resource.matCheapBlue
-        }
     }
 
     private fun initViewDefaultState() = binding.apply {

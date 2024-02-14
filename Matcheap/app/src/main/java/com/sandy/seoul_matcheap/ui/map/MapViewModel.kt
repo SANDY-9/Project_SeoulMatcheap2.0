@@ -9,6 +9,7 @@ import com.sandy.seoul_matcheap.data.store.dao.DistanceRadius
 import com.sandy.seoul_matcheap.data.store.repository.MapRepository
 import com.sandy.seoul_matcheap.util.constants.ALL_SELECT
 import com.sandy.seoul_matcheap.util.constants.Category
+import com.sandy.seoul_matcheap.util.helper.MapUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -189,8 +190,29 @@ class MapViewModel @Inject constructor(
         createPolygonOverlays()
     }
 
+    private fun clearMarkers() {
+        viewModelScope.launch {
+            storeMarkers.value?.forEach { (u, i) ->
+                u.map = null
+                i.map = null
+            }
+        }
+        viewModelScope.launch {
+            polygonOverlays.value?.forEach { (_, polygonOverlay) ->
+                polygonOverlay.map = null
+            }
+        }
+        viewModelScope.launch {
+            countMarkers.value?.forEach { (_, marker) ->
+                marker.map = null
+            }
+        }
+        rangeCircleOverlay.value?.map = null
+    }
+
     public override fun onCleared() {
         initData()
+        clearMarkers()
         super.onCleared()
     }
 
