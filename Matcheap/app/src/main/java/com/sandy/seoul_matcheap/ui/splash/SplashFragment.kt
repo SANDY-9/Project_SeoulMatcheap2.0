@@ -1,5 +1,6 @@
 package com.sandy.seoul_matcheap.ui.splash
 
+import android.Manifest
 import android.Manifest.permission.*
 import android.content.Context
 import android.content.SharedPreferences
@@ -97,6 +98,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
     private fun requestPermissions() {
         val permissions = arrayOf(
             POST_NOTIFICATIONS,
+            SCHEDULE_EXACT_ALARM,
             ACCESS_FINE_LOCATION,
             ACCESS_COARSE_LOCATION
         )
