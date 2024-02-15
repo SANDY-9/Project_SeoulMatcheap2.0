@@ -1,5 +1,6 @@
 package com.sandy.seoul_matcheap.ui.more.settings
 
+import android.app.Application
 import android.content.SharedPreferences
 import androidx.lifecycle.*
 import com.sandy.seoul_matcheap.notification.NotificationScheduler
@@ -22,8 +23,8 @@ typealias Time = Pair<Int, Int>
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     @Named(APP_PREFS_SETTINGS) private val prefs: SharedPreferences,
-    private val notificationScheduler: NotificationScheduler
-) : ViewModel() {
+    application: Application
+) : AndroidViewModel(application) {
 
     val isGranted = MutableLiveData<Boolean>()
 
@@ -71,7 +72,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun updateWorkerSchedule(register: Boolean) {
-        notificationScheduler.setNotificationSchedule(register, savedTime.value!!)
+        val context = getApplication<Application>().applicationContext
+        NotificationScheduler.setNotificationSchedule(context, register, savedTime.value!!)
     }
 
 }

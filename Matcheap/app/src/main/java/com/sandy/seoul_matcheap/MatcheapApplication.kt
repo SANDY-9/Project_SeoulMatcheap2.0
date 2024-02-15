@@ -7,7 +7,8 @@ import android.app.NotificationManager.IMPORTANCE_DEFAULT
 import android.content.Context
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.work.WorkManager
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.naver.maps.map.NaverMapSdk
 import com.sandy.seoul_matcheap.util.constants.APP_NAME
 import com.sandy.seoul_matcheap.util.constants.NOTIFICATION_CHANNEL_ID
@@ -24,14 +25,13 @@ import javax.inject.Inject
  */
 
 @HiltAndroidApp
-class MatcheapApplication : Application() {
+class MatcheapApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var notificationManager: NotificationManager
+    @Inject lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
         super.onCreate()
-
-        WorkManager.getInstance(this).cancelAllWork()
 
         setOnlyNightMode()
 
@@ -60,6 +60,12 @@ class MatcheapApplication : Application() {
             }
             notificationManager.createNotificationChannel(notificationChannel) // channel 생성
         } catch (e: Exception) { /* NO_OP */ }
+    }
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
     }
 
     companion object {
