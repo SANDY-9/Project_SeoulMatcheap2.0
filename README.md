@@ -32,7 +32,6 @@
 + Firebase RemoteConfig : 앱 버전 업데이트 관리
 + Firebase Dynamic Link
 + LeakCanary
-+ Alarm Manager : 푸시알림 시간 정확도 개선
 + Glide
 + Jsoup
 + UI: ConstaintLayout, Motion Layout, ViewPager2, TabLayout, RecyclerView, Lottie
@@ -40,6 +39,10 @@
 </br>
 
 ## Update Note
+<details><summary>2.1.2 (2024.02.15)</summary>
+1. 앱 업데이트 링크 버그 수정</br>
+2. 안드로이드14에서 푸시알림시 앱이 꺼지는 현상 수정</br>
+</details>    
 <details><summary>2.1.1 (2024.02.15)</summary>
 1. 북마크 기능 안정화 : 반복된 북마크 추가시 오류가 발생하는 현상 수정</br>
 2. 지도 기능 안정화 : 더이상 중복된 마커가 생성되지 않습니다.</br>
