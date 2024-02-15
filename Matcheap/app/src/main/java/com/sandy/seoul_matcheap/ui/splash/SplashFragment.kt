@@ -88,7 +88,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
             .setMessage(MESSAGE_NEW_VERSION_UPDATE)
             .setCancelable(false)
             .setNegativeButton(BUTTON_TITLE_UPDATE) { _, _ ->
-                navigateToBrowser(MARKET_URI + requireContext().packageName)
+                navigateToBrowser(MARKET_URL + requireContext().packageName)
                 setOnBackPressedListener()
             }
             .setPositiveButton(BUTTON_TITLE_CONFIRM) { _, _ -> requestPermissions() }
@@ -251,7 +251,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
     companion object {
         private const val BUTTON_TITLE_UPDATE = "업데이트"
         private const val BUTTON_TITLE_CONFIRM = "확인"
-        private const val MARKET_URI = "market://details?id="
+        private const val MARKET_URL = "https://play.google.com/store/apps/details?id="
     }
 
 }
