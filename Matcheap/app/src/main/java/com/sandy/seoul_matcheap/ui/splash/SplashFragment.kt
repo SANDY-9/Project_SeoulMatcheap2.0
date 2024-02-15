@@ -1,6 +1,5 @@
 package com.sandy.seoul_matcheap.ui.splash
 
-import android.Manifest
 import android.Manifest.permission.*
 import android.content.Context
 import android.content.SharedPreferences
@@ -26,9 +25,9 @@ import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.StoreDatabase
 import com.sandy.seoul_matcheap.databinding.FragmentSplashBinding
+import com.sandy.seoul_matcheap.notification.NotificationScheduler
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.BaseFragment
-import com.sandy.seoul_matcheap.notification.NotificationScheduler
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.util.helper.AppPrefsUtils
@@ -218,12 +217,10 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
             navigateToDestination()
         }
     }
-
-    @Inject lateinit var notificationScheduler: NotificationScheduler
     private fun setNotificationSchedule() {
         val time = AppPrefsUtils.getSavedTime(prefs)
         AppPrefsUtils.setNotificationState(prefs, register)
-        notificationScheduler.setNotificationSchedule(register, time)
+        NotificationScheduler.setNotificationSchedule(requireContext(), register, time)
     }
 
     private fun saveDatabaseVersion() {
