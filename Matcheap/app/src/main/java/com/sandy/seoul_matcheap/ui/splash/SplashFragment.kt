@@ -1,6 +1,5 @@
 package com.sandy.seoul_matcheap.ui.splash
 
-import android.Manifest
 import android.Manifest.permission.*
 import android.content.Context
 import android.content.SharedPreferences
@@ -26,9 +25,9 @@ import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.data.store.StoreDatabase
 import com.sandy.seoul_matcheap.databinding.FragmentSplashBinding
+import com.sandy.seoul_matcheap.notification.NotificationScheduler
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.BaseFragment
-import com.sandy.seoul_matcheap.notification.NotificationScheduler
 import com.sandy.seoul_matcheap.util.*
 import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.util.helper.AppPrefsUtils
@@ -88,7 +87,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
             .setMessage(MESSAGE_NEW_VERSION_UPDATE)
             .setCancelable(false)
             .setNegativeButton(BUTTON_TITLE_UPDATE) { _, _ ->
-                navigateToBrowser(MARKET_URI + requireContext().packageName)
+                navigateToBrowser(MARKET_URL)
                 setOnBackPressedListener()
             }
             .setPositiveButton(BUTTON_TITLE_CONFIRM) { _, _ -> requestPermissions() }
@@ -218,12 +217,10 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
             navigateToDestination()
         }
     }
-
-    @Inject lateinit var notificationScheduler: NotificationScheduler
     private fun setNotificationSchedule() {
         val time = AppPrefsUtils.getSavedTime(prefs)
         AppPrefsUtils.setNotificationState(prefs, register)
-        notificationScheduler.setNotificationSchedule(register, time)
+        NotificationScheduler.setNotificationSchedule(requireContext(), register, time)
     }
 
     private fun saveDatabaseVersion() {
@@ -251,7 +248,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>(R.layout.fragment_spl
     companion object {
         private const val BUTTON_TITLE_UPDATE = "업데이트"
         private const val BUTTON_TITLE_CONFIRM = "확인"
-        private const val MARKET_URI = "market://details?id="
+        private const val MARKET_URL = "https://play.google.com/store/apps/details?id=com.sandy.seoul_matcheap"
     }
 
 }
