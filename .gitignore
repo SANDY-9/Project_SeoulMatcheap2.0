@@ -39,3 +39,5 @@ Matcheap/settings.gradle
 *.txt
 Matcheap/app/src/main/java/com/sandy/seoul_matcheap/util/constants
 Matcheap/app/src/main/res/values/strings.xml
+Matcheap/common/src/main/java/com/sandy/matcheap/common/API_KEY.kt
+Matcheap/common/src/main/java/com/sandy/matcheap/common/Constants.kt
