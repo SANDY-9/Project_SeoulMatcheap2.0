@@ -1,6 +1,6 @@
-package com.sandy.seoul_matcheap.data.store
+package com.sandy.matcheap.data.remote.menu
 
-import com.sandy.seoul_matcheap.data.store.entity.MenuResponse
+import com.sandy.matcheap.data.remote.menu.model.MenuResponseDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -16,6 +16,6 @@ interface SeoulOpenAPI {
     @GET("{id}")
     suspend fun getMenu(
         @Path("id")id: String
-    ) : Response<MenuResponse>
+    ) : Response<MenuResponseDTO>
 
 }

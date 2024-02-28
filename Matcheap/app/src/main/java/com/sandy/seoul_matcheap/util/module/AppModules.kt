@@ -1,6 +1,5 @@
 package com.sandy.seoul_matcheap.util.module
 
-import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
@@ -12,10 +11,8 @@ import android.view.inputmethod.InputMethodManager
 import androidx.room.Room
 import com.google.android.gms.location.LocationServices
 import com.google.gson.GsonBuilder
+import com.sandy.matcheap.data.remote.menu.SeoulOpenAPI
 import com.sandy.seoul_matcheap.data.*
-import com.sandy.seoul_matcheap.data.forecast.ForecastDataSource
-import com.sandy.seoul_matcheap.data.forecast.ForecastRepository
-import com.sandy.seoul_matcheap.data.forecast.ForecastServiceAPI
 import com.sandy.seoul_matcheap.data.store.*
 import com.sandy.seoul_matcheap.data.store.dao.BookmarkDao
 import com.sandy.seoul_matcheap.data.store.dao.MapDao
@@ -115,40 +112,6 @@ object AppModules {
     fun provideSettingsSharedPreferences(@ApplicationContext app: Context) =
         app.getSharedPreferences(APP_PREFS_SETTINGS, Context.MODE_PRIVATE)
 
-    @Singleton
-    @Provides
-    fun provideSeoulOpenAPIService() : SeoulOpenAPI {
-        val requestInterceptor  = Interceptor {
-            val url = it.request()
-                .url()
-                .newBuilder()
-                .build()
-            val request = it.request()
-                .newBuilder()
-                .url(url)
-                .build()
-            return@Interceptor it.proceed(request)
-        }
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(requestInterceptor)
-            .connectTimeout(TIMEOUT_DURATION /2, TimeUnit.SECONDS)
-            .readTimeout(TIMEOUT_DURATION /2, TimeUnit.SECONDS)
-            .callTimeout(TIMEOUT_DURATION /2, TimeUnit.SECONDS)
-            .build()
-        val gson = GsonBuilder()
-            .setLenient()
-            .create()
-        return Retrofit.Builder()
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .baseUrl(SEOUL_API_BASE_URL)
-            .build()
-            .create(SeoulOpenAPI::class.java)
-    }
-
-    @Singleton
-    @Provides
-    fun provideSeoulOpenAPIDataSource(api: SeoulOpenAPI) = SeoulOpenAPIDataSource(api)
 
     @Singleton
     @Provides
