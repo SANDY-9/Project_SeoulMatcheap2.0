@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.sandy.seoul_matcheap.util.constants.MATCHEAP_NOTICE_URL
 import com.sandy.seoul_matcheap.util.constants.NOTICE_BASE_URL
-import com.sandy.seoul_matcheap.util.helper.DataHelper
+import com.sandy.matcheap.data.utils.DataHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup

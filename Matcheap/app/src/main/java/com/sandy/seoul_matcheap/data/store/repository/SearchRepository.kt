@@ -1,10 +1,9 @@
 package com.sandy.seoul_matcheap.data.store.repository
 
-import android.location.Location
 import androidx.room.Transaction
 import com.sandy.seoul_matcheap.data.store.dao.SearchDao
 import com.sandy.seoul_matcheap.data.store.entity.SearchHistory
-import com.sandy.seoul_matcheap.util.helper.DataHelper
+import com.sandy.matcheap.data.utils.DataHelper
 import java.time.LocalDateTime
 import javax.inject.Inject
 

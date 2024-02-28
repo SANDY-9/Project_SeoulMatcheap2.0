@@ -1,5 +1,6 @@
-package com.sandy.seoul_matcheap.data.forecast
+package com.sandy.matcheap.data.remote.forecast
 
+import com.sandy.matcheap.data.remote.forecast.model.ForecastResponseDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -20,7 +21,7 @@ interface ForecastServiceAPI {
         @Query("ny") ny: Int,
         @Query("dataType") dataType : String = DATA_TYPE,
         @Query("numOfRows") numOfRows : Int = NUM_OF_ROWS
-    ) : Response<ForecastResponse>
+    ) : Response<ForecastResponseDTO>
 
     private companion object {
         private const val DATA_TYPE = "json"

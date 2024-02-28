@@ -101,46 +101,6 @@ object AppModules {
 
     @Singleton
     @Provides
-    fun provideForecastAPIService() : ForecastServiceAPI {
-         val requestInterceptor  = Interceptor {
-             val url = it.request()
-                 .url()
-                 .newBuilder()
-                 .addQueryParameter("serviceKey", FORECAST_API_KEY)
-                 .build()
-             val request = it.request()
-                 .newBuilder()
-                 .url(url)
-                 .build()
-             return@Interceptor it.proceed(request)
-         }
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(requestInterceptor)
-            .connectTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
-            .readTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
-            .callTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
-            .build()
-        val gson = GsonBuilder()
-            .setLenient()
-            .create()
-        return Retrofit.Builder()
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .baseUrl(FORECAST_BASE_URL)
-            .build()
-            .create(ForecastServiceAPI::class.java)
-    }
-
-    @Singleton
-    @Provides
-    fun provideForecastDatasource(api: ForecastServiceAPI) = ForecastDataSource(api)
-
-    @Singleton
-    @Provides
-    fun provideForecastRepository(dataSource: ForecastDataSource) = ForecastRepository(dataSource)
-
-    @Singleton
-    @Provides
     fun provideInputManager(@ApplicationContext app: Context) =
         app.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 

@@ -6,7 +6,7 @@ sealed class Resource<T> (
 ) {
 
     class Success<T>(data: T?): Resource<T>(data = data)
-    class Error<T>(message: String?): Resource<T>()
-    class Loading<T>(message: String?): Resource<T>(message = message)
+    class Error<T>(message: String? = null): Resource<T>(message = message)
+    class Loading<T>(data: T? = null): Resource<T>(data = data)
 
 }
