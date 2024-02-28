@@ -46,4 +46,12 @@ dependencies {
     implementation 'com.google.dagger:hilt-android:2.50'
     kapt 'com.google.dagger:hilt-android-compiler:2.50'
 
+    // alternatively - without Android dependencies for tests
+    implementation "androidx.paging:paging-common-ktx:3.2.1"
+
+    // Room
+    implementation 'androidx.room:room-runtime:2.6.1'
+    kapt 'androidx.room:room-compiler:2.6.1'
+    implementation 'androidx.room:room-ktx:2.6.1'
+
 }

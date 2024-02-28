@@ -9,7 +9,11 @@ fun List<MenuDTO>.toDomain(): List<Menu> {
     }
 }
 
+<<<<<<< Updated upstream
 fun MenuDTO.toDomain(): Menu {
+=======
+private fun MenuDTO.toDomain(): Menu {
+>>>>>>> Stashed changes
     return Menu(
         storeId = id,
         name = name,
