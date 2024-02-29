@@ -5,7 +5,7 @@ import androidx.room.Transaction
 import com.sandy.matcheap.data.room.dao.SearchDao
 import com.sandy.matcheap.data.room.entity.SearchHistory
 import com.sandy.matcheap.domain.model.store.StoreItem
-import com.sandy.matcheap.domain.repository.search.GetSearchStoreRepository
+import com.sandy.matcheap.domain.search.repository.GetSearchStoreRepository
 import java.time.LocalDateTime
 
 class GetSearchStoreRepositoryImpl constructor(

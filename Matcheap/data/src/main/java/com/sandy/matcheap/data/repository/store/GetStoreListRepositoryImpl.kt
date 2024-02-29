@@ -6,7 +6,7 @@ import com.sandy.matcheap.data.room.dao.StoreDao
 import com.sandy.matcheap.domain.model.menu.Menu
 import com.sandy.matcheap.domain.model.store.StoreDetails
 import com.sandy.matcheap.domain.model.store.StoreItem
-import com.sandy.matcheap.domain.repository.store.GetStoreListRepository
+import com.sandy.matcheap.domain.store.repository.GetStoreListRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

@@ -4,8 +4,8 @@ import androidx.room.Transaction
 import com.sandy.matcheap.data.room.dao.BookmarkDao
 import com.sandy.matcheap.data.room.dao.MenuDao
 import com.sandy.matcheap.data.room.entity.Bookmark
-import com.sandy.matcheap.domain.repository.bookmark.BookmarkRepository
-import com.sandy.matcheap.domain.repository.menu.GetStoreMenuRepository
+import com.sandy.matcheap.domain.bookmark.repository.BookmarkRepository
+import com.sandy.matcheap.domain.menu.repository.GetStoreMenuRepository
 import java.time.LocalDateTime
 
 class BookmarkRepositoryImpl(

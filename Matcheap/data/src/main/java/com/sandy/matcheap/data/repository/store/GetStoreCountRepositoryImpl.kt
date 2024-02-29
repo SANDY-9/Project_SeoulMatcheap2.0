@@ -4,7 +4,7 @@ import com.sandy.matcheap.common.DEFAULT_
 import com.sandy.matcheap.data.mappers.toDomain
 import com.sandy.matcheap.data.mappers.toInt
 import com.sandy.matcheap.data.room.dao.CountDao
-import com.sandy.matcheap.domain.repository.store.GetStoreCountRepository
+import com.sandy.matcheap.domain.store.repository.GetStoreCountRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

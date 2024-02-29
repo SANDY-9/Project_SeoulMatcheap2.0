@@ -8,7 +8,7 @@ import com.sandy.matcheap.common.Resource
 import com.sandy.matcheap.data.paging.NoticePagingSource
 import com.sandy.matcheap.data.remote.notice.AppNoticeDataSource
 import com.sandy.matcheap.domain.model.notice.Notice
-import com.sandy.matcheap.domain.repository.notice.GetAppNoticeRepository
+import com.sandy.matcheap.domain.notice.repository.GetAppNoticeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

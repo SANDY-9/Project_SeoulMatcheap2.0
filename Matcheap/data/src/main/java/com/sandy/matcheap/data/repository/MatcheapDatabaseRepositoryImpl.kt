@@ -4,7 +4,7 @@ import com.sandy.matcheap.data.room.dao.MapDao
 import com.sandy.matcheap.data.room.dao.StoreDao
 import com.sandy.matcheap.domain.model.map.Polygon
 import com.sandy.matcheap.domain.model.store.StoreDetails
-import com.sandy.matcheap.domain.repository.MatcheapDatabaseRepository
+import com.sandy.matcheap.domain.appdb.repository.MatcheapDatabaseRepository
 import javax.inject.Inject
 
 class MatcheapDatabaseRepositoryImpl @Inject constructor(

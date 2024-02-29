@@ -2,7 +2,7 @@ package com.sandy.matcheap.data.repository.search
 
 import com.sandy.matcheap.data.mappers.toDomain
 import com.sandy.matcheap.data.room.dao.SearchDao
-import com.sandy.matcheap.domain.repository.search.SearchHistoryRepository
+import com.sandy.matcheap.domain.search.repository.SearchHistoryRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

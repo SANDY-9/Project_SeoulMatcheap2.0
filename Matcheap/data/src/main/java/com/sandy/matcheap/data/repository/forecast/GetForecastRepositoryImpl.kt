@@ -4,7 +4,7 @@ import com.sandy.matcheap.data.mappers.toDomain
 import com.sandy.matcheap.data.remote.forecast.ForecastServiceAPI
 import com.sandy.matcheap.data.utils.ForecastUtil
 import com.sandy.matcheap.domain.model.forecast.Forecast
-import com.sandy.matcheap.domain.repository.forecast.GetForecastRepository
+import com.sandy.matcheap.domain.forecast.repository.GetForecastRepository
 import javax.inject.Inject
 
 class GetForecastRepositoryImpl @Inject constructor(

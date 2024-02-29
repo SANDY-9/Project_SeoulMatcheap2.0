@@ -2,7 +2,7 @@ package com.sandy.matcheap.data.repository.map
 
 import com.sandy.matcheap.data.room.dao.MapDao
 import com.sandy.matcheap.domain.model.map.Polygon
-import com.sandy.matcheap.domain.repository.map.GetMapPolygonsRepository
+import com.sandy.matcheap.domain.map.repository.GetMapPolygonsRepository
 import javax.inject.Inject
 
 class GetMapPolygonsRepositoryImpl @Inject constructor(
