@@ -5,7 +5,7 @@ import com.sandy.matcheap.domain.model.map.Polygon
 import com.sandy.matcheap.domain.repository.map.GetMapPolygonsRepository
 import javax.inject.Inject
 
-class GetMapPolygonsImpl @Inject constructor(
+class GetMapPolygonsRepositoryImpl @Inject constructor(
     private val dao: MapDao
 ): GetMapPolygonsRepository {
 

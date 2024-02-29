@@ -3,7 +3,7 @@ package com.sandy.matcheap.domain.usecases.menu
 import com.sandy.matcheap.common.MESSAGE_NETWORK_ERROR
 import com.sandy.matcheap.common.Resource
 import com.sandy.matcheap.domain.model.menu.Menu
-import com.sandy.matcheap.domain.repository.menu.GetStoreMenuRepository
+import com.sandy.matcheap.domain.repository.GetStoreMenuRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
