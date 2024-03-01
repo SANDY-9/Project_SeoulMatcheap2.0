@@ -1,4 +1,4 @@
-package com.sandy.seoul_matcheap.ui.store
+package com.sandy.seoul_matcheap.ui.details
 
 import android.Manifest
 import android.app.Activity
@@ -7,25 +7,22 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.core.widget.NestedScrollView
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.dynamiclinks.ktx.*
 import com.google.firebase.ktx.Firebase
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.*
+import com.sandy.matcheap.common.*
+import com.sandy.matcheap.domain.model.store.StoreDetails
 import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.adapters.StoreMenuAdapter
-import com.sandy.seoul_matcheap.data.store.dao.StoreMapItem
-import com.sandy.seoul_matcheap.data.store.entity.StoreInfo
 import com.sandy.seoul_matcheap.databinding.ActivityStoreDetailsBinding
 import com.sandy.seoul_matcheap.util.custom.TouchFrameLayout
 import com.sandy.seoul_matcheap.ui.more.bookmark.BookmarkViewModel
@@ -33,6 +30,7 @@ import com.sandy.seoul_matcheap.util.constants.*
 import com.sandy.seoul_matcheap.util.helper.MapUtils
 import com.sandy.seoul_matcheap.util.helper.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
+import setStatusBarState
 import javax.inject.Inject
 
 
@@ -41,7 +39,7 @@ class StoreDetailsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityStoreDetailsBinding
 
-    private val storeViewModel: StoreViewModel by viewModels()
+    private val storeDetailsViewModel: StoreDetailsViewModel by viewModels()
     private val bookmarkViewModel: BookmarkViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,9 +47,8 @@ class StoreDetailsActivity : AppCompatActivity() {
         registerOnBackPressedDispatcher()
         setBinding()
         handleIntent(intent)
-        subscribeToConnectStateObserver()
         initView()
-        setupMap()
+        subscribeToObservers()
     }
 
     private fun setBinding() {
@@ -71,7 +68,7 @@ class StoreDetailsActivity : AppCompatActivity() {
     }
 
     private fun updateStoreDetails(id: String) {
-        storeViewModel.updateStoreDetails(id)
+        storeDetailsViewModel.updateStoreDetails(id)
     }
 
     private fun handleFirebaseDynamicLink(intent: Intent) = Firebase.dynamicLinks
@@ -87,86 +84,68 @@ class StoreDetailsActivity : AppCompatActivity() {
         }
 
 
-    private fun subscribeToConnectStateObserver() {
-        storeViewModel.loadingState.observe(this) {
-            if(it == ConnectState.FAIL) showToastMessage(this, MESSAGE_NETWORK_ERROR)
-        }
-    }
-
-    private fun initView() = binding.apply {
-        setLightStatusBar(true)
-        constraintLayout.setChangeLightStatusBar()
-        contentView.addOnScrollChangeListener()
-        rvMenu.addAdapter()
-        mapContainer.setOnMapTouchListener(true)
-    }
-
-    @Suppress("DEPRECATION")
-    private fun setLightStatusBar(state: Boolean) {
-        window.decorView.systemUiVisibility = when {
-            state -> View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            else -> View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        }
-    }
-    private fun MotionLayout.setChangeLightStatusBar() {
-        val transitionListener = object : MotionLayout.TransitionListener {
-            override fun onTransitionStarted(layout: MotionLayout?, start: Int, end: Int) { /* NO-OP */ }
-            override fun onTransitionCompleted(layout: MotionLayout?, current: Int) { /* NO-OP */ }
-            override fun onTransitionTrigger(layout: MotionLayout?, trigger: Int, positive: Boolean, progress: Float) { /* NO-OP */ }
-            override fun onTransitionChange(layout: MotionLayout?, start: Int, end: Int, progress: Float) {
-                setLightStatusBar(progress < STANDARD_POSITION)
+    private fun initView() = binding.run {
+        //풀스크린 모드 조절
+        setStatusBarState(true)
+        constraintLayout.setTransitionListener(
+            object : MotionLayout.TransitionListener {
+                override fun onTransitionStarted(layout: MotionLayout?, start: Int, end: Int) { /* NO-OP */ }
+                override fun onTransitionCompleted(layout: MotionLayout?, current: Int) { /* NO-OP */ }
+                override fun onTransitionTrigger(layout: MotionLayout?, trigger: Int, positive: Boolean, progress: Float) { /* NO-OP */ }
+                override fun onTransitionChange(layout: MotionLayout?, start: Int, end: Int, progress: Float) {
+                    setStatusBarState(progress < STANDARD_POSITION)
+                }
             }
-        }
-        setTransitionListener(transitionListener)
-    }
+        )
 
-    private fun NestedScrollView.addOnScrollChangeListener() {
-        setOnScrollChangeListener { _, _, scrollY, _, _ ->
+        contentView.setOnScrollChangeListener { _, _, scrollY, _, _ ->
             binding.tvTitle.alpha = if(scrollY > 200) VISIBLE else GONE
         }
+
+        mapContainer.setTouchListener(
+            object : TouchFrameLayout.OnTouchListener {
+                override fun onTouch() {
+                    binding.contentView.requestDisallowInterceptTouchEvent(true)
+                }
+            }
+        )
     }
 
-    private fun RecyclerView.addAdapter() {
-        storeViewModel.menu.observe(this@StoreDetailsActivity) {
-            adapter = StoreMenuAdapter().apply {
-                submitList(it)
-            }
+    private fun subscribeToObservers() {
+        storeDetailsViewModel.storeDetailsState.observe(this) {
+            handleStoreDetailsState(it)
+        }
+        storeDetailsViewModel.storeMenuListState.observe(this) {
+            handleStoreMenuState(it)
         }
     }
 
-    private fun TouchFrameLayout.setOnMapTouchListener(enable: Boolean) = setTouchListener(
-        object : TouchFrameLayout.OnTouchListener {
-            override fun onTouch() {
-                binding.contentView.requestDisallowInterceptTouchEvent(enable)
-            }
-        }
-    )
-
-    private fun setupMap() {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as MapFragment
-        mapFragment.getMapAsync {
-            subscribeToStoreObserver(it)
-        }
+    private fun handleStoreDetailsState(state: StoreDetailsState) {
+        val storeDetails = state.data
+        binding.storeDetails = state.data
+        setupMap(storeDetails)
     }
 
     @Inject lateinit var mapUtils: MapUtils
-    private fun subscribeToStoreObserver(map: NaverMap) {
-        storeViewModel.store.observe(this) {
-            binding.storeDetails = it
-            mapUtils.createStoreLocationMarker(it.store, map)
-            setMapCameraPosition(it.store, map)
+    private fun setupMap(storeDetails: StoreDetails?) = storeDetails?.let{ store ->
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as MapFragment
+        mapFragment.getMapAsync { map ->
+            mapUtils.createStoreLocationMarker(storeDetails, map)
+
+            val latLng = LatLng(store.lat, store.lng)
+            CameraPosition(latLng, MapUtils.MAP_DEFAULT_ZOOM).let { position ->
+                map.cameraPosition = position
+
+                // GPS 버튼을 누르면 카메라 중심좌표를 store의 위치로 옮긴다.
+                binding.btnGps.setOnClickListener { map.cameraPosition = position }
+            }
         }
     }
 
-    private fun setMapCameraPosition(store: StoreInfo, map: NaverMap) {
-        val latLng = LatLng(store.lat, store.lng)
-        CameraPosition(latLng, MapUtils.MAP_DEFAULT_ZOOM).let {
-            map.cameraPosition = it
-            binding.btnGps.setOnCameraResetButtonClickListener(it, map)
+    private fun handleStoreMenuState(state: StoreMenuListState) {
+        binding.rvMenu.adapter = StoreMenuAdapter().apply {
+            submitList(state.data)
         }
-    }
-    private fun ImageView.setOnCameraResetButtonClickListener(defaultCameraPosition: CameraPosition, map: NaverMap) {
-        setOnClickListener { map.cameraPosition = defaultCameraPosition }
     }
 
 
@@ -195,13 +174,13 @@ class StoreDetailsActivity : AppCompatActivity() {
     }
 
 
-    fun startSendToIntent(store: StoreInfo) = Intent(Intent.ACTION_SENDTO).apply {
+    fun startSendToIntent(store: StoreDetails) = Intent(Intent.ACTION_SENDTO).apply {
         val uriText = MAIL_TO_DEVELOPER_ADDRESS +
                 "?subject=" + Uri.encode(EMAIL_TITLE) +
                 "&body=" + Uri.encode(getEmailContent(store))
         data = Uri.parse(uriText)
     }.run(::startActivity)
-    private fun getEmailContent(store: StoreInfo) = """
+    private fun getEmailContent(store: StoreDetails) = """
        --------<착한가격업소 정보>----------
        가게 ID : ${store.id}
        가게 이름 : ${store.name}
@@ -212,10 +191,10 @@ class StoreDetailsActivity : AppCompatActivity() {
     """.trimIndent()
 
 
-    fun requestSandToOtherApp(store: StoreInfo) {
+    fun requestSandToOtherApp(store: StoreDetails) {
         createDeepLink(store)
     }
-    private fun createDeepLink(store: StoreInfo) = Firebase.dynamicLinks.shortLinkAsync {
+    private fun createDeepLink(store: StoreDetails) = Firebase.dynamicLinks.shortLinkAsync {
         link = Uri.parse(DEEP_LINK_URI_PREFIX + store.id)
         domainUriPrefix = DOMAIN_URI_PREFIX
         androidParameters(packageName) { }
@@ -232,14 +211,14 @@ class StoreDetailsActivity : AppCompatActivity() {
         showToastMessage(this, MESSAGE_WARNING_SHARE)
     }
 
-    private fun startChooserIntent(store: StoreInfo, shortLink: Uri) = Intent.createChooser(
+    private fun startChooserIntent(store: StoreDetails, shortLink: Uri) = Intent.createChooser(
         Intent(Intent.ACTION_SEND).apply {
             type = ACTION_SEND_TYPE
             putExtra(Intent.EXTRA_TEXT, getSharedContent(store, shortLink))
         },
         APP_NAME
     ).run(::startActivity)
-    private fun getSharedContent(store: StoreInfo, link: Uri) =
+    private fun getSharedContent(store: StoreDetails, link: Uri) =
         """
             [${store.name}]
             
@@ -259,8 +238,9 @@ class StoreDetailsActivity : AppCompatActivity() {
         isGranted -> startActionDialIntent()
         else -> hasNotGrantedCallPermission()
     }
+
     private fun startActionDialIntent() {
-        val callNumber = storeViewModel.getCallNumber()
+        val callNumber = binding.storeDetails.tel
         callNumber?.let {
             Intent(Intent.ACTION_DIAL).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -268,16 +248,17 @@ class StoreDetailsActivity : AppCompatActivity() {
             }.run(::startActivity)
         }
     }
+
     private fun hasNotGrantedCallPermission() {
         PermissionHelper.getPermissionSettingsIntent(this)
         showToastMessage(this, MESSAGE_PERMISSION_WARNING_CALL)
     }
 
 
-    fun requestNaviApp(store: StoreInfo) {
+    fun requestNaviApp(store: StoreDetails) {
         startNavigationIntent(store)
     }
-    private fun startNavigationIntent(store: StoreInfo) = try {
+    private fun startNavigationIntent(store: StoreDetails) = try {
         Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(getNavigationUriString(store))
             `package` = NAVER_MAP_PACKAGE_NAME
@@ -285,7 +266,8 @@ class StoreDetailsActivity : AppCompatActivity() {
     } catch (e : Exception) {
         showToastMessage(this, MESSAGE_APP_WARNING)
     }
-    private fun getNavigationUriString(store: StoreInfo) =
+
+    private fun getNavigationUriString(store: StoreDetails) =
         NAVER_MAP_URI + "dlat=${store.lat}" + "&dlng=${store.lng}" + "&dname=${store.name}" + "&appname=${packageName}"
 
     private fun registerOnBackPressedDispatcher() = onBackPressedDispatcher.addCallback(this,
@@ -297,8 +279,8 @@ class StoreDetailsActivity : AppCompatActivity() {
     )
 
     fun onFinish() {
-        binding.storeDetails?.store?.run {
-            val item = StoreMapItem(
+        binding.storeDetails?.run {
+            val item = StoreDetails(
                 id = id,
                 code = code,
                 gu = gu,

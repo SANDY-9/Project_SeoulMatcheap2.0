@@ -7,11 +7,11 @@
 
         <variable
             name="storeDetails"
-            type="com.sandy.seoul_matcheap.data.store.dao.StoreDetails" />
+            type="com.sandy.matcheap.domain.model.store.StoreDetails" />
 
         <variable
             name="activity"
-            type="com.sandy.seoul_matcheap.ui.store.StoreDetailsActivity" />
+            type="com.sandy.seoul_matcheap.ui.details.StoreDetailsActivity" />
 
         <import type="android.view.View"/>
 

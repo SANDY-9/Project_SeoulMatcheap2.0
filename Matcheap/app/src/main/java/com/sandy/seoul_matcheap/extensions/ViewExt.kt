@@ -68,3 +68,12 @@ fun MotionLayout.startTransition(id: Int) {
     setTransition(id)
     transitionToEnd()
 }
+
+//상태바 상태를 full screen로 설정하는 함수
+@Suppress("DEPRECATION")
+fun Activity.setStatusBarState(fullScreen: Boolean) {
+    window.decorView.systemUiVisibility = when {
+        fullScreen -> View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        else -> View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+    }
+}
