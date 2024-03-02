@@ -9,13 +9,16 @@ import androidx.fragment.app.activityViewModels
 import com.sandy.seoul_matcheap.BuildConfig
 import androidx.fragment.app.viewModels
 import changeScale
+import com.sandy.matcheap.common.APP_PREFS_SETTINGS
+import com.sandy.matcheap.common.MESSAGE_VERSION_UPDATE
+import com.sandy.matcheap.common.TYPE_CATEGORY
+import com.sandy.matcheap.common.TYPE_REGION
 import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.adapters.RegionSpinnerAdapter
 import com.sandy.seoul_matcheap.adapters.SurroundingStoreAdapter
-import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.FragmentHomeBinding
-import com.sandy.seoul_matcheap.extension.updateLocation
+import com.sandy.seoul_matcheap.extensions.updateLocation
 import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.util.*
@@ -48,13 +51,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     @Inject @Named(APP_PREFS_SETTINGS)
     lateinit var prefs: SharedPreferences
     private fun checkVersionUpdate() {
+        // currentVersion: 현재 실행중인 최신 앱의 버전, savedVersion: 저장되어 있는 이전 앱 버전
         val currentVersion = BuildConfig.VERSION_NAME
-        when(val savedVersion = AppPrefsUtils.getSavedAppVersion(prefs)) {
-            currentVersion -> return
-            else -> AppPrefsUtils.saveLatestAppVersion(prefs, currentVersion).also {
-                if(savedVersion != null) showToastMessage(requireContext(), MESSAGE_VERSION_UPDATE)
-            }
-        }
+        val savedVersion = AppPrefsUtils.getSavedAppVersion(prefs)
+
+        // 현재 버전과 저장되어 있는 버전이 같으면 새로운 버전으로 업데이트 한게 아니므로 함수 종료
+        if(savedVersion == currentVersion) return
+
+        // savedVersion == null이면 앱이 처음 설치된 상태이므로 업데이트 완료 메시지를 띄워서는 안된다.
+        if(savedVersion != null) showToastMessage(requireContext(), MESSAGE_VERSION_UPDATE)
+        // 최신 버전으로 저장한다.
+        saveCurrentVersion(currentVersion)
+    }
+
+    private fun saveCurrentVersion(currentVersion: String) {
+        AppPrefsUtils.saveLatestAppVersion(prefs, currentVersion)
     }
 
     private var regionSpinnerAdapter : RegionSpinnerAdapter? = null
@@ -105,7 +116,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     private var onBackstackCallback = false
-    private fun checkSavedBackstackState() = binding.apply {
+    private fun checkSavedBackstackState(DEFAULT_POSITION: Int = 0) = binding.apply {
         if(!onBackstackCallback) {
             nestedScrollView.post {
                 nestedScrollView.scrollY = DEFAULT_POSITION
@@ -124,7 +135,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     // region spinner가 visible되면 spinner icon이 180도 회전하고 spinner는 defalut postion으로 스크롤 되게 동작하는 설정
-    private fun showRegionSpinnerView() = binding.apply {
+    private fun showRegionSpinnerView(CHANGED_ROTATION: Float = 0f, DEFAULT_POSITION: Int = 0) = binding.apply {
         setRegionSpinnerPositionY()
         regionSpinnerView.visibility = View.VISIBLE
         spinnerIcon.rotation = CHANGED_ROTATION
@@ -132,21 +143,27 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
     }
 
     // region spinner가 화면에서 사라질 때, spinner아이콘과 spinner position은 defalut값으로 돌아가야함
-    private fun closeRegionSpinnerView() = binding.apply {
+    private fun closeRegionSpinnerView(DEFAULT_ROTATION: Float = 180.0f) = binding.apply {
         regionSpinnerView.visibility = View.GONE
         spinnerIcon.rotation = DEFAULT_ROTATION
         rvRegionSpinner.y = spinnerY
     }
 
     override fun subscribeToObservers() {
+        // Location ViewModel
         locationViewModel.location.observe(viewLifecycleOwner) {
             handleLocationInfo(it)
         }
-        homeViewModel.loadingState.observe(viewLifecycleOwner) {
-            handleLoadingState(it)
+
+        // Home ViewModel
+        homeViewModel.surroundingStoresState.observe(viewLifecycleOwner) {
+            handleSurroundingStoresState(it)
         }
-        homeViewModel.surroundingStores.observe(viewLifecycleOwner) {
-            handleSurroundStores(it)
+        homeViewModel.randomStoreState.observe(viewLifecycleOwner) {
+            handleRandomStoreState(it)
+        }
+        homeViewModel.forecastState.observe(viewLifecycleOwner) {
+            handleForecastState(it)
         }
     }
 
@@ -162,31 +179,28 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(R.layout.fragment_home) {
         }
     }
 
-    private fun handleLoadingState(state: ConnectState) = when(state) {
-        ConnectState.SUCCESS -> handleLoadSuccess()
-        ConnectState.FAIL -> handleLoadFail()
-        else -> handleNotLoad()
+    private fun handleSurroundingStoresState(state: SurroundingStoresState?) = state?.let {
+        surroundingStoreAdapter?.submitList(it.data)
     }
 
-    private fun handleLoadSuccess() {
-        binding.progressView.root.visibility = View.GONE
+    private fun handleRandomStoreState(state: RandomStoresState?) = state?.let {
+
     }
 
-    private fun handleLoadFail() {
-        if(!isLoaded) showToastMessage(requireContext(), MESSAGE_NETWORK_ERROR)
-        binding.progressView.fail.visibility = View.VISIBLE
-        isLoaded = true
-    }
-
-    private fun handleNotLoad() {
-        with(binding.progressView) {
-            root.visibility = View.VISIBLE
-            fail.visibility = View.GONE
+    private fun handleForecastState(state: ForecastState?) = state?.let {
+        binding.progressView.run {
+            if(it.isLoading) {
+                root.visibility = View.VISIBLE
+                fail.visibility = View.GONE
+            } else {
+                root.visibility = View.GONE
+            }
         }
-    }
-
-    private fun handleSurroundStores(stores: List<StoreItem>) {
-        surroundingStoreAdapter?.submitList(stores)
+        if(it.error.isNotBlank()) {
+            if(!isLoaded) showToastMessage(requireContext(), state.error)
+            binding.progressView.fail.visibility = View.VISIBLE
+            isLoaded = true
+        }
     }
 
     fun navigateToStoreListForCategory(v: View, code: String) {

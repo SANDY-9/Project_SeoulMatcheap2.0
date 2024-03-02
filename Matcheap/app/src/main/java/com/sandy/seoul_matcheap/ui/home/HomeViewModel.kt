@@ -2,15 +2,15 @@ package com.sandy.seoul_matcheap.ui.home
 
 import android.location.Location
 import androidx.lifecycle.*
-import com.sandy.seoul_matcheap.data.forecast.Forecast
-import com.sandy.seoul_matcheap.data.forecast.ForecastRepository
-import com.sandy.seoul_matcheap.data.store.dao.RandomStore
-import com.sandy.seoul_matcheap.data.store.dao.StoreItem
-import com.sandy.seoul_matcheap.data.store.repository.StoreRepository
-import com.sandy.seoul_matcheap.util.constants.ConnectState
-import com.sandy.seoul_matcheap.util.constants.DEFAULT_
+import com.sandy.matcheap.common.MESSAGE_ERROR
+import com.sandy.matcheap.common.MESSAGE_NETWORK_ERROR
+import com.sandy.matcheap.common.Resource
+import com.sandy.matcheap.domain.forecast.use_case.GetForecastUseCase
+import com.sandy.matcheap.domain.store.use_case.GetStoreListUseCase
+import com.sandy.seoul_matcheap.extensions.onIO
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 /**
@@ -22,71 +22,59 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor (
-    private val storeRepository: StoreRepository,
-    private val forecastRepository: ForecastRepository
+    private val getForecastUseCase: GetForecastUseCase,
+    private val getStoreListUseCase: GetStoreListUseCase
 ) : ViewModel() {
 
     //!-- surrounding stores
-    private val _surroundingStores = MutableLiveData<List<StoreItem>>()
-    val surroundingStores: LiveData<List<StoreItem>> = _surroundingStores
-    fun updateSurroundingStoreList(location: Location) = viewModelScope.launch(Dispatchers.IO) {
-        val stores = storeRepository.downloadSurroundingStores(location)
-        _surroundingStores.postValue(stores)
+    private val _surroundingStoresState = MutableLiveData<SurroundingStoresState>()
+    val surroundingStoresState: LiveData<SurroundingStoresState> = _surroundingStoresState
+    fun updateSurroundingStoreList(location: Location) {
+        onIO {
+            getStoreListUseCase.getSurroundingStores(location.latitude, location.longitude).onEach { result ->
+                _surroundingStoresState.postValue(
+                    when(result) {
+                        is Resource.Success -> SurroundingStoresState(data = result.data)
+                        is Resource.Error -> SurroundingStoresState(error = result.message ?: MESSAGE_ERROR)
+                        is Resource.Loading -> SurroundingStoresState(isLoading = true)
+                    }
+                )
+            }.launchIn(this)
+        }
     }
 
     //!-- random stores
-    private val _randomStore = MutableLiveData<List<RandomStore>>()
-    val randomStore: LiveData<List<RandomStore>> = _randomStore
-    fun updateRandomStoreList() = viewModelScope.launch(Dispatchers.IO) {
-        val stores = storeRepository.downloadRandomStores()
-        _randomStore.postValue(stores)
+    private val _randomStoreState = MutableLiveData<RandomStoresState>()
+    val randomStoreState: LiveData<RandomStoresState> = _randomStoreState
+    fun updateRandomStoreList() {
+        onIO {
+            getStoreListUseCase.getRandomStores().onEach { result ->
+                _randomStoreState.postValue(
+                    when(result) {
+                        is Resource.Success -> RandomStoresState(data = result.data)
+                        is Resource.Error -> RandomStoresState(error = result.message ?: MESSAGE_ERROR)
+                        is Resource.Loading -> RandomStoresState(isLoading = true)
+                    }
+                )
+            }.launchIn(this)
+        }
     }
-
-
-    private val _loadingState = MutableLiveData(ConnectState.NONE)
-    val loadingState : LiveData<ConnectState> = _loadingState
-    private fun setLoadingState(state: ConnectState) {
-        _loadingState.postValue(state)
-    }
-
 
     //!-- forecast
-    private val _temperature = MutableLiveData<String>()
-    val temperature : LiveData<String> = _temperature
-    private val _pty = MutableLiveData(DEFAULT_)
-    val pty : LiveData<String> = _pty
-    private val _sky = MutableLiveData<String>()
-    val sky : LiveData<String> = _sky
-    private val _wind = MutableLiveData<String>()
-    val wind : LiveData<String> = _wind
-    fun updateForecast(location: Location) = viewModelScope.launch(Dispatchers.IO) {
-        setLoadingState(ConnectState.ING)
-        val result = forecastRepository.downloadCurrentForecast(location.latitude, location.longitude)
-        updateWeather(result)
-    }
-
-    private fun updateWeather(result: List<Forecast>) = when {
-        result.isEmpty() -> setLoadingState(ConnectState.FAIL)
-        else -> {
-            setWeather(result)
-            setLoadingState(ConnectState.SUCCESS)
+    private val _forecastState = MutableLiveData<ForecastState>()
+    val forecastState: LiveData<ForecastState> = _forecastState
+    fun updateForecast(location: Location) {
+        onIO {
+            getForecastUseCase(location.latitude, location.longitude).onEach { result ->
+                _forecastState.postValue(
+                    when(result) {
+                        is Resource.Success -> ForecastState(data = result.data)
+                        is Resource.Error -> ForecastState(error = result.message ?: MESSAGE_NETWORK_ERROR)
+                        is Resource.Loading -> ForecastState(isLoading = true)
+                    }
+                )
+            }.launchIn(this)
         }
-    }
-
-    private fun setWeather(result: List<Forecast>) = result.forEach {
-        when (it.category.trim()) {
-            T1H -> _temperature.postValue(it.fcstValue)
-            PTY -> _pty.postValue(it.fcstValue)
-            SKY -> _sky.postValue(it.fcstValue)
-            WSD -> _wind.postValue(it.fcstValue)
-        }
-    }
-
-    private companion object {
-        const val T1H = "T1H"
-        const val SKY = "SKY"
-        const val PTY = "PTY"
-        const val WSD = "WSD"
     }
 
 }
