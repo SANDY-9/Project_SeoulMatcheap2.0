@@ -2,10 +2,10 @@ package com.sandy.seoul_matcheap.adapters
 
 import android.content.Context
 import android.location.Location
+import com.sandy.matcheap.common.PAGE_DISTANCE
+import com.sandy.matcheap.domain.model.store.BookmarkStoreDetails
 import com.sandy.seoul_matcheap.R
-import com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore
 import com.sandy.seoul_matcheap.databinding.ItemRvBookmarkBinding
-import com.sandy.seoul_matcheap.util.constants.PAGE_DISTANCE
 
 /**
  * @author SANDY
@@ -13,24 +13,24 @@ import com.sandy.seoul_matcheap.util.constants.PAGE_DISTANCE
  * @created 2023-04-09
  * @desc
  */
-class BookmarkListAdapter(private val location: Location) : BaseListAdapter<ItemRvBookmarkBinding, BookmarkedStore>(R.layout.item_rv_bookmark) {
+class BookmarkListAdapter(private val location: Location) : BaseListAdapter<ItemRvBookmarkBinding, BookmarkStoreDetails>(R.layout.item_rv_bookmark) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         super.onBindViewHolder(holder, position)
         requestPreload(holder.itemView.context, position, PAGE_DISTANCE)
     }
 
-    override fun ItemRvBookmarkBinding.setBinding(item: BookmarkedStore, position: Int) {
+    override fun ItemRvBookmarkBinding.setBinding(item: BookmarkStoreDetails, position: Int) {
         location = this@BookmarkListAdapter.location
         bookmarkedStore = item
-        item.menu?.let { menus ->
+        item.menus?.let { menus ->
             rvMenu.adapter = StoreMenuAdapter().also {
                 it.submitList(menus)
             }
         }
         btnRemove.setOnClickListener {
             onRemoveBookmark?.let {
-                it(item.store.id, item.store.code)
+                it(item.id)
             }
         }
         view.setOnClickListener {
@@ -45,12 +45,12 @@ class BookmarkListAdapter(private val location: Location) : BaseListAdapter<Item
     }
 
     override fun handlePreload(context: Context, preloadPosition: Int) {
-        val preloadUrl = (getItem(preloadPosition) as BookmarkedStore).store.photo
+        val preloadUrl = (getItem(preloadPosition) as BookmarkStoreDetails).photo
         preload(context, preloadUrl)
     }
 
-    private var onRemoveBookmark: ((String, String) -> Unit)? = null
-    fun setOnRemoveBookmarkListener(listener: (String, String) -> Unit) {
+    private var onRemoveBookmark: ((String) -> Unit)? = null
+    fun setOnRemoveBookmarkListener(listener: (String) -> Unit) {
         onRemoveBookmark = listener
     }
 

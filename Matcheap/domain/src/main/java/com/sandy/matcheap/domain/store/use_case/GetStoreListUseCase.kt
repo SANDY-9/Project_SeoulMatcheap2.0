@@ -15,6 +15,7 @@ import javax.inject.Inject
 class GetStoreListUseCase @Inject constructor(
     private val getStoreListRepository: GetStoreListRepository
 ) {
+
     fun getSurroundingStores(curLat: Double, curLng: Double): Flow<Resource<List<StoreItem>>> = flow {
         emit(Resource.Loading())
         try {
@@ -47,6 +48,9 @@ class GetStoreListUseCase @Inject constructor(
         }
     }
 
+    /**
+     * 필터 조건에 맞는 착한가격업소 목록을 불러온다.
+     */
     fun getStoresByFilter(
         code: List<String>,
         gu: String?,
@@ -63,7 +67,5 @@ class GetStoreListUseCase @Inject constructor(
             emit(Resource.Error(MESSAGE_ERROR))
         }
     }
-
-    suspend fun getBookmarkStores(): Flow<List<Map<StoreDetails, List<Menu>?>>> = getStoreListRepository.getBookmarkStoreList()
 
 }

@@ -6,15 +6,12 @@ import com.sandy.matcheap.data.room.CURRENT_LOCATION_QUERY
 import com.sandy.matcheap.data.room.DISTANCE_QUERY
 import com.sandy.matcheap.data.room.MAP_CENTER_LOCATION_QUERY
 import com.sandy.matcheap.data.room.MAP_DISTANCE_QUERY
-import com.sandy.matcheap.data.room.dto.BookmarkedStoreDTO
 import com.sandy.matcheap.data.room.dto.RandomStoreDTO
 import com.sandy.matcheap.data.room.dto.RecommendStoreDTO
 import com.sandy.matcheap.data.room.dto.StoreDetailsDTO
 import com.sandy.matcheap.data.room.dto.StoreMapItemDTO
 import com.sandy.matcheap.domain.model.store.StoreDetails
 import com.sandy.matcheap.domain.model.store.StoreItem
-import kotlinx.coroutines.flow.Flow
-
 /**
  * @author SANDY
  * @email nnal0256@naver.com
@@ -37,11 +34,11 @@ interface StoreDao {
 
     //추천 착한가격업소 목록 불러오기 ***
     @Query(
-        "SELECT * FROM store_info " +
+        "SELECT id, name FROM store_info " +
                 "WHERE code IN (1, 2, 3, 4) " +
                 "ORDER BY RANDOM() "
     )
-    suspend fun getRecommendStore() : StoreItem
+    suspend fun getRecommendStore() : RecommendStoreDTO
 
     //주변 착한가격업소 목록 불러오기
     @Query(
@@ -109,10 +106,5 @@ interface StoreDao {
         centerY: Double,
         r: Double
     ) : List<StoreMapItemDTO>
-
-    //북마크에 저장된 착한가격업소 목록 불러오기
-    @Transaction
-    @Query("SELECT * FROM store_bookmark ")
-    fun getBookmarkList() : Flow<List<BookmarkedStoreDTO>>
 
 }

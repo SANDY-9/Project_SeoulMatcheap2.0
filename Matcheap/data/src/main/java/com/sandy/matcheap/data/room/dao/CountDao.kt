@@ -90,18 +90,4 @@ interface CountDao {
         r: Double?
     ) : Map<String, Int>
 
-
-    // 북마크로 저장한 착한가격업소 총 개수 반환
-    @Query("SELECT count(*) FROM store_bookmark")
-    fun getBookmarkedStoreCount() : Flow<Int>
-
-
-    // 북마크로 저장한 착한가격업소 카테고리 조건에 따라 개수 반환
-    @Query(
-        "SELECT count(*) " +
-                "FROM store_bookmark " +
-                "WHERE code = :code "
-    )
-    fun getBookmarkedStoreCountByCode(code: String) : Flow<Int>
-
 }

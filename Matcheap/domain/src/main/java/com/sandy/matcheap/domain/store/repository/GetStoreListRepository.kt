@@ -20,6 +20,5 @@ interface GetStoreListRepository {
         centerY: Double,
         r: Double
     ): List<StoreDetails>
-    suspend fun getBookmarkStoreList(): Flow<List<Map<StoreDetails, List<Menu>?>>>
 
 }

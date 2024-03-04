@@ -1,5 +1,6 @@
 package com.sandy.matcheap.domain.bookmark.use_case
 
+import com.sandy.matcheap.common.MESSAGE_BOOKMARK_DELETE_SUCCESS
 import com.sandy.matcheap.common.MESSAGE_ERROR
 import com.sandy.matcheap.common.Resource
 import com.sandy.matcheap.domain.bookmark.repository.BookmarkRepository
@@ -14,7 +15,7 @@ class DeleteBookmark @Inject constructor(
         emit(Resource.Loading())
         try {
             bookmarkRepository.deleteBookmark(id)
-            emit(Resource.Success(null))
+            emit(Resource.Success(MESSAGE_BOOKMARK_DELETE_SUCCESS))
         } catch (e: Exception) {
             emit(Resource.Error(MESSAGE_ERROR))
         }

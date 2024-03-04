@@ -5,17 +5,18 @@ import android.view.*
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.viewpager2.widget.ViewPager2
+import com.sandy.matcheap.common.CATEGORY_SIZE
+import com.sandy.matcheap.common.DEFAULT_POSITION
+import com.sandy.matcheap.common.TYPE_NORMAL_SCROLL
+import com.sandy.matcheap.domain.model.store.BookmarkStoreDetails
+import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.adapters.BookmarkListAdapter
-import com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore
 import com.sandy.seoul_matcheap.databinding.FragmentBookmarkBinding
-import com.sandy.seoul_matcheap.extension.connectPagerWithTabLayout
+import com.sandy.seoul_matcheap.extensions.connectPagerWithTabLayout
 import com.sandy.seoul_matcheap.ui.LocationViewModel
 import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.adapters.PagerAdapter
-import com.sandy.seoul_matcheap.util.constants.CATEGORY_SIZE
-import com.sandy.seoul_matcheap.util.constants.DEFAULT_POSITION
-import com.sandy.seoul_matcheap.util.constants.TYPE_NORMAL_SCROLL
 import dagger.hilt.android.AndroidEntryPoint
 import showProgressView
 
@@ -51,63 +52,81 @@ class BookmarkFragment : BaseFragment<FragmentBookmarkBinding>(R.layout.fragment
 
     private fun initPager() = binding.pager.apply {
         adapter = pagerAdapter
-        setPagerPosition(DEFAULT_POSITION)
-        setOnPageChangeListener(DEFAULT_POSITION)
-    }
-
-    private fun setPagerPosition(position: Int) {
-        bookmarkViewModel.updateBookmarkCount(position.toString())
-        setOnAdapterEventListeners(position)
-    }
-    private fun setOnAdapterEventListeners(position: Int) {
-        pagerAdapter!!.adapter[position]?.apply {
-            setOnItemClickListener {
-                navigateToStoreDetails(it.store.id)
-            }
-            setOnRemoveBookmarkListener { id: String, code: String ->
-                bookmarkViewModel.updateBookmark(id, code, false)
-            }
-        }
-    }
-
-    private fun ViewPager2.setOnPageChangeListener(defaultPosition: Int) {
         val onPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
-            private var oldPosition = defaultPosition
+            private var oldPosition = DEFAULT_POSITION
             override fun onPageSelected(newPosition: Int) {
                 super.onPageSelected(newPosition)
                 // because current state of old page is recycled, have to be restored old page to default scroll state.
                 setOldPageScroll(oldPosition)
                 oldPosition = newPosition
 
-                setPagerPosition(newPosition)
+                handleUpdatePositionState(newPosition)
             }
         }
         registerOnPageChangeCallback(onPageChangeCallback)
+        handleUpdatePositionState(DEFAULT_POSITION)
     }
 
-    private fun setOldPageScroll(oldPosition: Int) {
+    private fun setOldPageScroll(oldPosition: Int, scroll: Int = TYPE_NORMAL_SCROLL) {
         // whenever page change, old page have to is scrolled to top.
-        pagerAdapter!!.initScroll(oldPosition, TYPE_NORMAL_SCROLL)
+        pagerAdapter!!.initScroll(oldPosition, scroll)
     }
 
-    override fun subscribeToObservers() {
-        bookmarkViewModel.bookmarkList.observe(viewLifecycleOwner) {
-            handleBookmarkStoreListData(it)
+    // 현재 포지션 상태에 따라 북마크 정보를 업데이트하고 페이저의 이벤트를 설정해줘야 한다.
+    private fun handleUpdatePositionState(position: Int) {
+        // code = position을 string으로 변환한 값
+        bookmarkViewModel.updateBookmarkState(code = position.toString())
+
+        // postion 상태에 따라 해당하는 어댑터의 이벤트 리스너를 설정한다.
+        setOnPagerAdapterEventListeners(position)
+    }
+
+    private fun setOnPagerAdapterEventListeners(position: Int) {
+        pagerAdapter!!.adapter[position]?.apply {
+            setOnItemClickListener {
+                navigateToStoreDetails(it.id)
+            }
+            setOnRemoveBookmarkListener { id: String ->
+                bookmarkViewModel.deleteBookmark(id)
+            }
+        }
+    }
+
+    override fun subscribeToObservers() = bookmarkViewModel.run {
+        bookmarkListState.observe(viewLifecycleOwner) {
+            handleBookmarkListState(it)
+        }
+        bookmarkCountState.observe(viewLifecycleOwner) {
+            handleBookmarkCountState(it)
+        }
+        deleteBookmarkState.observe(viewLifecycleOwner) {
+            handleDeleteBookmarkState(it)
         }
     }
 
     //why submit data to all of pagerAdapter is because thinking of swipe handling of viewpager.
     //when swiping, both sides of current page have to already be generated.
-    private fun handleBookmarkStoreListData(stores: List<BookmarkedStore>) {
-        repeat(CATEGORY_SIZE) { position ->
-            pagerAdapter?.run {
-                adapter[position]!!.submitList(getFilteredBookmarkStoreList(position, stores))
+    private fun handleBookmarkListState(state: BookmarkListState) {
+        state.data?.let { stores ->
+            repeat(CATEGORY_SIZE) { position ->
+                pagerAdapter?.run {
+                    adapter[position]!!.submitList(getFilteredBookmarkStoreList(position, stores))
+                }
             }
         }
     }
-    private fun getFilteredBookmarkStoreList(position: Int, stores: List<BookmarkedStore>) = when(position) {
+    private fun getFilteredBookmarkStoreList(position: Int, stores: List<BookmarkStoreDetails>) = when(position) {
         DEFAULT_POSITION -> stores
-        else -> stores.filter { it.store.code == "$position" }
+        else -> stores.filter { it.code == "$position" }
+    }
+
+    private fun handleBookmarkCountState(state: BookmarkCountState) {
+        binding.tvCount.text = state.data.toString()
+    }
+
+    private fun handleDeleteBookmarkState(state: DeleteBookmarkState) {
+        if(state.data != null) showToastMessage(requireContext(), state.data)
+        if(state.error.isNotBlank()) showToastMessage(requireContext(), state.error)
     }
 
     override fun setOnBackPressedListener(){

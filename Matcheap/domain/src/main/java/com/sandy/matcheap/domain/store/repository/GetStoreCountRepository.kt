@@ -8,7 +8,6 @@ interface GetStoreCountRepository {
     suspend fun getStoreCount(gu: String, code: String): Int
     suspend fun getStoreTotalCountForCode(): Map<String, Int>
     suspend fun getStoreTotalCount(): Int
-    fun getBookmarkedStoreCount(code: String): Flow<Int>
     suspend fun getStoreCountByFilter(
         code: List<String>,
         gu: String?,

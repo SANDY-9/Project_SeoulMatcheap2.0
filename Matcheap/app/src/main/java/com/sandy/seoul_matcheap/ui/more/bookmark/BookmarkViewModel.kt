@@ -1,13 +1,14 @@
 package com.sandy.seoul_matcheap.ui.more.bookmark
 
 import androidx.lifecycle.*
-import com.sandy.seoul_matcheap.data.store.dao.BookmarkedStore
-import com.sandy.seoul_matcheap.data.store.repository.BookmarkRepository
-import com.sandy.seoul_matcheap.util.constants.ConnectState
+import com.sandy.matcheap.common.MESSAGE_ERROR
+import com.sandy.matcheap.common.MESSAGE_NETWORK_ERROR
+import com.sandy.matcheap.common.Resource
+import com.sandy.matcheap.domain.bookmark.use_case.BookmarkUseCases
+import com.sandy.seoul_matcheap.extensions.onIO
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 /**
@@ -18,38 +19,63 @@ import javax.inject.Inject
  */
 
 @HiltViewModel
-class BookmarkViewModel @Inject constructor(private val bookmarkRepository: BookmarkRepository) : ViewModel() {
+class BookmarkViewModel @Inject constructor(
+    private val bookmarkUseCases: BookmarkUseCases
+) : ViewModel() {
 
-    private val _loadingState = MutableLiveData(ConnectState.NONE)
-    val loadingState : LiveData<ConnectState> = _loadingState
-    private fun setLoadingState(state: ConnectState) {
-        _loadingState.postValue(state)
-    }
+    private val _bookmarkListState = MutableLiveData<BookmarkListState>()
+    val bookmarkListState: LiveData<BookmarkListState> = _bookmarkListState
 
+    private val _bookmarkCountState = MutableLiveData<BookmarkCountState>()
+    val bookmarkCountState: LiveData<BookmarkCountState> = _bookmarkCountState
 
-    val bookmarkList: LiveData<List<BookmarkedStore>> by lazy { bookmarkRepository.downloadBookmarkList() }
+    private val _addBookmarkState = MutableLiveData<AddBookmarkState>()
+    val addBookmarkState: LiveData<AddBookmarkState> = _addBookmarkState
 
-    private val code = MutableLiveData<String>()
-    val bookmarkCount = code.switchMap {
-        bookmarkRepository.downloadBookmarkCount(it)
-    }
-    fun updateBookmarkCount(code: String) {
-        this.code.value = code
-    }
+    private val _deleteBookmarkState = MutableLiveData<DeleteBookmarkState>()
+    val deleteBookmarkState: LiveData<DeleteBookmarkState> = _deleteBookmarkState
 
-    fun updateBookmark(id: String, code: String, bookmarked: Boolean) = CoroutineScope(Dispatchers.IO).launch {
-        setLoadingState(ConnectState.ING)
-        when {
-            bookmarked -> addBookmark(id, code)
-            else -> deleteBookmark(id)
+    fun updateBookmarkState(code: String) {
+        onIO {
+            bookmarkUseCases.getBookmarkList().onEach { result ->
+                _bookmarkListState.postValue(
+                    BookmarkListState(data = result)
+                )
+            }.launchIn(this)
+        }
+        onIO {
+            bookmarkUseCases.getBookmarkList.getBookmarkedStoreCount(code).onEach { result ->
+                _bookmarkCountState.postValue(
+                    BookmarkCountState(data = result)
+                )
+            }.launchIn(this)
         }
     }
-    private suspend fun addBookmark(id: String, code: String) {
-        val result = bookmarkRepository.addBookmark(id, code)
-        setLoadingState(if(result) ConnectState.SUCCESS else ConnectState.FAIL)
+
+    fun addBookmark(id: String, code: String) {
+        onIO {
+            bookmarkUseCases.addBookmark(id, code).onEach { result ->
+                _addBookmarkState.postValue(
+                    when(result) {
+                        is Resource.Success -> AddBookmarkState(data = result.data)
+                        is Resource.Error -> AddBookmarkState(error = result.message ?: MESSAGE_NETWORK_ERROR)
+                        is Resource.Loading -> AddBookmarkState(isLoading = true)
+                    }
+                )
+            }.launchIn(this)
+        }
     }
-    private suspend fun deleteBookmark(id: String) {
-        bookmarkRepository.deleteBookmark(id)
+
+    fun deleteBookmark(id: String) {
+        onIO {
+            bookmarkUseCases.deleteBookmark(id).onEach { result ->
+                when(result) {
+                    is Resource.Success -> DeleteBookmarkState(data = result.data)
+                    is Resource.Error -> DeleteBookmarkState(error = result.message ?: MESSAGE_ERROR)
+                    is Resource.Loading -> DeleteBookmarkState(isLoading = true)
+                }
+            }.launchIn(this)
+        }
     }
 
 }
