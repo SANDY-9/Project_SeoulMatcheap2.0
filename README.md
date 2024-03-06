@@ -21,20 +21,42 @@
 
 </br>
 
+## 레거시 서울맛칩 프로젝트를 리팩토링한 이유
+- UI와 비즈니스 로직을 분리하고 MVVM 디자인 패턴으로 리팩토링하여 기능 확장과 유지 보수 성능 확보
+- Activity, Fragment가 비즈니스 로직까지 전부 담고 있어서 이를 분리해 UI Class들의 코드량 최적화
+- 불안정한 코드들(Coroutine 사용시 GlobalScope 사용, Context 객체 글로벌 참조 등)이 많아서 이를 보수하여 안정적인 앱으로 출시
+- 중복 코드를 개선하고 가독성을 높히기 위해
+
+</br>
+
 ## Skills
 <img src="https://img.shields.io/badge/Android-34A853?style=flat&logo=android&logoColor=white"/> <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=flat&logo=Kotlin&logoColor=white"/> <img src="https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=white"/> <img src="https://img.shields.io/badge/MVVM-000000?style=flat&logo=&logoColor=white"/> <img src="https://img.shields.io/badge/RESTful API-000000?style=flat&logo=&logoColor=000000"/> 
-+ AAC(Android Architecture Component) : Lifecycles, LiveData, ViewModel, Room, Paging, DataBinding, Navigation, WorkManager
-+ Dagger-Hilt
-+ Retrofit2 : 빠른 네트워크 통신 속도
-+ Coroutine : 비동기 처리시 메모리 성능 최적화
-+ Naver Map SDK
-+ FusedLocaionProvider : 정확성이 높은 사용자 위치 정보를 얻기 위해 사용
-+ Firebase RemoteConfig : 앱 버전 업데이트 관리
-+ Firebase Dynamic Link
-+ LeakCanary
-+ Glide
-+ Jsoup
-+ UI: ConstaintLayout, Motion Layout, ViewPager2, TabLayout, RecyclerView, Lottie
+- **MVVM 디자인 패턴**</br>
+  기존의 서울맛칩 레거시 프로젝트의 유지 보수 성능을 확보하고 기능을 확장하기 위해 ViewModel을 활용해 UI 영역과 비즈니스 로직 영역을 분리하여 MVVM 디자인 패턴으로 리팩토링</br>
+- **의존성 주입 : Dagger-Hilt**</br>
+  코드의 중복과 객체간 결합도 줄이기 위해 앱의 여러 컴포넌트에서 공통적으로 사용되는 객체를 한 곳에서 관리하는 Module을 만들고, Hilt annotation을 사용해서 각각의 컴포넌트에서 의존성 주입하여 사용</br>
+- **Jetpack** : Lifecycles, LiveData, ViewModel, Room, Paging, DataBinding, Navigation, WorkManager
+- **비동기 처리 : Coroutine** </br>
+  간결한 비동기 처리 코드 작성과 백그라운드 작업시 메모리 성능 최적화를 위해 Coroutine을 사용해 비동기 처리 요청</br>
+- **네트워크 통신** : Retrofit2, Okhttp3, Jsoup, Gson
+- **위치정보 활용**</br>
+  Naver Map SDK : 서울시 착한가격업소 지도 제작</br>
+  FusedLocaionProvider : 정확성이 높은 사용자의 현재 위치 정보를 얻기 위해 사용</br>
+- **앱 업데이트 관리** : Firebase RemoteConfig</br>
+- **etc.**</br>
+  Firebase Dynamic Link : 미리보기가 포함된 공유하기 기능 구현을 위해 사용</br>
+  LeakCanary : 앱 메모리 누수 점검시 안드로이드 스튜디오 App Profiler와 함께 병행</br>
+  Glide : 사진을 뷰에 로드하는 라이브러리</br>
+  UI: ConstaintLayout, Motion Layout, ViewPager2, TabLayout, RecyclerView, Lottie
+
+</br>
+
+## App Data
+- 서울시 착한가격업소 데이터 : 백엔드 서버를 구축할 수 없어 대안으로 로컬 DB에 서울시 착한가격업소 데이터베이스를 구축하고 Room을 활용해 사용
+- 서울시 착한가격업소 메뉴 데이터 : Retrofit2, Okhttp3를 이용해 REST API(서울 열린데이터광장) 연동
+- 우리동네 기상정보 : Retrofit2, Okhttp3를 이용해 REST API(공공데이터 포털) 연동
+- 사용자의 위치 정보 : FusedLocationProviderClient LocationRequest를 사용하여 사용자의 현재 위치 정확성을 높힘
+- 데이터 처리시 비동기 처리 코드 효율화: Coroutine을 사용하여 비동기 처리
 
 </br>
 
@@ -60,6 +82,16 @@
 <details><summary>2.0.0 (2023.06.1)</summary>
 서울맛칩2.0을 출시합니다. 서울맛칩은 서울시에서 선정한 착한가격업소 정보앱입니다!
 </details>   
+
+</br>
+
+## Issue Note
+
++ [Location 사용 로직 변경](https://github.com/SANDY-9/Project_SeoulMatcheap2.0/pull/3)</br>
++ [지도 성능 개선](https://github.com/SANDY-9/Project_SeoulMatcheap2.0/pull/4)</br>
++ [프로젝트 패키지 구조 개선](https://github.com/SANDY-9/Project_SeoulMatcheap2.0/pull/8)</br>
++ [북마크 등록/삭제 로직 개선](https://github.com/SANDY-9/Project_SeoulMatcheap2.0/pull/10)</br>
++ [푸시알림 백그라운드 예약 방식 변경](https://github.com/SANDY-9/Project_SeoulMatcheap2.0/pull/14)
 
 </br>
 
