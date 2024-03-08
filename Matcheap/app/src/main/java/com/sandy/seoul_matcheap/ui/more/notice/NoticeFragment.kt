@@ -2,15 +2,18 @@ package com.sandy.seoul_matcheap.ui.more.notice
 
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.PagingData
+import com.sandy.matcheap.domain.model.notice.Notice
 import com.sandy.seoul_matcheap.MatcheapApplication.Companion.showToastMessage
 import com.sandy.seoul_matcheap.R
 import com.sandy.seoul_matcheap.adapters.NoticeTitleAdapter
-import com.sandy.seoul_matcheap.data.matcheap.Notice
 import com.sandy.seoul_matcheap.databinding.FragmentNoticeBinding
 import com.sandy.seoul_matcheap.ui.BaseFragment
 import com.sandy.seoul_matcheap.util.constants.MESSAGE_NETWORK_ERROR
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class NoticeFragment : BaseFragment<FragmentNoticeBinding>(R.layout.fragment_notice) {
 
@@ -64,8 +67,10 @@ class NoticeFragment : BaseFragment<FragmentNoticeBinding>(R.layout.fragment_not
     }
 
     override fun subscribeToObservers() {
-        noticeViewModel.noticeList.observe(viewLifecycleOwner) {
-            handleNoticeList(it)
+        lifecycleScope.launch {
+            noticeViewModel.getNoticeList().collectLatest {
+                handleNoticeList(it)
+            }
         }
     }
     private fun handleNoticeList(data: PagingData<Notice>) = noticeAdapter?.run {

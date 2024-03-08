@@ -2,8 +2,14 @@ package com.sandy.seoul_matcheap.ui.more.notice
 
 import androidx.lifecycle.*
 import androidx.paging.*
-import com.sandy.seoul_matcheap.data.matcheap.NoticePagingSource
+import com.sandy.matcheap.data.paging.NoticePagingSource
+import com.sandy.matcheap.domain.model.notice.Notice
+import com.sandy.matcheap.domain.notice.use_case.GetAppNoticeUseCase
 import com.sandy.seoul_matcheap.util.constants.PAGE_SIZE
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 /**
  * @author SANDY
@@ -12,10 +18,11 @@ import com.sandy.seoul_matcheap.util.constants.PAGE_SIZE
  * @desc
  */
 
-class NoticeViewModel : ViewModel() {
+@HiltViewModel
+class NoticeViewModel @Inject constructor(
+    private val getAppNoticeUseCase: GetAppNoticeUseCase
+): ViewModel() {
 
-    val noticeList = Pager(PagingConfig(pageSize = PAGE_SIZE)) {
-        NoticePagingSource()
-    }.liveData.cachedIn(viewModelScope)
+    suspend fun getNoticeList(): StateFlow<PagingData<Notice>> = getAppNoticeUseCase(PAGE_SIZE, viewModelScope)
 
 }
