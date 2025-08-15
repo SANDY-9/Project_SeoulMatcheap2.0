@@ -1,6 +1,5 @@
 package com.sandy.seoul_matcheap.util.module
 
-import android.app.AlarmManager
 import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
@@ -12,11 +11,12 @@ import android.view.inputmethod.InputMethodManager
 import androidx.room.Room
 import com.google.android.gms.location.LocationServices
 import com.google.gson.GsonBuilder
-import com.sandy.seoul_matcheap.data.*
 import com.sandy.seoul_matcheap.data.forecast.ForecastDataSource
 import com.sandy.seoul_matcheap.data.forecast.ForecastRepository
 import com.sandy.seoul_matcheap.data.forecast.ForecastServiceAPI
-import com.sandy.seoul_matcheap.data.store.*
+import com.sandy.seoul_matcheap.data.store.SeoulOpenAPI
+import com.sandy.seoul_matcheap.data.store.SeoulOpenAPIDataSource
+import com.sandy.seoul_matcheap.data.store.StoreDatabase
 import com.sandy.seoul_matcheap.data.store.dao.BookmarkDao
 import com.sandy.seoul_matcheap.data.store.dao.MapDao
 import com.sandy.seoul_matcheap.data.store.dao.SearchDao
@@ -25,9 +25,13 @@ import com.sandy.seoul_matcheap.data.store.repository.BookmarkRepository
 import com.sandy.seoul_matcheap.data.store.repository.MapRepository
 import com.sandy.seoul_matcheap.data.store.repository.SearchRepository
 import com.sandy.seoul_matcheap.data.store.repository.StoreRepository
+import com.sandy.seoul_matcheap.util.constants.APP_DATABASE_NAME
+import com.sandy.seoul_matcheap.util.constants.APP_PREFS_SETTINGS
+import com.sandy.seoul_matcheap.util.constants.FORECAST_API_KEY
+import com.sandy.seoul_matcheap.util.constants.FORECAST_BASE_URL
+import com.sandy.seoul_matcheap.util.constants.SEOUL_API_BASE_URL
+import com.sandy.seoul_matcheap.util.constants.TIMEOUT_DURATION
 import com.sandy.seoul_matcheap.util.helper.MapUtils
-import com.sandy.seoul_matcheap.util.*
-import com.sandy.seoul_matcheap.util.constants.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -62,12 +66,15 @@ object AppModules {
     @Singleton
     @Provides
     fun provideStoreDao(db: StoreDatabase) = db.storeDao()
+
     @Singleton
     @Provides
     fun provideSearchDao(db: StoreDatabase) = db.searchDao()
+
     @Singleton
     @Provides
     fun provideMapDao(db: StoreDatabase) = db.mapDao()
+
     @Singleton
     @Provides
     fun provideBookmarkDao(db: StoreDatabase) = db.bookmarkDao()
@@ -75,15 +82,19 @@ object AppModules {
     @Singleton
     @Provides
     fun provideStoreRepository(dao: StoreDao) = StoreRepository(dao)
+
     @Singleton
     @Provides
     fun provideSearchRepository(dao: SearchDao) = SearchRepository(dao)
+
     @Singleton
     @Provides
     fun provideMapRepository(dao: MapDao) = MapRepository(dao)
+
     @Singleton
     @Provides
-    fun provideBookmarkRepository(dao: BookmarkDao, dataSource: SeoulOpenAPIDataSource) = BookmarkRepository(dao, dataSource)
+    fun provideBookmarkRepository(dao: BookmarkDao, dataSource: SeoulOpenAPIDataSource) =
+        BookmarkRepository(dao, dataSource)
 
     @Singleton
     @Provides
@@ -101,19 +112,19 @@ object AppModules {
 
     @Singleton
     @Provides
-    fun provideForecastAPIService() : ForecastServiceAPI {
-         val requestInterceptor  = Interceptor {
-             val url = it.request()
-                 .url()
-                 .newBuilder()
-                 .addQueryParameter("serviceKey", FORECAST_API_KEY)
-                 .build()
-             val request = it.request()
-                 .newBuilder()
-                 .url(url)
-                 .build()
-             return@Interceptor it.proceed(request)
-         }
+    fun provideForecastAPIService(): ForecastServiceAPI {
+        val requestInterceptor = Interceptor {
+            val url = it.request()
+                .url
+                .newBuilder()
+                .addQueryParameter("serviceKey", FORECAST_API_KEY)
+                .build()
+            val request = it.request()
+                .newBuilder()
+                .url(url)
+                .build()
+            return@Interceptor it.proceed(request)
+        }
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(requestInterceptor)
             .connectTimeout(TIMEOUT_DURATION, TimeUnit.SECONDS)
@@ -157,10 +168,10 @@ object AppModules {
 
     @Singleton
     @Provides
-    fun provideSeoulOpenAPIService() : SeoulOpenAPI {
-        val requestInterceptor  = Interceptor {
+    fun provideSeoulOpenAPIService(): SeoulOpenAPI {
+        val requestInterceptor = Interceptor {
             val url = it.request()
-                .url()
+                .url
                 .newBuilder()
                 .build()
             val request = it.request()
@@ -171,9 +182,9 @@ object AppModules {
         }
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(requestInterceptor)
-            .connectTimeout(TIMEOUT_DURATION /2, TimeUnit.SECONDS)
-            .readTimeout(TIMEOUT_DURATION /2, TimeUnit.SECONDS)
-            .callTimeout(TIMEOUT_DURATION /2, TimeUnit.SECONDS)
+            .connectTimeout(TIMEOUT_DURATION / 2, TimeUnit.SECONDS)
+            .readTimeout(TIMEOUT_DURATION / 2, TimeUnit.SECONDS)
+            .callTimeout(TIMEOUT_DURATION / 2, TimeUnit.SECONDS)
             .build()
         val gson = GsonBuilder()
             .setLenient()
@@ -192,7 +203,8 @@ object AppModules {
 
     @Singleton
     @Provides
-    fun provideInflater(@ApplicationContext app: Context) = app.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    fun provideInflater(@ApplicationContext app: Context) =
+        app.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     @Singleton
     @Provides
@@ -200,6 +212,7 @@ object AppModules {
 
     @Singleton
     @Provides
-    fun provideConnectivityManager(@ApplicationContext app: Context) = app.getSystemService(ConnectivityManager::class.java)
+    fun provideConnectivityManager(@ApplicationContext app: Context) =
+        app.getSystemService(ConnectivityManager::class.java)
 
 }
