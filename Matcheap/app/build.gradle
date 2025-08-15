@@ -71,7 +71,7 @@ dependencies {
     kapt 'com.google.dagger:hilt-android-compiler:2.46.1'
 
     // NaverMaps
-    implementation 'com.naver.maps:map-sdk:3.16.2'
+    implementation 'com.naver.maps:map-sdk:3.22.1'
 
     // FusedLocation
     implementation 'com.google.android.gms:play-services-location:21.0.1'
