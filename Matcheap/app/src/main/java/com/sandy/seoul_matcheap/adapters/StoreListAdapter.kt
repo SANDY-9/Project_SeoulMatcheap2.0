@@ -1,14 +1,15 @@
 package com.sandy.seoul_matcheap.adapters
 
 import android.content.Context
-import android.view.*
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.sandy.seoul_matcheap.data.store.dao.StoreItem
 import com.sandy.seoul_matcheap.databinding.ItemRvStoreBinding
 import com.sandy.seoul_matcheap.util.constants.PAGE_DISTANCE
-import com.sandy.seoul_matcheap.util.module.GlideApp
 
 /**
  * @author SANDY
@@ -20,7 +21,8 @@ class StoreListAdapter : PagingDataAdapter<StoreItem, StoreListAdapter.ItemRvSto
     DIFF_UTIL
 ) {
 
-    inner class ItemRvStoreViewHolder(val binding: ItemRvStoreBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ItemRvStoreViewHolder(val binding: ItemRvStoreBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -47,9 +49,9 @@ class StoreListAdapter : PagingDataAdapter<StoreItem, StoreListAdapter.ItemRvSto
 
     private fun requestPreload(context: Context, position: Int) {
         val preloadPosition = position + PAGE_DISTANCE
-        if(itemCount > preloadPosition) {
+        if (itemCount > preloadPosition) {
             val preloadUrl = getItem(preloadPosition)?.photo
-            GlideApp.with(context).load(preloadUrl).preload()
+            Glide.with(context).load(preloadUrl).preload()
         }
     }
 
@@ -60,8 +62,11 @@ class StoreListAdapter : PagingDataAdapter<StoreItem, StoreListAdapter.ItemRvSto
 
     companion object {
         val DIFF_UTIL = object : DiffUtil.ItemCallback<StoreItem>() {
-            override fun areItemsTheSame(oldItem: StoreItem, newItem: StoreItem)= oldItem.id == newItem.id
-            override fun areContentsTheSame(oldItem: StoreItem, newItem: StoreItem) = oldItem == newItem
+            override fun areItemsTheSame(oldItem: StoreItem, newItem: StoreItem) =
+                oldItem.id == newItem.id
+
+            override fun areContentsTheSame(oldItem: StoreItem, newItem: StoreItem) =
+                oldItem == newItem
         }
     }
 
