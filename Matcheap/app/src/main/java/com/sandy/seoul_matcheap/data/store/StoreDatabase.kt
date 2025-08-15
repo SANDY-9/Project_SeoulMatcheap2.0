@@ -5,8 +5,15 @@ import androidx.room.Database
 import androidx.room.DeleteColumn
 import androidx.room.RoomDatabase
 import androidx.room.migration.AutoMigrationSpec
-import com.sandy.seoul_matcheap.data.store.dao.*
-import com.sandy.seoul_matcheap.data.store.entity.*
+import com.sandy.seoul_matcheap.data.store.dao.BookmarkDao
+import com.sandy.seoul_matcheap.data.store.dao.MapDao
+import com.sandy.seoul_matcheap.data.store.dao.SearchDao
+import com.sandy.seoul_matcheap.data.store.dao.StoreDao
+import com.sandy.seoul_matcheap.data.store.entity.Bookmark
+import com.sandy.seoul_matcheap.data.store.entity.Menu
+import com.sandy.seoul_matcheap.data.store.entity.Polygon
+import com.sandy.seoul_matcheap.data.store.entity.SearchHistory
+import com.sandy.seoul_matcheap.data.store.entity.StoreInfo
 
 /**
  * @author SANDY
@@ -17,11 +24,11 @@ import com.sandy.seoul_matcheap.data.store.entity.*
 
 @Database(
     entities = [StoreInfo::class, SearchHistory::class, Bookmark::class, Polygon::class, Menu::class],
-    version = 2,
+    version = 3,
     autoMigrations = [
-        AutoMigration (
+        AutoMigration(
             from = 1,
-            to = 2,
+            to = 3,
             spec = StoreDatabase.MyAutoMigration::class
         )
     ],
@@ -29,13 +36,13 @@ import com.sandy.seoul_matcheap.data.store.entity.*
 )
 abstract class StoreDatabase : RoomDatabase() {
 
-    abstract fun storeDao() : StoreDao
-    abstract fun mapDao() : MapDao
-    abstract fun searchDao() : SearchDao
-    abstract fun bookmarkDao() : BookmarkDao
+    abstract fun storeDao(): StoreDao
+    abstract fun mapDao(): MapDao
+    abstract fun searchDao(): SearchDao
+    abstract fun bookmarkDao(): BookmarkDao
 
-    @DeleteColumn(tableName ="store_info", columnName ="codeName")
-    @DeleteColumn(tableName ="store_info", columnName ="distance")
+    @DeleteColumn(tableName = "store_info", columnName = "codeName")
+    @DeleteColumn(tableName = "store_info", columnName = "distance")
     class MyAutoMigration : AutoMigrationSpec
 
 }
