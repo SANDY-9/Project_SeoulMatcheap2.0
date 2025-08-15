@@ -11,8 +11,8 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.naver.maps.map.NaverMapSdk
 import com.sandy.seoul_matcheap.util.constants.APP_NAME
-import com.sandy.seoul_matcheap.util.constants.NOTIFICATION_CHANNEL_ID
 import com.sandy.seoul_matcheap.util.constants.NAVER_CLIENT_ID
+import com.sandy.seoul_matcheap.util.constants.NOTIFICATION_CHANNEL_ID
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -27,8 +27,11 @@ import javax.inject.Inject
 @HiltAndroidApp
 class MatcheapApplication : Application(), Configuration.Provider {
 
-    @Inject lateinit var notificationManager: NotificationManager
-    @Inject lateinit var workerFactory: HiltWorkerFactory
+    @Inject
+    lateinit var notificationManager: NotificationManager
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
         super.onCreate()
@@ -44,7 +47,7 @@ class MatcheapApplication : Application(), Configuration.Provider {
     }
 
     private fun initNaverMapSdkClient() {
-        NaverMapSdk.getInstance(this).client = NaverMapSdk.NaverCloudPlatformClient(NAVER_CLIENT_ID)
+        NaverMapSdk.getInstance(this).client = NaverMapSdk.NcpKeyClient(NAVER_CLIENT_ID)
     }
 
     private fun createNotificationChannel() {
@@ -59,7 +62,8 @@ class MatcheapApplication : Application(), Configuration.Provider {
                 importance = IMPORTANCE_DEFAULT
             }
             notificationManager.createNotificationChannel(notificationChannel) // channel 생성
-        } catch (e: Exception) { /* NO_OP */ }
+        } catch (e: Exception) { /* NO_OP */
+        }
     }
 
     override fun getWorkManagerConfiguration(): Configuration {
@@ -69,7 +73,8 @@ class MatcheapApplication : Application(), Configuration.Provider {
     }
 
     companion object {
-        fun showToastMessage(context: Context, message : String) = Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        fun showToastMessage(context: Context, message: String) =
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
 }

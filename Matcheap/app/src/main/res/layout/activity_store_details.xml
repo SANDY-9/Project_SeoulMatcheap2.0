@@ -13,7 +13,7 @@
             name="activity"
             type="com.sandy.seoul_matcheap.ui.store.StoreDetailsActivity" />
 
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
 
     </data>
 
@@ -290,7 +290,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
                         android:layout_marginTop="8dp"
-                        android:text="* 메뉴 항목과 가격은 가게의 사정에 따라 다를 수 있습니다."
+                        android:text="* 메뉴 항목과 가격은 서울시 데이터를 사용합니다."
                         android:textAlignment="viewEnd"
                         android:textColor="@color/matcheap_lightgray"
                         android:textSize="12sp" />
