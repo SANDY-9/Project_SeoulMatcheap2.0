@@ -7,6 +7,7 @@ plugins {
     id 'com.google.gms.google-services'
     id 'com.google.devtools.ksp'
     id 'androidx.room'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -112,6 +113,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-dynamic-links-ktx'
     implementation 'com.google.firebase:firebase-config-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ndk'
 
     //jsoup
     implementation 'org.jsoup:jsoup:1.16.1'
